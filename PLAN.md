@@ -68,7 +68,7 @@
 | §2+ VHDX 压缩（用户追加，官方未提供） | 见 §2.1 | 需要管理员权限与 `wsl --shutdown`；作为显式长任务 |
 | §2 导出 / 导入 / 备份恢复 | `--export --format tar|tar.gz|vhd`、`--import` | 一致性：默认先 `--terminate`（用户确认），见 §6 |
 | §2 状态、磁盘占用、资源 | 状态来自 CLI；VHDX 大小来自 BasePath 文件；内存 / CPU 通过 `wsl -d X -- cat /proc/...` 或 vmmem 进程 | 「可获取的」信息为准，界面注明来源 |
-| §2 `.wslconfig` / `wsl.conf` | 原始 INI 文档编辑 + 键模式库（类型、默认值、说明）；`wsl.conf` 以 `wsl -d X -u root -- sh -c` 读写，写前备份到 `/etc/wsl.conf.wslpilot-<ts>` | 修改后提示需要 `--shutdown` / `--terminate` 生效 |
+| §2 `.wslconfig` / `wsl.conf` | **可视化表单为主**：常用键（systemd、默认用户、Windows 互操作与 PATH、自动挂载与 metadata、主机名、DNS、时区；`.wslconfig` 的内存、处理器、交换区、网络模式、空闲超时、sparse 等）以通俗标签、默认值与说明呈现，保存前展示差异；**直接编辑原文件归入「高级」**。底层为原始 INI 文档 + 键模式库，只改变更行，保留注释与表单未覆盖的键（并在 UI 提示其存在）。`wsl.conf` 以 `wsl -d X -u root -- sh -c` 读写，写前备份到 `/etc/wsl.conf.wslpilot-<ts>`；WSLc `settings.yaml` 同一模式 | 修改后提示需要 `--shutdown` / `--terminate` 生效；键清单与默认值须对照微软官方文档核对后才写入键模式库 |
 | §2 终端 / Windows Terminal | MyGo Terminal 插件；WT Fragment | WT 未安装时隐藏入口 |
 | §2 更新 | `wsl --update`（含 `--pre-release` 选项）；发行版内更新以终端运行包管理器，不自动执行 | 发行版更新不做静默批处理 |
 | §3 容器 / 镜像 / 网络 / 端口 / Volume / 日志 / exec / stats / inspect | 一一映射 `wslc` 子命令 | 「编辑容器配置」= 依据 inspect 生成新配置并重建容器（容器配置本身不可变），需确认 |
@@ -203,6 +203,17 @@ type Backend interface {
 - 计划（每小时 / 每天 / 每周 / cron 表达式）、保留策略（最近 N 个、按日/周/月分层）、失败重试（指数退避、上限）、通知、日志与历史、空间统计。
 - 应用未运行：用户级计划任务按最近一次到期时间唤醒 `wslpilot-agent run-due`；GUI 运行时由 GUI 进程内调度，二者通过仓库 `locks/` 与 agent 锁文件互斥。
 
+### 6.4 以恢复为中心：打开任意来源的备份（用户追加需求）
+
+备份页以「能恢复什么」为主视图，而不是以计划为主；计划只负责产生备份，不拥有备份。
+
+- **统一目录**：按备份对象（发行版、Volume、Compose 项目）汇总所有位置、所有类型（Folder / Archive / 增量仓库）的版本，并注明每个版本由哪个计划或哪次手动操作产生。
+- **打开备份**：可以选择或拖入任意文件夹、归档（`.tar`、`.tar.gz`、`.tar.zst`，有无 `.wpmeta.json` 均可）、`wsl --export` 生成的 `.tar` / `.vhdx`、`wpbk` 增量仓库，包括来自其它电脑或 NAS 的备份。打开后先做完整性校验，再列出其中的内容。
+- **只读**：外部打开的位置默认只读，不加锁、不执行 forget / prune，避免破坏别人或别的电脑的仓库。用户可以显式把它「接管」为本机位置。
+- **非 WSLPilot 产生的 tar**：识别为「普通归档」，可以恢复为新发行版（`wsl --import`）或新 Volume（§5 的 helper 流程）。缺少元数据时，界面需要说明哪些信息无法确认。
+- **恢复目标**：默认恢复为新的发行版 / Volume / 项目；覆盖现有对象需要确认，并且先备份现有对象；支持只恢复部分文件到文件夹或运行中的发行版。
+- **格式兼容**：恢复路径必须能读取所有已发布的旧格式版本（wpbk v1 起），这一点写入 `backup-format.md` 的验收测试。
+
 ## 7. 界面
 
 Sidebar：Dashboard / WSL / WSLc / Compose / Volumes / Backups / Terminal / Settings（M0 已建空壳）。
@@ -210,6 +221,8 @@ Sidebar：Dashboard / WSL / WSLc / Compose / Volumes / Backups / Terminal / Sett
 - 视图是状态的函数；后台结果经 `Window.Update` 发布；所有 I/O 不在 UI 线程。
 - 全局任务面板：进度、取消、错误详情、日志；完成通知。
 - 危险操作（删除、覆盖、迁移、unregister、prune）统一确认对话框：说明影响、提供「先备份」默认勾选、需要输入名称确认的场景（unregister、删除带数据的 Volume）。
+- 配置类页面统一模式：常用设置表单化，原文件编辑为「高级」；待保存变更以差异预览呈现；注明是否需要重启。
+- 界面原型（设计稿）：https://claude.ai/artifact/H1EtLxkwG9h3yURRJNxprT（Dashboard、WSL、容器、Compose、Volume、备份、发行版设置）。
 - 深色 / 浅色 / 跟随系统（`mygo.Theme.SetSource`）；布局数值、颜色为命名 token。
 - 界面字符串走 ARB（en、zh-Hans 首批；zh-Hant、ja 视需要）。
 
