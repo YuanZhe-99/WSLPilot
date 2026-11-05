@@ -222,7 +222,7 @@ Sidebar：Dashboard / WSL / WSLc / Compose / Volumes / Backups / Terminal / Sett
 - 全局任务面板：进度、取消、错误详情、日志；完成通知。
 - 危险操作（删除、覆盖、迁移、unregister、prune）统一确认对话框：说明影响、提供「先备份」默认勾选、需要输入名称确认的场景（unregister、删除带数据的 Volume）。
 - 配置类页面统一模式：常用设置表单化，原文件编辑为「高级」；待保存变更以差异预览呈现；注明是否需要重启。
-- 界面原型（设计稿）：https://claude.ai/artifact/H1EtLxkwG9h3yURRJNxprT（Dashboard、WSL、容器、Compose、Volume、备份、发行版设置）。
+- 界面原型（设计稿）：https://claude.ai/artifact/H1EtLxkwG9h3yURRJNxprT；仓库内的导出副本在 `design/`（打开 `design/index.html`）。画布为可编辑源，修改后重新导出。
 - 深色 / 浅色 / 跟随系统（`mygo.Theme.SetSource`）；布局数值、颜色为命名 token。
 - 界面字符串走 ARB（en、zh-Hans 首批；zh-Hant、ja 视需要）。
 

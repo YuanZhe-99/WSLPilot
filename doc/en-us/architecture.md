@@ -41,6 +41,7 @@ gui  →  domain packages (compose, volume, backup, …)  →  adapters (wsl, ws
 | `cmd/wslpilot` | GUI entry point |
 | `internal/` | All application packages (see `functions/INDEX.md`) |
 | `locales/` | ARB catalogs and the generated `catalog_gen.go` |
+| `design/` | Static HTML mockups of the screens, exported from the design canvas (see `design/README.md`) |
 | `resources/` | App icon (`icon.svg` is the source, `icon.png` is rendered from it) and packaged resources |
 | `tools/checkdocs` | Documentation mirror check |
 | `tools/icon` | Renders `resources/icon.svg` to the 1024×1024 `resources/icon.png` |

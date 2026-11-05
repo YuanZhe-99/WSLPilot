@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Backups: restore</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#0B5CD5}a:hover{color:#08449E}
+</style>
+</head>
+<body>
+<div style="font-family: 'Segoe UI Variable', 'Segoe UI', Inter, system-ui, sans-serif; color: #1B1B1F; background: #F6F7F9; min-height: 940px; display: flex; flex-wrap: wrap">
+<nav aria-label="Main" style="flex: 1 1 220px; max-width: 248px; background: #EEF1F6; border-right: 1px solid #E1E5EC; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<div style="display: flex; align-items: center; gap: 10px; padding: 4px 8px 16px">
+<img src="../resources/icon.png" alt="" style="width: 28px; height: 28px">
+<span style="font-size: 16px; font-weight: 600">WSLPilot</span>
+</div>
+<a href="index.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #1B1B1F; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+<a href="WSL.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #1B1B1F; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M12 15h5"/></svg>WSL</a>
+<a href="Containers.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #1B1B1F; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>Containers</a>
+<a href="Compose.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #1B1B1F; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>Compose</a>
+<a href="Volumes.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #1B1B1F; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>Volumes</a>
+<a href="Backups.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; background: #DCE6F7; color: #0B4FB8; font-size: 14px; font-weight: 600"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>Backups</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #1B1B1F; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7l5 5-5 5M12 17h7"/></svg>Terminal</a>
+<div style="flex-grow: 1; min-height: 24px"></div>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #1B1B1F; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h6"/></svg>Tasks<span style="margin-left: auto; background: #0B5CD5; color: #FFFFFF; font-size: 12px; font-weight: 600; border-radius: 10px; padding: 1px 8px">1</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #1B1B1F; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</a>
+</nav>
+<main style="flex: 999 1 560px; min-width: 0; padding: 28px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<h1 style="margin: 0; font-size: 26px; font-weight: 600; flex-grow: 1">Backups</h1>
+<div role="group" aria-label="Backups view" style="display: flex; background: #E9ECF1; border-radius: 8px; padding: 3px">
+<button type="button" aria-pressed="true" style="min-height: 32px; padding: 0 14px; border: 0; border-radius: 6px; background: #FFFFFF; color: #1B1B1F; font: inherit; font-size: 13px; font-weight: 600">Restore</button>
+<a href="BackupPlans.html" style="display: flex; align-items: center; min-height: 32px; padding: 0 14px; border-radius: 6px; color: #3D4555; font-size: 13px; text-decoration: none">Plans</a>
+</div>
+<button type="button" style="min-height: 36px; padding: 0 14px; border-radius: 6px; border: 1px solid #D5DAE2; background: #FFFFFF; color: #1B1B1F; font: inherit; font-size: 14px">Back up now…</button>
+<button type="button" style="min-height: 36px; padding: 0 16px; border-radius: 6px; border: 1px solid #0B5CD5; background: #0B5CD5; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Open a backup…</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+<div style="flex: 2 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<section aria-label="Open a backup" style="border: 1.5px dashed #B9C6DD; border-radius: 10px; padding: 16px; background: #FAFBFD; display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 0; font-size: 14px; font-weight: 600">Restore from a backup made anywhere</h2>
+<p style="margin: 0; font-size: 13px; color: #3D4555">Drop or choose a folder backup, an archive (.tar, .tar.gz, .tar.zst, or a wsl --export file) or an incremental repository. It is checked first and opened read-only.</p>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" style="min-height: 34px; padding: 0 12px; border-radius: 6px; border: 1px solid #D5DAE2; background: #FFFFFF; color: #1B1B1F; font: inherit; font-size: 13px">Choose file…</button><button type="button" style="min-height: 34px; padding: 0 12px; border-radius: 6px; border: 1px solid #D5DAE2; background: #FFFFFF; color: #1B1B1F; font: inherit; font-size: 13px">Choose folder…</button></div>
+</section>
+<section aria-label="What can be restored" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 8px; display: flex; flex-direction: column; gap: 2px">
+<h2 style="margin: 8px 10px 6px; font-size: 13px; font-weight: 600; color: #596070">What can be restored</h2>
+<button type="button" aria-pressed="true" style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-height: 52px; padding: 8px 10px; border: 0; border-radius: 8px; background: #EEF3FC; color: #1B1B1F; font: inherit"><span style="font-size: 14px; font-weight: 600">Debian</span><span style="font-size: 12px; color: #596070">Distribution · 18 versions in 3 places · latest today</span></button>
+<button type="button" aria-pressed="false" style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-height: 52px; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; color: #1B1B1F; font: inherit"><span style="font-size: 14px; font-weight: 600">pgdata</span><span style="font-size: 12px; color: #596070">Volume · 48 versions · latest 20:00</span></button>
+<button type="button" aria-pressed="false" style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-height: 52px; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; color: #1B1B1F; font: inherit"><span style="font-size: 14px; font-weight: 600">blog</span><span style="font-size: 12px; color: #596070">Compose project · 5 versions</span></button>
+<button type="button" aria-pressed="false" style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-height: 52px; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; color: #1B1B1F; font: inherit"><span style="font-size: 14px; font-weight: 600; display: flex; gap: 6px; align-items: center">Ubuntu-22.04 <span style="font-size: 11px; font-weight: 600; color: #3D4555; background: #EDEFF3; border-radius: 8px; padding: 1px 7px">From another PC</span></span><span style="font-size: 12px; color: #596070">Distribution · 25 versions · E:\old-pc\wsl-repo</span></button>
+<button type="button" aria-pressed="false" style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; min-height: 52px; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; color: #1B1B1F; font: inherit"><span style="font-size: 14px; font-weight: 600; display: flex; gap: 6px; align-items: center">site-2026-10.tar.zst <span style="font-size: 11px; font-weight: 600; color: #3D4555; background: #EDEFF3; border-radius: 8px; padding: 1px 7px">Plain archive</span></span><span style="font-size: 12px; color: #596070">Not made by WSLPilot · restore as a distribution or a volume</span></button>
+</section>
+<section aria-label="Backup locations" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; font-size: 13px">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 style="margin: 0; font-size: 13px; font-weight: 600; color: #596070">Locations</h2><button type="button" style="border: 0; background: transparent; color: #0B5CD5; font: inherit; font-size: 13px; font-weight: 600; padding: 0; min-height: 28px">Add…</button></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span>E:\Backups\wsl-repo</span><span style="color: #596070">Incremental · this PC</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span>D:\exports</span><span style="color: #596070">Archives</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span>\\nas\wsl</span><span style="color: #596070">Folder backups</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span>E:\old-pc\wsl-repo</span><span style="color: #596070">Incremental · read-only</span></div>
+</section>
+</div>
+<div style="flex: 3 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<section aria-label="Debian versions" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; overflow-x: auto">
+<div style="padding: 14px 16px 6px"><h2 style="margin: 0; font-size: 15px; font-weight: 600">Debian · versions</h2></div>
+<table style="width: 100%; border-collapse: collapse; font-size: 13px; min-width: 520px">
+<thead><tr style="text-align: left; color: #596070; font-size: 12px"><th style="padding: 8px 16px; font-weight: 600">When</th><th style="padding: 8px; font-weight: 600">Kind</th><th style="padding: 8px; font-weight: 600">Where</th><th style="padding: 8px; font-weight: 600">Size</th><th style="padding: 8px 16px 8px 8px; font-weight: 600">Made by</th></tr></thead>
+<tbody>
+<tr style="background: #EEF3FC; border-top: 1px solid #EDEFF3"><td style="padding: 10px 16px; font-weight: 600">Today, 02:00</td><td style="padding: 10px 8px">Incremental</td><td style="padding: 10px 8px">wsl-repo</td><td style="padding: 10px 8px">15.6 GB</td><td style="padding: 10px 16px 10px 8px">Plan: Debian nightly</td></tr>
+<tr style="border-top: 1px solid #EDEFF3"><td style="padding: 10px 16px">Yesterday, 02:00</td><td style="padding: 10px 8px">Incremental</td><td style="padding: 10px 8px">wsl-repo</td><td style="padding: 10px 8px">15.5 GB</td><td style="padding: 10px 16px 10px 8px">Plan: Debian nightly</td></tr>
+<tr style="border-top: 1px solid #EDEFF3"><td style="padding: 10px 16px">Oct 28, 14:12</td><td style="padding: 10px 8px">Archive (.tar.zst)</td><td style="padding: 10px 8px">D:\exports</td><td style="padding: 10px 8px">6.1 GB</td><td style="padding: 10px 16px 10px 8px">Before compacting the disk</td></tr>
+<tr style="border-top: 1px solid #EDEFF3"><td style="padding: 10px 16px">Oct 2, 09:40</td><td style="padding: 10px 8px">Folder</td><td style="padding: 10px 8px">\\nas\wsl</td><td style="padding: 10px 8px">15.0 GB</td><td style="padding: 10px 16px 10px 8px">Manual backup</td></tr>
+</tbody>
+</table>
+<div style="padding: 8px 16px 14px; font-size: 12px; color: #596070">14 older incremental versions · <a href="#" style="text-decoration: none; font-weight: 600">Show all</a></div>
+</section>
+<section aria-label="Restore" style="background: #FFFFFF; border: 1px solid #E3E6EB; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Restore Debian from today, 02:00</h2>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px">
+<li style="display: flex; gap: 10px; font-size: 13px"><span style="flex-shrink: 0; width: 22px; height: 22px; border-radius: 11px; background: #E5F4EA; color: #1F7A3D; font-weight: 600; display: flex; align-items: center; justify-content: center; font-size: 12px">1</span><span><span style="font-weight: 600">Checked.</span> All 3,214 data blocks are present and intact. <a href="#" style="text-decoration: none; font-weight: 600">Browse files</a></span></li>
+<li style="display: flex; gap: 10px; font-size: 13px"><span style="flex-shrink: 0; width: 22px; height: 22px; border-radius: 11px; background: #DCE6F7; color: #0B4FB8; font-weight: 600; display: flex; align-items: center; justify-content: center; font-size: 12px">2</span>
+<fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; flex-grow: 1">
+<legend style="font-weight: 600; padding: 0; margin-bottom: 6px">Restore as</legend>
+<label style="display: flex; align-items: center; gap: 8px; font-size: 14px; flex-wrap: wrap"><input type="radio" name="restore" checked style="width: 18px; height: 18px; accent-color: #0B5CD5">A new distribution <input type="text" value="Debian-restored" aria-label="New distribution name" style="min-height: 32px; padding: 0 8px; border: 1px solid #D5DAE2; border-radius: 6px; font: inherit; font-size: 13px; width: 150px"> in <input type="text" value="D:\WSL\Debian-restored" aria-label="Location" style="min-height: 32px; padding: 0 8px; border: 1px solid #D5DAE2; border-radius: 6px; font: inherit; font-size: 13px; width: 180px"></label>
+<label style="display: flex; align-items: center; gap: 8px; font-size: 14px"><input type="radio" name="restore" style="width: 18px; height: 18px; accent-color: #0B5CD5">Replace the current Debian (it is backed up first)</label>
+<label style="display: flex; align-items: center; gap: 8px; font-size: 14px"><input type="radio" name="restore" style="width: 18px; height: 18px; accent-color: #0B5CD5">Only some files, into a folder or a running distribution</label>
+</fieldset></li>
+</ol>
+<div style="display: flex; gap: 8px; justify-content: flex-end">
+<button type="button" style="min-height: 36px; padding: 0 16px; border-radius: 6px; border: 1px solid #0B5CD5; background: #0B5CD5; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600">Restore</button>
+</div>
+</section>
+</div>
+</div>
+</main>
+</div>
+</body>
+</html>

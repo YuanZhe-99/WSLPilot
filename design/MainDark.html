@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WSLPilot dashboard, dark theme</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#8AB4FF}a:hover{color:#B5CEFF}
+</style>
+</head>
+<body>
+<div style="font-family: 'Segoe UI Variable', 'Segoe UI', Inter, system-ui, sans-serif; color: #E8EAEE; background: #141519; min-height: 800px; display: flex; flex-wrap: wrap">
+<nav aria-label="Main" style="flex: 1 1 220px; max-width: 248px; background: #1B1D23; border-right: 1px solid #2A2D35; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<div style="display: flex; align-items: center; gap: 10px; padding: 4px 8px 16px">
+<img src="../resources/icon.png" alt="" style="width: 28px; height: 28px">
+<span style="font-size: 16px; font-weight: 600">WSLPilot</span>
+</div>
+<a href="MainDark.html" aria-current="page" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; background: #22355A; color: #B5CEFF; font-size: 14px; font-weight: 600"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</a>
+<a href="WSL.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #E8EAEE; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M12 15h5"/></svg>WSL</a>
+<a href="Containers.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #E8EAEE; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>Containers</a>
+<a href="Compose.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #E8EAEE; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></svg>Compose</a>
+<a href="Volumes.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #E8EAEE; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>Volumes</a>
+<a href="Backups.html" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #E8EAEE; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>Backups</a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #E8EAEE; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7l5 5-5 5M12 17h7"/></svg>Terminal</a>
+<div style="flex-grow: 1; min-height: 24px"></div>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #E8EAEE; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h10M4 18h6"/></svg>Tasks<span style="margin-left: auto; background: #2D6BDB; color: #FFFFFF; font-size: 12px; font-weight: 600; border-radius: 10px; padding: 1px 8px">1</span></a>
+<a href="#" style="display: flex; align-items: center; gap: 12px; min-height: 40px; padding: 0 12px; border-radius: 6px; text-decoration: none; color: #E8EAEE; font-size: 14px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>Settings</a>
+</nav>
+<main style="flex: 999 1 560px; min-width: 0; padding: 28px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px">
+<div style="flex-grow: 1">
+<h1 style="margin: 0; font-size: 26px; font-weight: 600">Dashboard</h1>
+<p style="margin: 4px 0 0; font-size: 14px; color: #A3AAB7">Checked just now · everything read from wsl.exe and wslc.exe</p>
+</div>
+<button type="button" style="min-height: 36px; padding: 0 16px; border-radius: 6px; border: 1px solid #3A3E48; background: #262932; color: #E8EAEE; font: inherit; font-size: 14px">Check again</button>
+<button type="button" style="min-height: 36px; padding: 0 16px; border-radius: 6px; border: 1px solid #2D6BDB; background: #2D6BDB; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Check for updates</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<section style="background: #1E2027; border: 1px solid #2C2F38; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; justify-content: space-between"><h2 style="margin: 0; font-size: 15px; font-weight: 600">WSL</h2><span style="font-size: 12px; font-weight: 600; color: #86E0A6; background: #183A27; border-radius: 10px; padding: 2px 10px">Ready</span></div>
+<p style="margin: 0; font-size: 24px; font-weight: 600">3 distributions</p>
+<p style="margin: 0; font-size: 13px; color: #A3AAB7">1 running · default Debian · WSL 3.0.3.0, kernel 6.18.54.1</p>
+<a href="WSL.html" style="font-size: 13px; font-weight: 600; text-decoration: none; margin-top: 4px">Manage distributions</a>
+</section>
+<section style="background: #1E2027; border: 1px solid #2C2F38; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; justify-content: space-between"><h2 style="margin: 0; font-size: 15px; font-weight: 600">WSL Containers</h2><span style="font-size: 12px; font-weight: 600; color: #86E0A6; background: #183A27; border-radius: 10px; padding: 2px 10px">Ready</span></div>
+<p style="margin: 0; font-size: 24px; font-weight: 600">5 containers</p>
+<p style="margin: 0; font-size: 13px; color: #A3AAB7">3 running · 7 images · 4 volumes · WSLc 3.0.3.0</p>
+<a href="Containers.html" style="font-size: 13px; font-weight: 600; text-decoration: none; margin-top: 4px">Manage containers</a>
+</section>
+<section style="background: #1E2027; border: 1px solid #2C2F38; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; justify-content: space-between"><h2 style="margin: 0; font-size: 15px; font-weight: 600">Compose</h2><span style="font-size: 12px; font-weight: 600; color: #C9CED8; background: #2C3040; border-radius: 10px; padding: 2px 10px">Built-in</span></div>
+<p style="margin: 0; font-size: 24px; font-weight: 600">2 projects</p>
+<p style="margin: 0; font-size: 13px; color: #A3AAB7">Native WSLc Compose not available yet. Projects keep their backend until you migrate them.</p>
+<a href="Compose.html" style="font-size: 13px; font-weight: 600; text-decoration: none; margin-top: 4px">Open projects</a>
+</section>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 16px">
+<section style="flex: 3 1 420px; background: #1E2027; border: 1px solid #2C2F38; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Disk usage</h2>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span>Debian · ext4.vhdx</span><span style="color: #A3AAB7">24.1 GB on disk · 15.6 GB used inside</span></div>
+<div style="height: 8px; background: #2C3040; border-radius: 4px; display: flex; overflow: hidden"><div style="width: 52%; background: #4C8DFF"></div><div style="width: 28%; background: #F2C14E"></div></div>
+<div style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #A3AAB7"><span>About 8.5 GB could be reclaimed</span><a href="WSL.html" style="font-weight: 600; text-decoration: none">Compact disk</a></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span>Ubuntu-24.04 · ext4.vhdx</span><span style="color: #A3AAB7">9.8 GB on disk · 9.1 GB used inside</span></div>
+<div style="height: 8px; background: #2C3040; border-radius: 4px; display: flex; overflow: hidden"><div style="width: 30%; background: #4C8DFF"></div><div style="width: 2%; background: #F2C14E"></div></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span>WSL Containers data</span><span style="color: #A3AAB7">13.2 GB</span></div>
+<div style="height: 8px; background: #2C3040; border-radius: 4px; display: flex; overflow: hidden"><div style="width: 41%; background: #4C8DFF"></div></div>
+</div>
+<div style="display: flex; gap: 16px; font-size: 12px; color: #A3AAB7"><span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #4C8DFF"></span>Used</span><span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; background: #F2C14E"></span>Reclaimable</span></div>
+</section>
+<section style="flex: 2 1 300px; background: #1E2027; border: 1px solid #2C2F38; border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">Activity</h2>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 12px; border-radius: 8px; background: #1F2A3F">
+<div style="display: flex; justify-content: space-between; font-size: 14px"><span style="font-weight: 600">Exporting Ubuntu-24.04</span><span style="color: #A3AAB7">62%</span></div>
+<div style="height: 6px; background: #2C3A55; border-radius: 3px; overflow: hidden"><div style="width: 62%; height: 6px; background: #4C8DFF"></div></div>
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: #A3AAB7"><span>Archive backup · about 3 min left</span><button type="button" style="border: 0; background: transparent; color: #8AB4FF; font: inherit; font-size: 12px; font-weight: 600; padding: 0">Cancel</button></div>
+</div>
+<div style="display: flex; gap: 10px; font-size: 13px"><span style="color: #6FD596; font-weight: 600; min-width: 64px">Done</span><span>Daily backup of volume pgdata · 02:00</span></div>
+<div style="display: flex; gap: 10px; font-size: 13px"><span style="color: #6FD596; font-weight: 600; min-width: 64px">Done</span><span>Compose project blog started 3 services</span></div>
+<div style="display: flex; gap: 10px; font-size: 13px"><span style="color: #FF8A80; font-weight: 600; min-width: 64px">Failed</span><span>Pull ghcr.io/acme/api:2.1 · registry login needed</span></div>
+<div style="font-size: 13px; color: #A3AAB7; border-top: 1px solid #2C2F38; padding-top: 10px">Next scheduled backup: Debian (full) tonight at 02:00</div>
+</section>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px">
+<button type="button" style="min-height: 40px; padding: 0 16px; border-radius: 6px; border: 1px solid #3A3E48; background: #262932; color: #E8EAEE; font: inherit; font-size: 14px">Open Debian terminal</button>
+<button type="button" style="min-height: 40px; padding: 0 16px; border-radius: 6px; border: 1px solid #3A3E48; background: #262932; color: #E8EAEE; font: inherit; font-size: 14px">Install a distribution</button>
+<button type="button" style="min-height: 40px; padding: 0 16px; border-radius: 6px; border: 1px solid #3A3E48; background: #262932; color: #E8EAEE; font: inherit; font-size: 14px">Run a container</button>
+<button type="button" style="min-height: 40px; padding: 0 16px; border-radius: 6px; border: 1px solid #3A3E48; background: #262932; color: #E8EAEE; font: inherit; font-size: 14px">Import TAR into a volume</button>
+</div>
+</main>
+</div>
+</body>
+</html>
