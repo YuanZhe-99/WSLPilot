@@ -2,8 +2,10 @@
 
 This is the authoritative specification of the `wpbk` repository format, version 1. It is written
 so that a reader who has only this document, a zstd decoder and a BLAKE3 implementation can
-restore every snapshot. `internal/backup/wpbk` is one implementation; its `spec_test.go` contains
-an independent reader written from this document and must keep passing.
+restore every snapshot; an encrypted repository additionally needs the password and Argon2id,
+HKDF-SHA256 and AES-256-GCM. `internal/backup/wpbk` is one implementation; its `spec_test.go`
+contains an independent reader written from this document, for unencrypted and encrypted
+repositories, and must keep passing.
 
 Status: implemented in `internal/backup/wpbk`, not yet released. The format becomes frozen with the
 first release that writes it.
@@ -17,15 +19,21 @@ Linux metadata (owner, mode, times, links, xattrs, device numbers) travels as ta
   **chunks** that make up its content. The tar stream itself is never stored byte for byte; it is
   regenerated on restore. Single entries can therefore be listed and restored.
 - Content is split by a content-defined **chunker**. A chunk's id is the BLAKE3-256 hash of its
-  plaintext; a chunk already in the repository is never stored again, across all snapshots.
+  plaintext (keyed in an encrypted repository); a chunk already in the repository is never stored
+  again, across all snapshots.
 - Chunks are compressed with zstd and stored as **blobs** inside **pack** files of about 32 MiB.
   Each pack ends with its own table of contents, so the **index** can be rebuilt from packs alone.
+- A repository may be **encrypted**, chosen when it is created. Blobs, pack trailers, index files
+  and snapshot files are then sealed with keys derived from a **master key** that the **password**
+  unlocks (see [Encryption](#encryption)).
 
 ## Conventions
 
 - **Id**: 32 bytes written as 64 lowercase hexadecimal characters. Chunk, pack and index ids are
   the BLAKE3-256 (unkeyed, 32-byte output) of the chunk plaintext, the whole pack file and the whole
-  index file respectively. Snapshot, repository and lock ids are random.
+  index file as stored, respectively; in an encrypted repository chunk ids are keyed instead (see
+  [Encryption](#encryption)). Snapshot, repository and lock ids are random.
+- **Base64** is standard base64 with padding (RFC 4648, section 4).
 - **JSON**: UTF-8, RFC 8259. Readers must ignore fields they do not know.
 - **Time**: an RFC 3339 string with optional fractional seconds (nanosecond precision), for example
   `"2026-03-04T05:06:07.123456789Z"`. Writers use UTC.
@@ -74,7 +82,7 @@ All five entries must exist; `locks/` may be absent only for read-only access.
 | `chunker` | Chunking parameters writers must use (see [Chunking](#chunking)). |
 | `compression` | `"zstd"`, the only v1 value. |
 | `hash` | `"blake3-256"`, the only v1 value. |
-| `encryption` | `null` in v1. Any other value means the repository cannot be read by a v1 reader. |
+| `encryption` | `null` for an unencrypted repository; an object for an encrypted one (see [Encryption](#encryption)). A reader that does not implement encryption must refuse any value other than `null`. |
 | `packSize` | Target pack size in bytes for writers. Readers do not need it. |
 
 ## Chunking
@@ -117,8 +125,8 @@ A pack is a sequence of blobs between a header and a trailer:
 | Offset | Size | Content |
 |---|---|---|
 | 0 | 8 | ASCII `WPBKPAK1` |
-| 8 | variable | blobs, back to back; each blob is one complete zstd frame of one chunk |
-| `S - 16 - T` | `T` | trailer: JSON document (UTF-8) |
+| 8 | variable | blobs, back to back; each blob is one complete zstd frame of one chunk, sealed in an encrypted repository |
+| `S - 16 - T` | `T` | trailer: JSON document (UTF-8), sealed in an encrypted repository |
 | `S - 16` | 8 | `T`, the trailer length, `uint64` little-endian |
 | `S - 8` | 8 | ASCII `WPBKEND1` |
 
@@ -128,14 +136,16 @@ A pack is a sequence of blobs between a header and a trailer:
 {"version": 1, "blobs": [{"id": "<chunk id>", "offset": 8, "length": 51234, "rawLength": 1048576}]}
 ```
 
-`offset` and `length` locate the compressed blob within the file, `rawLength` is the plaintext
+`offset` and `length` locate the stored blob within the file, `rawLength` is the plaintext
 length. The pack id is the BLAKE3-256 of the whole file. A pack contains only blobs; each chunk is
-decoded independently with a standard zstd decoder, and the result must hash to its id.
+decoded independently (after unsealing, in an encrypted repository) with a standard zstd decoder,
+and the result must hash to its id.
 
 ## Index files
 
 An index file maps chunks to packs. A repository may have any number of index files; their union
-is the index. The file name is the BLAKE3-256 of the file content.
+is the index. The file name is the BLAKE3-256 of the file content as stored (sealed, in an
+encrypted repository).
 
 ```json
 {"version": 1, "packs": [{"id": "<pack id>", "size": 33561020, "blobs": [{"id": "<chunk id>", "offset": 8, "length": 51234, "rawLength": 1048576}]}]}
@@ -149,7 +159,8 @@ any copy that verifies may be used.
 
 ### Snapshot file
 
-`snapshots/<id>.json`, where `<id>` is the random snapshot id and equals the `id` field:
+`snapshots/<id>.json`, where `<id>` is the random snapshot id and equals the `id` field. In an
+encrypted repository the file holds the sealed document instead:
 
 ```json
 {
@@ -200,6 +211,71 @@ and `GNU.sparse.*` never appear in `pax`; the fields above are authoritative. GN
 stored expanded, as type `"0"`: holes become zero bytes. Hard links are stored as type `"1"`
 entries and stay hard links on restore.
 
+## Encryption
+
+Encryption is chosen when a repository is created and cannot be turned on or off later; only the
+password can change. A non-null `encryption` object in `config.json` marks an encrypted
+repository:
+
+```json
+"encryption": {
+  "algorithm": "aes-256-gcm",
+  "kdf": {"name": "argon2id", "salt": "<base64 of 16 random bytes>", "time": 3, "memory": 65536, "threads": 4},
+  "key": "<base64 of 60 bytes: nonce || AES-256-GCM(KEK, master key)>"
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `algorithm` | `"aes-256-gcm"`, the only v1 value. |
+| `kdf.name` | `"argon2id"`, the only v1 value. |
+| `kdf.salt` | Base64 salt; writers use 16 random bytes. |
+| `kdf.time`, `kdf.memory`, `kdf.threads` | Argon2id passes, memory in KiB and parallelism. Writers use 3, 65536 (64 MiB) and 4. |
+| `key` | Base64 of the wrapped master key: a 12-byte nonce, then the 32-byte ciphertext and the 16-byte tag of AES-256-GCM under the KEK, without additional data. |
+
+### Keys
+
+```text
+KEK        = Argon2id(password as UTF-8, kdf.salt, kdf.time, kdf.memory, kdf.threads, 32)  // RFC 9106, version 0x13
+master key = AES-256-GCM-Open(KEK, nonce = key[0:12], ciphertext||tag = key[12:60], aad = empty)
+data key   = HKDF-SHA256(master key, salt = empty, info = "wpbk v1 data key", 32)       // RFC 5869
+id key     = HKDF-SHA256(master key, salt = empty, info = "wpbk v1 chunk id key", 32)
+```
+
+The master key is 32 random bytes chosen when the repository is created; it never changes. A tag
+failure while opening `key` means the password is wrong, which a reader therefore learns from
+`config.json` alone. Changing the password writes a new salt and a new `key` wrapping the same
+master key; nothing else in the repository changes.
+
+### Sealed data
+
+`seal(aad, data)` is a 12-byte random nonce followed by AES-256-GCM(data key, nonce, data, aad):
+the ciphertext and then the 16-byte tag, 28 bytes longer than `data` in total. Unsealing reverses
+it; a tag failure means the bytes are damaged or were tampered with.
+
+| Object | Unencrypted | Encrypted |
+|---|---|---|
+| Chunk id | BLAKE3-256 of the plaintext | BLAKE3 keyed hash of the plaintext, key = id key, 32-byte output |
+| Blob | zstd frame | `seal(chunk id as 32 raw bytes, zstd frame)` |
+| Pack trailer (`T` bytes) | JSON | `seal("wpbk trailer", JSON)` |
+| Index file | JSON | `seal("wpbk index", JSON)` |
+| Snapshot file | JSON | `seal("wpbk snapshot", JSON)` |
+
+The additional data strings are ASCII without a terminator. Everything else stays as described
+above: layout, file names, pack header and footer, and the JSON documents inside the sealed data.
+A blob's `length` is its sealed length; `rawLength` stays the plaintext length. Pack and index ids
+remain the unkeyed BLAKE3-256 of the stored bytes, so file integrity can be checked without the
+password. The entry list is stored as chunks and is therefore sealed like any blob. Snapshot files
+keep the `.json` name but hold binary data. `config.json` and lock files are not encrypted; they
+contain no backed-up data (a lock names a host, a process id and times).
+
+### Threat model
+
+- Protects backed-up content and metadata (names, sizes, owners, xattrs, sources, tags, times) at rest against anyone who obtains the repository files, and detects modification of stored data.
+- Keyed chunk ids prevent confirming by hash that a known file is in the repository; deduplication still works inside the repository.
+- Does not hide the repository size, the number and sizes of pack, index and snapshot files, or when backups were written.
+- There is no recovery: losing the password loses the data.
+
 ## Locks
 
 Every writer coordinates through files in `locks/`:
@@ -235,8 +311,11 @@ make it fail, and never changes anything.
 - **Rebuild index** reads every pack trailer, writes one index with all of them (keeping the old
   index entry of a pack whose trailer is damaged), then deletes the old index files.
 - **Check** verifies the layout, that every indexed pack exists and its trailer matches the index,
-  and that every referenced chunk has a copy. With data verification it also decompresses and
-  rehashes every blob and rehashes every pack file. It names the snapshots that cannot be restored.
+  and that every referenced chunk has a copy. With data verification it also unseals (verifying
+  the GCM tag, in an encrypted repository), decompresses and rehashes every blob and rehashes every
+  pack file. It names the snapshots that cannot be restored.
+- **Change password** (encrypted repositories) takes an exclusive lock and rewrites only
+  `config.json`.
 
 ## Retention policy
 
@@ -254,17 +333,25 @@ Forgetting a snapshot only removes its snapshot file; prune reclaims the space.
   unknown fields, so older readers keep working.
 - Index, pack trailer, snapshot and lock documents carry their own `version`; a reader rejects a
   higher version than it knows.
+- Encryption was reserved in version 1 and does not change `version`: a non-null `encryption`
+  object is what marks an encrypted repository. A reader that does not implement
+  [Encryption](#encryption), or does not know its `algorithm` or `kdf.name`, must refuse the
+  repository instead of reading it. A reader may refuse KDF parameters that exceed its resources;
+  this implementation accepts `time` up to 64 and `memory` up to 4 GiB.
 - Every later WSLPilot release must keep reading version 1. A new major version is introduced only
   by an explicit, confirmed upgrade of a repository; it is never written implicitly.
 
 ## Restoring by hand
 
-1. Read `config.json`; check `format`, `version`, `compression`, `hash` and `encryption`.
+1. Read `config.json`; check `format`, `version`, `compression`, `hash` and `encryption`. If
+   `encryption` is not `null`, derive the data key and id key from the password (see
+   [Keys](#keys)) and unseal every index file, pack trailer, snapshot file and blob below before
+   using it.
 2. Build the chunk map: from every `index/*.json`, or, if the index is lost, from every pack
    trailer (read the last 16 bytes, check `WPBKEND1`, read `T` bytes before them).
 3. Read `snapshots/<id>.json`. For each id in `tree`: open `packs/<id[0:2]>/<pack>.pack`, read
-   `length` bytes at `offset`, zstd-decode, check that the BLAKE3-256 of the result is the chunk id.
-   Concatenate the results.
+   `length` bytes at `offset`, zstd-decode, check that the BLAKE3-256 of the result (keyed with the
+   id key, in an encrypted repository) is the chunk id. Concatenate the results.
 4. Split the result into lines and parse each line as an entry.
 5. For each entry write a tar header from its fields (type, name, mode, owner, times, link target,
    device numbers, size, PAX records), then the concatenated plaintext of its `chunks`. An entry
@@ -277,7 +364,7 @@ for line in concat(chunk(id) for id in snapshot.tree).split("\n"):
     e = json(line)
     tar.write_header(e)
     for id in e.chunks:
-        tar.write(zstd_decode(pack(id).read(offset, length)))
+        tar.write(zstd_decode(unseal(pack(id).read(offset, length))))  // unseal = identity when unencrypted
 ```
 
 ## Libraries
@@ -286,6 +373,8 @@ for line in concat(chunk(id) for id in snapshot.tree).split("\n"):
 |---|---|---|
 | `github.com/klauspost/compress/zstd` | zstd compression | BSD-3-Clause (parts Apache-2.0) |
 | `github.com/klauspost/cpuid/v2` | CPU feature detection for BLAKE3 | MIT |
-| `github.com/zeebo/blake3` | BLAKE3-256 | CC0-1.0 |
+| `github.com/zeebo/blake3` | BLAKE3-256 and keyed BLAKE3 | CC0-1.0 |
+| `golang.org/x/crypto/argon2` | Argon2id password key derivation | BSD-3-Clause |
 
-All three are compatible with GPL-3.0. Both libraries are pure Go with optional assembly; no cgo.
+All four are compatible with GPL-3.0. HKDF-SHA256 and AES-256-GCM come from the Go standard
+library. Every library is pure Go with optional assembly; no cgo.

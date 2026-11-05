@@ -16,18 +16,18 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"sync/atomic"
 
 	"github.com/klauspost/compress/zstd"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/wslc"
 )
 
-// HelperImage is the image helper containers run. It needs a tar that
-// understands -p and --numeric-owner (busybox tar 1.36.1 in alpine 3.20,
-// verified on WSLc 3.0.3.0).
-// Notes: the source of the helper image is still an open decision
-// (PLAN.md §10); it is pulled on first use when missing.
-var HelperImage = "alpine:3.20"
+// DefaultHelperImage is the image helper containers run unless the user
+// chose another. It needs a tar that understands -p and --numeric-owner
+// (busybox tar 1.36.1 in alpine 3.20, verified on WSLc 3.0.3.0); it is
+// pulled on first use when missing.
+const DefaultHelperImage = "alpine:3.20"
 
 // HelperLabel marks helper containers so leftovers can be found and removed.
 const HelperLabel = "io.wslpilot.helper"
@@ -49,25 +49,40 @@ type Engine interface {
 type Pipeline struct {
 	E Engine
 	// Log receives progress text (pull output); may be nil.
-	Log io.Writer
+	Log   io.Writer
+	image atomic.Value // string; set by SetImage
+}
+
+// SetImage chooses the helper image ("" restores DefaultHelperImage). It
+// may be called while transfers run; each transfer uses the image it saw
+// when it started.
+func (p *Pipeline) SetImage(ref string) { p.image.Store(strings.TrimSpace(ref)) }
+
+// Image returns the helper image in use.
+func (p *Pipeline) Image() string {
+	if s, _ := p.image.Load().(string); s != "" {
+		return s
+	}
+	return DefaultHelperImage
 }
 
 // helper starts a helper container with volume mounted at target.
 // Returns: its ID and a cleanup that force-removes it.
 func (p *Pipeline) helper(ctx context.Context, volume, target string, readOnly bool) (string, func(), error) {
-	if _, err := p.E.InspectImage(ctx, HelperImage); err != nil {
+	img := p.Image()
+	if _, err := p.E.InspectImage(ctx, img); err != nil {
 		if !errors.Is(err, wslc.ErrNotFound) {
 			return "", nil, err
 		}
-		if err := p.E.Pull(ctx, HelperImage, p.log()); err != nil {
-			return "", nil, fmt.Errorf("pull helper image %s: %w", HelperImage, err)
+		if err := p.E.Pull(ctx, img, p.log()); err != nil {
+			return "", nil, fmt.Errorf("pull helper image %s: %w", img, err)
 		}
 	}
 	var rnd [4]byte
 	rand.Read(rnd[:])
 	spec := wslc.ContainerSpec{
 		Name:    "wslpilot-helper-" + hex.EncodeToString(rnd[:]),
-		Image:   HelperImage,
+		Image:   img,
 		Command: []string{"sleep", "86400"},
 		Labels:  map[string]string{HelperLabel: "1"},
 		Mounts:  []wslc.MountSpec{{Type: "volume", Source: volume, Target: target, ReadOnly: readOnly}},

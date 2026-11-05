@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/plugins/terminal"
+	"github.com/egoist/mygo/plugins/updater"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/gui"
@@ -89,3 +90,12 @@ func (t *term) Done() bool {
 
 // Close ends the program.
 func (t *term) Close() { t.t.Close() }
+
+// CheckForUpdates checks now and shows MyGo's update window.
+func (h *host) CheckForUpdates() { updater.CheckForUpdates() }
+
+// AutoUpdate reports whether background update checks are on.
+func (h *host) AutoUpdate() bool { return updater.AutomaticChecks() }
+
+// SetAutoUpdate turns background update checks on or off.
+func (h *host) SetAutoUpdate(on bool) { updater.SetAutomaticChecks(on) }

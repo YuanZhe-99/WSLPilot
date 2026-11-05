@@ -33,6 +33,10 @@
 |---|---|---|
 | `MYGO_UPDATER_PRIVATE_KEY` | 为更新包与 `update-<platform>.json` 签名 | 不发布更新 |
 
+该密钥已在 GitHub 仓库中设置；其公钥是 `mygo.json` 中的 `updates.publicKey`，且绝不能更换（已安装的应用只接受用它签名的更新）。
+发布说明取自 `doc/en-us/version-history.md` 中的 `## <version>` 小节，每次发布都必须有该小节。应用通过 MyGo 的 updater 插件（原生窗口）
+检查最新的 GitHub Release，每天一次，也可从设置或托盘手动检查；只有安装版（每用户安装于 `%LOCALAPPDATA%Programs`）能自行更新。
+
 ## 上游更新流程
 
 `go run ./tools/deps check` 输出 MyGo 与 WSL 的固定版本和最新版本。

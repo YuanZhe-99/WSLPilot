@@ -351,7 +351,7 @@ func (r *Repo) RebuildIndex(ctx context.Context) (RebuildReport, error) {
 		if err := ctx.Err(); err != nil {
 			return rep, err
 		}
-		blobs, size, err := readTrailer(r.packPath(id))
+		blobs, size, err := r.readTrailer(r.packPath(id))
 		if err != nil {
 			rep.Damaged = append(rep.Damaged, id)
 			if p, ok := old.packs[id]; ok {

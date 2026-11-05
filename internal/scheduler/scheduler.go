@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/backup"
+	"github.com/YuanZhe-99/WSLPilot/internal/secret"
 	"github.com/YuanZhe-99/WSLPilot/internal/store"
 )
 
@@ -34,6 +35,10 @@ type Destination struct {
 	Kind        backup.Kind        `json:"kind"` // folder | archive | repo
 	Path        string             `json:"path"`
 	Compression backup.Compression `json:"compression,omitempty"`
+	// ProtectedPassword is the password of an encrypted repository,
+	// protected with DPAPI for the current user (internal/secret); empty
+	// for unencrypted destinations. The plain password is never stored.
+	ProtectedPassword string `json:"protectedPassword,omitempty"`
 }
 
 // Plan is a scheduled backup.
@@ -252,7 +257,11 @@ func writer(d Destination) (backup.Writer, error) {
 		}
 		return &backup.ArchiveWriter{Dir: d.Path, Compression: c}, nil
 	case backup.KindRepo:
-		return &backup.RepoWriter{Dir: d.Path}, nil
+		pw, err := secret.Unprotect(d.ProtectedPassword)
+		if err != nil {
+			return nil, fmt.Errorf("scheduler: the repository password cannot be read on this account: %w", err)
+		}
+		return &backup.RepoWriter{Dir: d.Path, Password: pw}, nil
 	}
 	return nil, fmt.Errorf("scheduler: unknown destination kind %q", d.Kind)
 }

@@ -75,6 +75,7 @@ manifest 每行是一个 JSON 对象：
 |---|---|---|
 | `.wslpilot/folder.json` | `folder` | 发行版、Volume，或恢复文件到发行版 |
 | `config.json` + `snapshots/`（wpbk） | `repo`，每个快照一项 | 同上 |
+| 缺少密码的加密 wpbk 仓库 | `repo`，一项，备注为 `encrypted` | 解锁前不能恢复：在应用中输入的密码会在本次运行期间保存在内存中，或取自写入该位置的计划 |
 | 带 sidecar 的 `*.tar*` | `archive` | 同上 |
 | 不带 sidecar 的 `*.tar*` | `tar`（外部归档） | 同上；界面会说明来源与一致性未知 |
 | `*.vhdx`、`*.vhd` | `vhdx` | 仅新发行版（`wsl --import --vhd`） |
@@ -104,7 +105,7 @@ manifest 每行是一个 JSON 对象：
 | 字段 | 含义 |
 |---|---|
 | `targets` | 要备份的来源 |
-| `destination` | `kind`（`folder`、`archive`、`repo`）、`path`、`compression` |
+| `destination` | `kind`（`folder`、`archive`、`repo`）、`path`、`compression`、`protectedPassword`（加密仓库的密码，用 DPAPI 为当前 Windows 用户保护；从不以明文保存） |
 | `schedule` | `every`（`hourly`、`daily`、`weekly`、`monthly`、`manual`）、`at`（HH:MM）、`weekday`、`day`（1–28） |
 | `retention` | 按来源分别计算的 `keepLast`、`keepDaily`、`keepWeekly`、`keepMonthly` |
 | `retry` | 失败后的最多重试次数 `max`；延迟从 `initial` 开始，每次加倍，直到 `limit` |

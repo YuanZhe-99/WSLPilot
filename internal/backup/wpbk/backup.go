@@ -170,7 +170,7 @@ func (r *Repo) Backup(ctx context.Context, src io.Reader, meta SnapshotMeta, pro
 	if err != nil {
 		return Snapshot{}, err
 	}
-	if err := writeFileAtomic(filepath.Join(r.dir, "snapshots", snap.ID+".json"), data); err != nil {
+	if err := writeFileAtomic(filepath.Join(r.dir, "snapshots", snap.ID+".json"), r.seal(aadSnapshot, data)); err != nil {
 		return Snapshot{}, err
 	}
 	return snap, nil
@@ -232,11 +232,11 @@ type saver struct {
 // store makes sure chunk b is in the repository.
 // Returns: the chunk id.
 func (s *saver) store(b []byte) (string, error) {
-	id := hashID(b)
+	id := s.r.chunkID(b)
 	if s.pending[id] || s.idx.has(id) {
 		return id, nil
 	}
-	data := s.r.enc.EncodeAll(b, make([]byte, 0, len(b)/2+64))
+	data := s.r.seal(blobAAD(id), s.r.enc.EncodeAll(b, make([]byte, 0, len(b)/2+64)))
 	if s.pw == nil {
 		pw, err := s.r.newPackWriter()
 		if err != nil {

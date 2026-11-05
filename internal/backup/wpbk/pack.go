@@ -44,8 +44,9 @@ func (r *Repo) newPackWriter() (*packWriter, error) {
 	return pw, nil
 }
 
-// add appends one compressed blob.
-// Inputs: id is the chunk id, data the zstd frame, raw the plaintext length.
+// add appends one stored blob.
+// Inputs: id is the chunk id, data the zstd frame (sealed in an encrypted
+// repository), raw the plaintext length.
 func (pw *packWriter) add(id string, data []byte, raw int64) error {
 	if _, err := pw.w.Write(data); err != nil {
 		return err
@@ -68,6 +69,7 @@ func (pw *packWriter) finish() (indexPack, error) {
 		pw.abort()
 		return indexPack{}, err
 	}
+	trailer = pw.r.seal(aadTrailer, trailer)
 	footer := make([]byte, packFooterSize)
 	binary.LittleEndian.PutUint64(footer, uint64(len(trailer)))
 	copy(footer[8:], packFooterMagic)
@@ -148,9 +150,11 @@ func (r *Repo) listPacks() (map[string]int64, error) {
 // errPackDamaged marks a pack whose framing or trailer cannot be read.
 var errPackDamaged = errors.New("pack damaged")
 
-// readTrailer parses the trailer of the pack at path.
-// Returns: the blob list and file size, or an error wrapping errPackDamaged.
-func readTrailer(path string) ([]BlobRef, int64, error) {
+// readTrailer parses the trailer of the pack at path, decrypting it in an
+// encrypted repository.
+// Returns: the blob list and file size, or an error wrapping errPackDamaged
+// (also when a sealed trailer fails authentication).
+func (r *Repo) readTrailer(path string) ([]BlobRef, int64, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, 0, err
@@ -188,6 +192,9 @@ func readTrailer(path string) ([]BlobRef, int64, error) {
 	if _, err := f.ReadAt(raw, tstart); err != nil {
 		return nil, size, fmt.Errorf("%w: %v", errPackDamaged, err)
 	}
+	if raw, err = r.unseal(aadTrailer, raw); err != nil {
+		return nil, size, fmt.Errorf("%w: trailer: %v", errPackDamaged, err)
+	}
 	var t packTrailer
 	if err := json.Unmarshal(raw, &t); err != nil {
 		return nil, size, fmt.Errorf("%w: trailer: %v", errPackDamaged, err)
@@ -217,9 +224,10 @@ func packHash(path string) (string, error) {
 	return hex.EncodeToString(h.Sum(nil)), nil
 }
 
-// readBlob reads, decompresses and verifies one blob.
+// readBlob reads, decrypts (in an encrypted repository), decompresses and
+// verifies one blob.
 // Returns: the plaintext, or an error wrapping ErrChunkCorrupt when the bytes
-// are present but wrong.
+// are present but wrong (including a failed GCM tag).
 func (r *Repo) readBlob(f io.ReaderAt, ref BlobRef) ([]byte, error) {
 	buf := make([]byte, ref.Length)
 	n, err := f.ReadAt(buf, ref.Offset)
@@ -229,11 +237,15 @@ func (r *Repo) readBlob(f io.ReaderAt, ref BlobRef) ([]byte, error) {
 		}
 		return nil, err
 	}
+	buf, err = r.unseal(blobAAD(ref.ID), buf)
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s: %v", ErrChunkCorrupt, ref.ID, err)
+	}
 	plain, err := r.dec.DecodeAll(buf, make([]byte, 0, min(max(ref.RawLength, 0), 8<<20)))
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s: %v", ErrChunkCorrupt, ref.ID, err)
 	}
-	if int64(len(plain)) != ref.RawLength || hashID(plain) != ref.ID {
+	if int64(len(plain)) != ref.RawLength || r.chunkID(plain) != ref.ID {
 		return nil, fmt.Errorf("%w: %s: hash mismatch", ErrChunkCorrupt, ref.ID)
 	}
 	return plain, nil

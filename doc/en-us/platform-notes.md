@@ -13,8 +13,10 @@ machine.
 | WSL distribution list, lifecycle, compact, sparse, move | verified | live runs on `wslpilot-test-d1` (WSL 3.0.3.0), fixtures |
 | WSLc lists, inspect, events, exec streams | verified | live runs on `wslpilot-test-*` objects (WSLc 3.0.3.0), fixtures |
 | Config editing (`.wslconfig`, `wsl.conf`, `settings.yaml`) | implemented | unit tests |
-| diskpart compaction (elevated) | implemented | unit tests; UAC path not yet run |
+| diskpart compaction (elevated) | verified | live test `internal/core` (UAC accepted): a WSLc vhd volume 308 MB → 14 MB |
 | `wpbk` repository | verified | unit, fault-injection and spec tests |
+| `wpbk` encryption, plan passwords (DPAPI) | verified | unit, spec and leakage tests; encrypted plan end to end |
+| Automatic updates | implemented | signed by the release workflow; first update check possible after 0.1.0 is published |
 | Volume tar import/export (owners, modes, links) | verified | live test `internal/volume` |
 | Distribution backup (folder, archive, repository), verify, restore as new, partial restore | verified | live test `internal/backup` on `wslpilot-test-d1` |
 | Compose builtin backend up / update / down | verified | live test `internal/compose` (`wslpilot-test-compose`) |
@@ -23,7 +25,7 @@ machine.
 | GUI pages | implemented | view tests, page renders checked by eye; packaged app starts (10 s smoke run) |
 | Terminal plugin, tray, notifications, UAC prompt | implemented | not exercised by hand yet |
 | Container edit (safety export, validated recreate) | verified | live test `internal/gui` (`wslpilot-test-edit`) |
-| WSLc data location move | implemented | not run: it changes the user's real WSLc session |
+| WSLc data location move | verified | live test `internal/core` on an otherwise empty session: image and volume moved, content checked, settings.yaml restored |
 
 ## Windows 11 x64
 

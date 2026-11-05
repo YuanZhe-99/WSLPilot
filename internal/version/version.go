@@ -3,4 +3,4 @@
 package version
 
 // Version is the WSLPilot release version (semantic versioning, no "v").
-const Version = "0.0.1"
+const Version = "0.1.0"

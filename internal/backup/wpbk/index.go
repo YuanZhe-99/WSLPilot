@@ -83,6 +83,10 @@ func (r *Repo) loadIndex(scanUnindexed bool) (*memIndex, error) {
 			m.badFiles[e.Name()] = fmt.Errorf("content does not match its id")
 			continue
 		}
+		if data, err = r.unseal(aadIndex, data); err != nil {
+			m.badFiles[e.Name()] = err
+			continue
+		}
 		var f indexFile
 		if err := json.Unmarshal(data, &f); err != nil {
 			m.badFiles[e.Name()] = err
@@ -111,7 +115,7 @@ func (r *Repo) loadIndex(scanUnindexed bool) (*memIndex, error) {
 		}
 		slices.Sort(ids)
 		for _, id := range ids {
-			blobs, size, err := readTrailer(r.packPath(id))
+			blobs, size, err := r.readTrailer(r.packPath(id))
 			if err != nil {
 				m.badPacks[id] = err
 				continue
@@ -123,8 +127,10 @@ func (r *Repo) loadIndex(scanUnindexed bool) (*memIndex, error) {
 	return m, nil
 }
 
-// writeIndex publishes an index file listing packs.
-// Returns: the new index id ("" when packs is empty).
+// writeIndex publishes an index file listing packs, sealed in an encrypted
+// repository.
+// Returns: the new index id ("" when packs is empty), the hash of the
+// stored bytes.
 // Side effects: creates index/<id>.json atomically.
 func (r *Repo) writeIndex(packs []indexPack) (string, error) {
 	if len(packs) == 0 {
@@ -134,6 +140,7 @@ func (r *Repo) writeIndex(packs []indexPack) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	data = r.seal(aadIndex, data)
 	id := hashID(data)
 	return id, writeFileAtomic(filepath.Join(r.dir, "index", id+".json"), data)
 }

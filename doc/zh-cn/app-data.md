@@ -15,7 +15,7 @@ WSLPilot 只保存自身的元数据（行为契约：状态归上游所有）�
 
 | 路径 | 内容 | Schema |
 |---|---|---|
-| `settings.json` | `theme`（`system`、`light`、`dark`）、`backupDir` | 1 |
+| `settings.json` | `theme`（`system`、`light`、`dark`）、`backupDir`、`helperImage`（Volume 辅助镜像，留空为 `alpine:3.20`） | 1 |
 | `locations.json` | 从外部打开的备份位置：`path`、`readOnly`、`label` | 1 |
 | `projects/<id>/project.json` | 一个 Compose 项目（见 [compose.md](compose.md)） | 1 |
 | `plans/<id>.json` | 一个备份计划（见 [backups.md](backups.md)） | 1 |

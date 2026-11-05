@@ -5,11 +5,14 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/backup"
+	"github.com/YuanZhe-99/WSLPilot/internal/backup/wpbk"
+	"github.com/YuanZhe-99/WSLPilot/internal/secret"
 	"github.com/YuanZhe-99/WSLPilot/internal/store"
 )
 
@@ -123,5 +126,43 @@ func TestLockExcludes(t *testing.T) {
 		t.Error(err)
 	} else {
 		u()
+	}
+}
+
+func TestEncryptedPlanRepository(t *testing.T) {
+	prot, err := secret.Protect("plan password 1")
+	if err != nil {
+		t.Skip("DPAPI unavailable: ", err)
+	}
+	now := time.Date(2026, 11, 5, 10, 0, 0, 0, time.Local)
+	dest := filepath.Join(t.TempDir(), "repo")
+	s := &Service{Store: &store.Store{Dir: t.TempDir()}, Now: func() time.Time { return now },
+		Do: func(ctx context.Context, tg Target, w backup.Writer, o backup.Options) (backup.Item, error) {
+			return w.Write(ctx, bytes.NewReader(emptyTar()), backup.Meta{Source: backup.Source{Kind: tg.Kind, Name: tg.Name}, Time: now, Consistent: true, Plan: o.Plan})
+		}}
+	p := Plan{ID: "enc", Name: "Encrypted", Enabled: true, Targets: []Target{{Kind: backup.SourceDistro, Name: "x"}},
+		Destination: Destination{Kind: backup.KindRepo, Path: dest, ProtectedPassword: prot},
+		Schedule:    Schedule{Every: Daily, At: "02:00"}, Retention: backup.Policy{KeepLast: 1}}
+	for i := 0; i < 3; i++ {
+		now = now.Add(time.Hour)
+		if r := s.Run(context.Background(), p); r.Result != "ok" {
+			t.Fatal(r.Result)
+		}
+	}
+	cfg, err := wpbk.ReadConfig(dest)
+	if err != nil || !cfg.Encrypted() {
+		t.Fatalf("repository not encrypted: %v", err)
+	}
+	r, err := wpbk.Open(dest, wpbk.OpenOptions{ReadOnly: true, Password: "plan password 1"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r.Close()
+	if snaps, _ := r.Snapshots(); len(snaps) != 1 {
+		t.Errorf("retention kept %d snapshots", len(snaps))
+	}
+	b, _ := os.ReadFile(filepath.Join(s.Store.Dir, "plans", "enc.json"))
+	if bytes.Contains(b, []byte("plan password")) {
+		t.Error("plain password stored in the plan")
 	}
 }

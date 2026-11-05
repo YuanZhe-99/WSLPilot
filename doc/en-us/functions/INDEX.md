@@ -16,7 +16,8 @@
 | `internal/configdoc` | Raw-document editing of `.wslconfig`, `wsl.conf`, `settings.yaml`; form schemas; conflict-checked saves | `INI`, `YAML`, `Field`, `WSLConf`, `WSLConfig`, `WSLcSettings`, `ApplyINI`, `ApplyYAML`, `Snapshot.Save`, `DiffLines` |
 | `internal/vhdx` | diskpart compaction of VHDX files WSL cannot compact itself | `Script`, `Compact`, `Elevator`, `ErrInUse` |
 | `internal/elevate` | One elevated child process through the UAC prompt | `Run`, `ErrDeclined` |
-| `internal/backup/wpbk` | Incremental backup repository (see `backup-format.md`) | `Init`, `Open`, `Repo.Backup`, `Restore`, `Entries`, `Check`, `Forget`, `ApplyPolicy`, `Prune`, `RebuildIndex` |
+| `internal/secret` | DPAPI protection of stored secrets (repository passwords) | `Protect`, `Unprotect` |
+| `internal/backup/wpbk` | Incremental backup repository (see `backup-format.md`) | `Init`, `Open`, `Repo.Backup`, `Restore`, `Entries`, `Check`, `Forget`, `ApplyPolicy`, `Prune`, `RebuildIndex`, `ChangePassword`, `ReadConfig` |
 | `internal/gui` | Native UI: Dashboard, WSL, Containers, Compose, Volumes, Backups, Terminal, Settings; job panel, confirmation dialog, config forms | `App`, `New`, `Host`, `Term`, `confForm` |
 | `locales` | Generated message accessors from `locales/*.json` | `catalog_gen.go` |
 | `tools/checkdocs` | Verifies the `doc/` language mirror | `main` |
@@ -25,7 +26,7 @@
 | `internal/core` | Wires the services for each process; Compose wiring (backup, autostart) | `Core`, `New`, `BackupTarget`, `WireCompose`, `FindProject`, `MoveWSLcData`, `AgentPath` |
 | `internal/compose` | Compose: backend interface, project metadata, loader, validation, planner, builtin and native backends, migration (see `compose.md`) | `Backend`, `Registry`, `Project`, `Projects`, `Load`, `Translate`, `Diff`, `Builtin`, `Native`, `Migrate` |
 | `internal/volume` | Volume import/export as tar through a helper container | `Pipeline`, `Import`, `Export`, `Decompress`, `HelperImage` |
-| `internal/backup` | Sources → tar → folder/archive/repository; catalog, verify, restore, retention (see `backups.md`) | `Runner`, `FolderWriter`, `ArchiveWriter`, `RepoWriter`, `Scan`, `GroupBySource`, `Open`, `Verify`, `PlanRetention`, `Delete` |
+| `internal/backup` | Sources → tar → folder/archive/repository; catalog, verify, restore, retention (see `backups.md`) | `Runner`, `FolderWriter`, `ArchiveWriter`, `RepoWriter`, `Scan`, `GroupBySource`, `Open`, `Verify`, `PlanRetention`, `Delete`, `RepoPassword` |
 | `internal/scheduler` | Backup plans, due times, retries, retention, history, lock, Task Scheduler registration | `Service`, `Plan`, `Schedule`, `Retry`, `RunDue`, `Run`, `Install` |
 | `internal/restart` | Container restart policies from `wslc events` | `Watcher`, `Decide`, `Label` |
 | `internal/wtprofile` | Windows Terminal fragment profiles | `Fragment`, `ContainerShell`, `DistroShell`, `GUIDFor` |

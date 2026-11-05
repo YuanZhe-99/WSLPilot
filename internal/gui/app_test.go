@@ -333,3 +333,7 @@ func TestRunSpecParsesDialog(t *testing.T) {
 		t.Errorf("labels %v", s.Labels)
 	}
 }
+
+func (h *fakeHost) CheckForUpdates()   {}
+func (h *fakeHost) AutoUpdate() bool   { return true }
+func (h *fakeHost) SetAutoUpdate(bool) {}

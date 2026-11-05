@@ -32,6 +32,10 @@
 | sparse VHD | 稀疏 VHD |
 | job | 任务 |
 | audit log | 审计日志 |
+| encryption | 加密 |
+| password | 密码 |
+| master key | 主密钥 |
+| auto-update | 自动更新 |
 | fixture | fixture |
 | adapter | 适配层 |
 | verified | 已验证 |

@@ -898,5 +898,29 @@
   "WSLUpdatePackages": "Update packages",
   "CmpVolumes": "Volumes",
   "CmpVolumesHelp": "native keeps data in a WSL Containers volume; bind uses a Windows folder instead.",
-  "CmpVolumesWarning": "Existing data is not moved between a volume and a folder. Back the volume up first if it holds data."
+  "CmpVolumesWarning": "Existing data is not moved between a volume and a folder. Back the volume up first if it holds data.",
+  "SetUpdates": "Updates",
+  "SetAutoUpdate": "Check for updates automatically",
+  "SetCheckNow": "Check now",
+  "SetUpdatesHelp": "Updates are signed and downloaded from the GitHub releases of WSLPilot. The installed app updates itself; a portable copy cannot.",
+  "SetHelperImage": "Volume helper image",
+  "SetHelperImageHelp": "Volume import, export and backups run tar in a short-lived container of this image. It needs tar with -p and --numeric-owner. Empty uses alpine:3.20.",
+  "BkEncrypt": "Encryption",
+  "BkEncryptOption": "Encrypt the repository with a password",
+  "BkEncryptHelp": "Applies when the repository is created; an existing repository keeps its setting. The password is kept for this Windows account only (DPAPI). Losing it loses the backups.",
+  "BkPassword": "Password",
+  "BkPasswordAgain": "Password again",
+  "BkPasswordShort": "Use at least 8 characters.",
+  "BkPasswordMismatch": "The passwords differ.",
+  "BkUnlock": "Unlock…",
+  "BkWrongPassword": "The password is wrong.",
+  "BkEncryptedRepo": "Encrypted repository {name}",
+  "@BkEncryptedRepo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "BkNoteEncrypted": "Encrypted: enter its password to see and restore its backups."
 }

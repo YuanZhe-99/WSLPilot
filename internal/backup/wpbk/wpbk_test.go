@@ -272,7 +272,7 @@ func TestCheckTruncatedPack(t *testing.T) {
 func TestCheckCorruptPack(t *testing.T) {
 	r, a, b, _, packB, tarA, _ := twoSnapshotRepo(t)
 	path := r.packPath(packB)
-	blobs, _, err := readTrailer(path)
+	blobs, _, err := r.readTrailer(path)
 	if err != nil {
 		t.Fatal(err)
 	}

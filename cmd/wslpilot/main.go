@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/egoist/mygo"
+	"github.com/egoist/mygo/plugins/updater"
+	updatewindow "github.com/egoist/mygo/plugins/updater/native"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/core"
@@ -29,6 +31,9 @@ func main() {
 		return
 	}
 	mygo.Theme.SetSource(mygo.ThemeSystem)
+	// Signed updates from the GitHub releases (mygo.json "updates"); the
+	// window is drawn in native UI, so no WebView2 is needed.
+	mygo.Use(updatewindow.Plugin)
 
 	k, err := core.New()
 	if err != nil {
@@ -67,6 +72,7 @@ func main() {
 			ToolTip: "WSLPilot",
 			Menu: mygo.NewMenu([]*mygo.MenuItem{
 				{Label: L.TrayOpen(), Click: func(*mygo.MenuItem, *mygo.Window) { show() }},
+				updater.MenuItem(),
 				mygo.Separator(),
 				{Label: L.TrayQuit(), Click: func(*mygo.MenuItem, *mygo.Window) { mygo.App.Quit() }},
 			}),

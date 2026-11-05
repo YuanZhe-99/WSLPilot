@@ -1,7 +1,7 @@
 {
   "name": "WSLPilot",
   "identifier": "com.yuanzhe.wslpilot",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "copyright": "Copyright (C) 2026 YuanZhe",
   "main": "./cmd/wslpilot",
   "out": "build",
@@ -9,5 +9,10 @@
     "dir": "locales",
     "source": "en"
   },
-  "description": "Manage WSL distributions, WSL containers, Compose projects and backups"
+  "description": "Manage WSL distributions, WSL containers, Compose projects and backups",
+  "updates": {
+    "publicKey": "JEyZX/7oJ1Z2xv74As2Q87eGbl3MYnD9DryhX2Da6q4=",
+    "github": "YuanZhe-99/WSLPilot",
+    "changelog": "doc/en-us/version-history.md"
+  }
 }

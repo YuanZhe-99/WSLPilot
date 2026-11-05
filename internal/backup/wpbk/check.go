@@ -127,7 +127,7 @@ func (r *Repo) Check(ctx context.Context, readData bool) (CheckReport, error) {
 			continue
 		}
 		if !unindexed[id] {
-			if blobs, _, err := readTrailer(r.packPath(id)); err != nil {
+			if blobs, _, err := r.readTrailer(r.packPath(id)); err != nil {
 				add(Problem{Kind: ProblemPackDamaged, Pack: id, Detail: err.Error()})
 			} else if !slices.Equal(blobs, p.Blobs) {
 				add(Problem{Kind: ProblemPackDamaged, Pack: id, Detail: "trailer disagrees with index"})

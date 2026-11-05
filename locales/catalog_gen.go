@@ -4675,3 +4675,173 @@ func CmpVolumesWarning() string { return In(i18n.Locale()).CmpVolumesWarning() }
 func (msgs Messages) CmpVolumesWarning() string {
 	return Catalog.Format(msgs.locale, "CmpVolumesWarning", nil)
 }
+
+// SetUpdates says "Updates"
+// in the language the app shows.
+func SetUpdates() string { return In(i18n.Locale()).SetUpdates() }
+
+// SetUpdates says "Updates"
+// in the language of msgs.
+func (msgs Messages) SetUpdates() string {
+	return Catalog.Format(msgs.locale, "SetUpdates", nil)
+}
+
+// SetAutoUpdate says "Check for updates automatically"
+// in the language the app shows.
+func SetAutoUpdate() string { return In(i18n.Locale()).SetAutoUpdate() }
+
+// SetAutoUpdate says "Check for updates automatically"
+// in the language of msgs.
+func (msgs Messages) SetAutoUpdate() string {
+	return Catalog.Format(msgs.locale, "SetAutoUpdate", nil)
+}
+
+// SetCheckNow says "Check now"
+// in the language the app shows.
+func SetCheckNow() string { return In(i18n.Locale()).SetCheckNow() }
+
+// SetCheckNow says "Check now"
+// in the language of msgs.
+func (msgs Messages) SetCheckNow() string {
+	return Catalog.Format(msgs.locale, "SetCheckNow", nil)
+}
+
+// SetUpdatesHelp says "Updates are signed and downloaded from the GitHub releases of WSLPilot. The installed app updates itself; a portable …"
+// in the language the app shows.
+func SetUpdatesHelp() string { return In(i18n.Locale()).SetUpdatesHelp() }
+
+// SetUpdatesHelp says "Updates are signed and downloaded from the GitHub releases of WSLPilot. The installed app updates itself; a portable …"
+// in the language of msgs.
+func (msgs Messages) SetUpdatesHelp() string {
+	return Catalog.Format(msgs.locale, "SetUpdatesHelp", nil)
+}
+
+// SetHelperImage says "Volume helper image"
+// in the language the app shows.
+func SetHelperImage() string { return In(i18n.Locale()).SetHelperImage() }
+
+// SetHelperImage says "Volume helper image"
+// in the language of msgs.
+func (msgs Messages) SetHelperImage() string {
+	return Catalog.Format(msgs.locale, "SetHelperImage", nil)
+}
+
+// SetHelperImageHelp says "Volume import, export and backups run tar in a short-lived container of this image. It needs tar with -p and --numeri…"
+// in the language the app shows.
+func SetHelperImageHelp() string { return In(i18n.Locale()).SetHelperImageHelp() }
+
+// SetHelperImageHelp says "Volume import, export and backups run tar in a short-lived container of this image. It needs tar with -p and --numeri…"
+// in the language of msgs.
+func (msgs Messages) SetHelperImageHelp() string {
+	return Catalog.Format(msgs.locale, "SetHelperImageHelp", nil)
+}
+
+// BkEncrypt says "Encryption"
+// in the language the app shows.
+func BkEncrypt() string { return In(i18n.Locale()).BkEncrypt() }
+
+// BkEncrypt says "Encryption"
+// in the language of msgs.
+func (msgs Messages) BkEncrypt() string {
+	return Catalog.Format(msgs.locale, "BkEncrypt", nil)
+}
+
+// BkEncryptOption says "Encrypt the repository with a password"
+// in the language the app shows.
+func BkEncryptOption() string { return In(i18n.Locale()).BkEncryptOption() }
+
+// BkEncryptOption says "Encrypt the repository with a password"
+// in the language of msgs.
+func (msgs Messages) BkEncryptOption() string {
+	return Catalog.Format(msgs.locale, "BkEncryptOption", nil)
+}
+
+// BkEncryptHelp says "Applies when the repository is created; an existing repository keeps its setting. The password is kept for this Windo…"
+// in the language the app shows.
+func BkEncryptHelp() string { return In(i18n.Locale()).BkEncryptHelp() }
+
+// BkEncryptHelp says "Applies when the repository is created; an existing repository keeps its setting. The password is kept for this Windo…"
+// in the language of msgs.
+func (msgs Messages) BkEncryptHelp() string {
+	return Catalog.Format(msgs.locale, "BkEncryptHelp", nil)
+}
+
+// BkPassword says "Password"
+// in the language the app shows.
+func BkPassword() string { return In(i18n.Locale()).BkPassword() }
+
+// BkPassword says "Password"
+// in the language of msgs.
+func (msgs Messages) BkPassword() string {
+	return Catalog.Format(msgs.locale, "BkPassword", nil)
+}
+
+// BkPasswordAgain says "Password again"
+// in the language the app shows.
+func BkPasswordAgain() string { return In(i18n.Locale()).BkPasswordAgain() }
+
+// BkPasswordAgain says "Password again"
+// in the language of msgs.
+func (msgs Messages) BkPasswordAgain() string {
+	return Catalog.Format(msgs.locale, "BkPasswordAgain", nil)
+}
+
+// BkPasswordShort says "Use at least 8 characters."
+// in the language the app shows.
+func BkPasswordShort() string { return In(i18n.Locale()).BkPasswordShort() }
+
+// BkPasswordShort says "Use at least 8 characters."
+// in the language of msgs.
+func (msgs Messages) BkPasswordShort() string {
+	return Catalog.Format(msgs.locale, "BkPasswordShort", nil)
+}
+
+// BkPasswordMismatch says "The passwords differ."
+// in the language the app shows.
+func BkPasswordMismatch() string { return In(i18n.Locale()).BkPasswordMismatch() }
+
+// BkPasswordMismatch says "The passwords differ."
+// in the language of msgs.
+func (msgs Messages) BkPasswordMismatch() string {
+	return Catalog.Format(msgs.locale, "BkPasswordMismatch", nil)
+}
+
+// BkUnlock says "Unlock…"
+// in the language the app shows.
+func BkUnlock() string { return In(i18n.Locale()).BkUnlock() }
+
+// BkUnlock says "Unlock…"
+// in the language of msgs.
+func (msgs Messages) BkUnlock() string {
+	return Catalog.Format(msgs.locale, "BkUnlock", nil)
+}
+
+// BkWrongPassword says "The password is wrong."
+// in the language the app shows.
+func BkWrongPassword() string { return In(i18n.Locale()).BkWrongPassword() }
+
+// BkWrongPassword says "The password is wrong."
+// in the language of msgs.
+func (msgs Messages) BkWrongPassword() string {
+	return Catalog.Format(msgs.locale, "BkWrongPassword", nil)
+}
+
+// BkEncryptedRepo says "Encrypted repository {name}"
+// in the language the app shows.
+func BkEncryptedRepo(name string) string { return In(i18n.Locale()).BkEncryptedRepo(name) }
+
+// BkEncryptedRepo says "Encrypted repository {name}"
+// in the language of msgs.
+func (msgs Messages) BkEncryptedRepo(name string) string {
+	return Catalog.Format(msgs.locale, "BkEncryptedRepo", map[string]any{"name": name})
+}
+
+// BkNoteEncrypted says "Encrypted: enter its password to see and restore its backups."
+// in the language the app shows.
+func BkNoteEncrypted() string { return In(i18n.Locale()).BkNoteEncrypted() }
+
+// BkNoteEncrypted says "Encrypted: enter its password to see and restore its backups."
+// in the language of msgs.
+func (msgs Messages) BkNoteEncrypted() string {
+	return Catalog.Format(msgs.locale, "BkNoteEncrypted", nil)
+}

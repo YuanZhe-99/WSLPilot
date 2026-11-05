@@ -22,6 +22,8 @@ type Repo struct {
 	readOnly bool
 	enc      *zstd.Encoder
 	dec      *zstd.Decoder
+	// crypt holds the derived keys; nil for an unencrypted repository.
+	crypt *cryptoState
 	// now returns the current time; tests replace it.
 	now func() time.Time
 }
@@ -32,6 +34,9 @@ type InitOptions struct {
 	Chunker ChunkerParams
 	// PackSize overrides the pack target size in bytes (zero: 32 MiB).
 	PackSize int64
+	// Password, when not empty, makes the repository encrypted. Encryption
+	// cannot be turned on or off later; only the password can change.
+	Password string
 }
 
 // OpenOptions configure how an existing repository is opened.
@@ -39,15 +44,21 @@ type OpenOptions struct {
 	// ReadOnly forbids every write, including lock files. Use it for
 	// repositories that belong to another PC or sit on shared storage.
 	ReadOnly bool
+	// Password unlocks an encrypted repository. It is ignored for an
+	// unencrypted one.
+	Password string
 }
 
 // repoDirs are the subdirectories of every repository.
 var repoDirs = []string{"packs", "index", "snapshots", "locks"}
 
 // Init creates a new, empty repository in dir.
-// Inputs: dir must not exist or be an empty directory.
+// Inputs: dir must not exist or be an empty directory; opts.Password, when
+// set, makes the repository encrypted.
 // Returns: the repository, open for writing.
 // Side effects: creates dir, its subdirectories and config.json.
+// Notes: without a password config.json is exactly the unencrypted v1
+// document ("encryption": null).
 func Init(dir string, opts InitOptions) (*Repo, error) {
 	if ents, err := os.ReadDir(dir); err == nil && len(ents) > 0 {
 		return nil, fmt.Errorf("wpbk: %s is not empty", dir)
@@ -71,6 +82,18 @@ func Init(dir string, opts InitOptions) (*Repo, error) {
 	if cfg.PackSize <= 0 {
 		cfg.PackSize = DefaultPackSize
 	}
+	var master []byte
+	if opts.Password != "" {
+		master = make([]byte, keyLen)
+		if _, err := rand.Read(master); err != nil {
+			return nil, err
+		}
+		enc, err := json.Marshal(newEncryption(master, opts.Password))
+		if err != nil {
+			return nil, err
+		}
+		cfg.Encryption = enc
+	}
 	if err := cfg.validate(); err != nil {
 		return nil, err
 	}
@@ -86,27 +109,74 @@ func Init(dir string, opts InitOptions) (*Repo, error) {
 	if err := writeFileAtomic(filepath.Join(dir, "config.json"), data); err != nil {
 		return nil, err
 	}
-	return newRepo(dir, cfg, false)
+	r, err := newRepo(dir, cfg, false)
+	if err != nil {
+		return nil, err
+	}
+	if master != nil {
+		if r.crypt, err = newCryptoState(master); err != nil {
+			r.Close()
+			return nil, err
+		}
+	}
+	return r, nil
 }
 
-// Open opens an existing repository.
-// Returns: ErrNotRepository or ErrUnsupportedVersion (wrapped) when dir is not
-// a repository this build can read.
-// Notes: with ReadOnly nothing in dir is ever created, changed or removed.
-func Open(dir string, opts OpenOptions) (*Repo, error) {
+// ReadConfig reads and validates dir/config.json without unlocking or
+// opening the repository.
+// Returns: the configuration, or ErrNotRepository / ErrUnsupportedVersion
+// (wrapped) when dir is not a repository this build can read.
+// Notes: use Config.Encrypted to learn whether Open needs a password.
+func ReadConfig(dir string) (Config, error) {
 	data, err := os.ReadFile(filepath.Join(dir, "config.json"))
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return nil, fmt.Errorf("%w: %s has no config.json", ErrNotRepository, dir)
+			return Config{}, fmt.Errorf("%w: %s has no config.json", ErrNotRepository, dir)
 		}
-		return nil, err
+		return Config{}, err
 	}
 	var cfg Config
 	if err := json.Unmarshal(data, &cfg); err != nil {
-		return nil, fmt.Errorf("%w: config.json: %v", ErrNotRepository, err)
+		return Config{}, fmt.Errorf("%w: config.json: %v", ErrNotRepository, err)
 	}
 	if err := cfg.validate(); err != nil {
+		return Config{}, err
+	}
+	return cfg, nil
+}
+
+// Encrypted reports whether the configuration describes an encrypted
+// repository.
+func (c Config) Encrypted() bool {
+	e, err := c.encryption()
+	return err == nil && e != nil
+}
+
+// Open opens an existing repository.
+// Inputs: opts.Password unlocks an encrypted repository; it is ignored for
+// an unencrypted one.
+// Returns: ErrNotRepository or ErrUnsupportedVersion (wrapped) when dir is not
+// a repository this build can read; ErrEncrypted when the repository is
+// encrypted and no password was given; ErrPassword when it is wrong. Both
+// are decided from config.json alone.
+// Notes: with ReadOnly nothing in dir is ever created, changed or removed.
+func Open(dir string, opts OpenOptions) (*Repo, error) {
+	cfg, err := ReadConfig(dir)
+	if err != nil {
 		return nil, err
+	}
+	var crypt *cryptoState
+	if enc, _ := cfg.encryption(); enc != nil {
+		if opts.Password == "" {
+			return nil, ErrEncrypted
+		}
+		master, err := enc.unwrap(opts.Password)
+		if err != nil {
+			return nil, err
+		}
+		if crypt, err = newCryptoState(master); err != nil {
+			return nil, err
+		}
 	}
 	if cfg.PackSize <= 0 {
 		cfg.PackSize = DefaultPackSize
@@ -119,7 +189,63 @@ func Open(dir string, opts OpenOptions) (*Repo, error) {
 			return nil, fmt.Errorf("%w: missing %s/", ErrNotRepository, d)
 		}
 	}
-	return newRepo(dir, cfg, opts.ReadOnly)
+	r, err := newRepo(dir, cfg, opts.ReadOnly)
+	if err != nil {
+		return nil, err
+	}
+	r.crypt = crypt
+	return r, nil
+}
+
+// ChangePassword replaces the password of an encrypted repository.
+// Inputs: oldPassword must unlock the repository; newPassword must not be
+// empty (encryption cannot be turned off).
+// Returns: ErrNotEncrypted, ErrPassword, ErrReadOnly or a lock error.
+// Side effects: holds an exclusive lock and rewrites config.json with the
+// master key wrapped under the new password (fresh salt). Packs, index and
+// snapshots are untouched, because they are encrypted with keys derived
+// from the master key, which does not change.
+func (r *Repo) ChangePassword(oldPassword, newPassword string) error {
+	if r.crypt == nil {
+		return ErrNotEncrypted
+	}
+	if newPassword == "" {
+		return fmt.Errorf("wpbk: the new password must not be empty")
+	}
+	l, err := r.lock(true)
+	if err != nil {
+		return err
+	}
+	defer l.release()
+	cfg, err := ReadConfig(r.dir)
+	if err != nil {
+		return err
+	}
+	enc, err := cfg.encryption()
+	if err != nil {
+		return err
+	}
+	if enc == nil {
+		return ErrNotEncrypted
+	}
+	master, err := enc.unwrap(oldPassword)
+	if err != nil {
+		return err
+	}
+	raw, err := json.Marshal(newEncryption(master, newPassword))
+	if err != nil {
+		return err
+	}
+	cfg.Encryption = raw
+	data, err := json.MarshalIndent(cfg, "", "  ")
+	if err != nil {
+		return err
+	}
+	if err := writeFileAtomic(filepath.Join(r.dir, "config.json"), data); err != nil {
+		return err
+	}
+	r.cfg.Encryption = cfg.Encryption
+	return nil
 }
 
 // newRepo builds the Repo value and its codecs.

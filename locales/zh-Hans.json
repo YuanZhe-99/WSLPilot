@@ -462,5 +462,22 @@
   "WSLUpdatePackages": "更新软件包",
   "CmpVolumes": "Volume",
   "CmpVolumesHelp": "native 把数据保存在 WSL 容器的 Volume 中；bind 改用一个 Windows 目录。",
-  "CmpVolumesWarning": "已有数据不会在 Volume 与目录之间移动。如果 Volume 中有数据，请先备份。"
+  "CmpVolumesWarning": "已有数据不会在 Volume 与目录之间移动。如果 Volume 中有数据，请先备份。",
+  "SetUpdates": "更新",
+  "SetAutoUpdate": "自动检查更新",
+  "SetCheckNow": "立即检查",
+  "SetUpdatesHelp": "更新经过签名，从 WSLPilot 的 GitHub Releases 下载。安装版会自行更新；便携版不能。",
+  "SetHelperImage": "Volume 辅助镜像",
+  "SetHelperImageHelp": "Volume 的导入、导出与备份会在此镜像的临时容器中运行 tar。镜像中的 tar 需支持 -p 与 --numeric-owner。留空则使用 alpine:3.20。",
+  "BkEncrypt": "加密",
+  "BkEncryptOption": "用密码加密仓库",
+  "BkEncryptHelp": "在创建仓库时生效；已有仓库保持原设置。密码只为当前 Windows 账户保存（DPAPI）。丢失密码即丢失备份。",
+  "BkPassword": "密码",
+  "BkPasswordAgain": "再次输入密码",
+  "BkPasswordShort": "至少使用 8 个字符。",
+  "BkPasswordMismatch": "两次输入的密码不一致。",
+  "BkUnlock": "解锁…",
+  "BkWrongPassword": "密码错误。",
+  "BkEncryptedRepo": "加密仓库 {name}",
+  "BkNoteEncrypted": "已加密：输入密码后才能查看并恢复其中的备份。"
 }

@@ -14,25 +14,22 @@ import (
 	"github.com/YuanZhe-99/WSLPilot/internal/jobs"
 	"github.com/YuanZhe-99/WSLPilot/internal/scheduler"
 	"github.com/YuanZhe-99/WSLPilot/internal/version"
+	"github.com/YuanZhe-99/WSLPilot/internal/volume"
 	L "github.com/YuanZhe-99/WSLPilot/locales"
 )
 
-// settingsDoc stores the app's own preferences.
-const settingsDoc = "settings.json"
-
-// Prefs are WSLPilot's preferences.
-type Prefs struct {
-	Theme     string `json:"theme"` // system, light, dark
-	BackupDir string `json:"backupDir,omitempty"`
-}
+// Prefs are WSLPilot's preferences (shared with the agent through core).
+type Prefs = core.Prefs
 
 // settingsPage is the state of the Settings page.
 type settingsPage struct {
 	loaded         bool
 	prefs          Prefs
 	backupDir      string
+	helperImage    string
 	themeChoice    string
 	openAtLogin    bool
+	autoUpdate     bool
 	agentInstalled bool
 	agentChecked   bool
 	tab            int
@@ -48,14 +45,16 @@ func (a *App) loadPrefs() {
 		return
 	}
 	s.loaded = true
-	a.k.Store.Load(settingsDoc, 1, &s.prefs)
+	s.prefs = a.k.LoadPrefs()
 	if s.prefs.Theme == "" {
 		s.prefs.Theme = "system"
 	}
 	s.backupDir = s.prefs.BackupDir
+	s.helperImage = s.prefs.HelperImage
 	s.themeChoice = themeLabel(s.prefs.Theme)
 	if a.host != nil {
 		s.openAtLogin = a.host.OpenAtLogin()
+		s.autoUpdate = a.host.AutoUpdate()
 		a.host.SetTheme(s.prefs.Theme)
 	}
 	a.checkAgent()
@@ -87,7 +86,7 @@ func (a *App) installAgent() {
 func (a *App) savePrefs() {
 	prefs := a.settings.prefs
 	a.async(func(ctx context.Context) func() {
-		err := a.k.Store.Save(settingsDoc, 1, prefs)
+		err := a.k.Store.Save(core.SettingsDoc, 1, prefs)
 		return func() {
 			if err != nil {
 				a.notify(friendlyError(err), true)
@@ -149,6 +148,16 @@ func (a *App) settingsView(c *ui.Context) {
 					})
 				})
 			}).Description(L.SetBackupDirHelp())
+			ui.Field(c, L.SetHelperImage(), func() {
+				ui.Row(c).FillWidth().Gap(smallGap).Children(func() {
+					ui.TextInput(c, &s.helperImage).Placeholder(volume.DefaultHelperImage).Label(L.SetHelperImage()).Grow(1)
+					ui.Button(c, L.Save()).OnClick(func() {
+						s.prefs.HelperImage = strings.TrimSpace(s.helperImage)
+						a.k.ApplyPrefs(s.prefs)
+						a.savePrefs()
+					})
+				})
+			}).Description(L.SetHelperImageHelp())
 			ui.Field(c, L.SetAgent(), func() {
 				switch {
 				case !s.agentChecked:
@@ -167,6 +176,13 @@ func (a *App) settingsView(c *ui.Context) {
 					ui.Button(c, L.SetInstallAgent()).OnClick(a.installAgent)
 				}
 			}).Description(L.SetAgentHelp())
+			ui.Field(c, L.SetUpdates(), func() {
+				ui.Row(c).Gap(smallGap).AlignItems(ui.Center).Children(func() {
+					ui.Switch(c, &s.autoUpdate).Label(L.SetAutoUpdate()).OnChange(func() { a.host.SetAutoUpdate(s.autoUpdate) })
+					ui.Text(c, L.SetAutoUpdate())
+					ui.Button(c, L.SetCheckNow()).OnClick(a.host.CheckForUpdates)
+				})
+			}).Description(L.SetUpdatesHelp())
 			ui.Field(c, L.SetData(), func() {
 				ui.Button(c, a.k.Store.Dir).OnClick(func() { a.host.OpenPath(a.k.Store.Dir) })
 			})

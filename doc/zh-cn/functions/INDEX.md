@@ -16,7 +16,8 @@
 | `internal/configdoc` | 以原始文档方式编辑 `.wslconfig`、`wsl.conf`、`settings.yaml`；表单键模式；带冲突检测的保存 | `INI`、`YAML`、`Field`、`WSLConf`、`WSLConfig`、`WSLcSettings`、`ApplyINI`、`ApplyYAML`、`Snapshot.Save`、`DiffLines` |
 | `internal/vhdx` | 用 diskpart 压缩 WSL 自身无法压缩的 VHDX | `Script`、`Compact`、`Elevator`、`ErrInUse` |
 | `internal/elevate` | 通过 UAC 提示启动单个提权子进程 | `Run`、`ErrDeclined` |
-| `internal/backup/wpbk` | 增量备份仓库（见 `backup-format.md`） | `Init`、`Open`、`Repo.Backup`、`Restore`、`Entries`、`Check`、`Forget`、`ApplyPolicy`、`Prune`、`RebuildIndex` |
+| `internal/secret` | 以 DPAPI 保护保存的机密（仓库密码） | `Protect`、`Unprotect` |
+| `internal/backup/wpbk` | 增量备份仓库（见 `backup-format.md`） | `Init`、`Open`、`Repo.Backup`、`Restore`、`Entries`、`Check`、`Forget`、`ApplyPolicy`、`Prune`、`RebuildIndex`、`ChangePassword`、`ReadConfig` |
 | `internal/gui` | 原生 UI：概览、WSL、容器、Compose、Volume、备份、终端、设置页面；任务面板、确认对话框、配置表单 | `App`、`New`、`Host`、`Term`、`confForm` |
 | `locales` | 由 `locales/*.json` 生成的消息访问函数 | `catalog_gen.go` |
 | `tools/checkdocs` | 校验 `doc/` 语言镜像 | `main` |
@@ -25,7 +26,7 @@
 | `internal/core` | 为各进程装配服务；Compose 接线（备份、自启） | `Core`、`New`、`BackupTarget`、`WireCompose`、`FindProject`、`MoveWSLcData`、`AgentPath` |
 | `internal/compose` | Compose：Backend 接口、项目元数据、加载、校验、规划、builtin 与 native Backend、迁移（见 `compose.md`） | `Backend`、`Registry`、`Project`、`Projects`、`Load`、`Translate`、`Diff`、`Builtin`、`Native`、`Migrate` |
 | `internal/volume` | 经辅助容器以 tar 导入导出 Volume | `Pipeline`、`Import`、`Export`、`Decompress`、`HelperImage` |
-| `internal/backup` | 来源→tar→目录/归档/仓库；目录扫描、校验、恢复、保留（见 `backups.md`） | `Runner`、`FolderWriter`、`ArchiveWriter`、`RepoWriter`、`Scan`、`GroupBySource`、`Open`、`Verify`、`PlanRetention`、`Delete` |
+| `internal/backup` | 来源→tar→目录/归档/仓库；目录扫描、校验、恢复、保留（见 `backups.md`） | `Runner`、`FolderWriter`、`ArchiveWriter`、`RepoWriter`、`Scan`、`GroupBySource`、`Open`、`Verify`、`PlanRetention`、`Delete`、`RepoPassword` |
 | `internal/scheduler` | 备份计划、到期计算、重试、保留、历史、锁、计划任务注册 | `Service`、`Plan`、`Schedule`、`Retry`、`RunDue`、`Run`、`Install` |
 | `internal/restart` | 基于 `wslc events` 的容器重启策略 | `Watcher`、`Decide`、`Label` |
 | `internal/wtprofile` | Windows Terminal fragment 配置 | `Fragment`、`ContainerShell`、`DistroShell`、`GUIDFor` |

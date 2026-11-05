@@ -5,11 +5,16 @@ import (
 	"os"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/backup/wpbk"
+	"github.com/YuanZhe-99/WSLPilot/internal/secret"
 )
 
 // applyRepoRetention forgets snapshots of this plan by policy, then prunes.
 func applyRepoRetention(ctx context.Context, p Plan) ([]string, error) {
-	repo, err := wpbk.Open(p.Destination.Path, wpbk.OpenOptions{})
+	pw, err := secret.Unprotect(p.Destination.ProtectedPassword)
+	if err != nil {
+		return nil, err
+	}
+	repo, err := wpbk.Open(p.Destination.Path, wpbk.OpenOptions{Password: pw})
 	if err != nil {
 		return nil, err
 	}

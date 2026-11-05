@@ -37,6 +37,12 @@ installers and `SHA256SUMS.txt`, and refuses to publish when the tag differs fro
 |---|---|---|
 | `MYGO_UPDATER_PRIVATE_KEY` | Signing the update archives and `update-<platform>.json` | No updates are published |
 
+The key is set in the GitHub repository; its public half is `updates.publicKey` in `mygo.json` and must
+never change (installed apps accept only updates signed with it). Release notes come from the
+`## <version>` section of `doc/en-us/version-history.md`, which every release must have. The app
+checks the latest GitHub release with MyGo's updater plugin (native window), daily and from
+Settings or the tray; only the installed app (per-user, `%LOCALAPPDATA%Programs`) can update itself.
+
 ## Upstream update procedure
 
 `go run ./tools/deps check` prints the pinned and latest versions of MyGo and WSL.

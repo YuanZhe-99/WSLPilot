@@ -45,11 +45,15 @@ func (r *Repo) loadSnapshots() ([]Snapshot, error) {
 	return out, errors.Join(errs...)
 }
 
-// readSnapshot reads and validates snapshots/<id>.json.
+// readSnapshot reads, decrypts (in an encrypted repository) and validates
+// snapshots/<id>.json.
 func (r *Repo) readSnapshot(id string) (Snapshot, error) {
 	data, err := os.ReadFile(filepath.Join(r.dir, "snapshots", id+".json"))
 	if err != nil {
 		return Snapshot{}, err
+	}
+	if data, err = r.unseal(aadSnapshot, data); err != nil {
+		return Snapshot{}, fmt.Errorf("wpbk: snapshot %s: %w", id, err)
 	}
 	var s Snapshot
 	if err := json.Unmarshal(data, &s); err != nil {

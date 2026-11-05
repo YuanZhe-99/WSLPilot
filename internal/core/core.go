@@ -7,12 +7,15 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
+	"sync"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/backup"
 	"github.com/YuanZhe-99/WSLPilot/internal/capability"
 	"github.com/YuanZhe-99/WSLPilot/internal/compose"
 	"github.com/YuanZhe-99/WSLPilot/internal/jobs"
 	"github.com/YuanZhe-99/WSLPilot/internal/scheduler"
+	"github.com/YuanZhe-99/WSLPilot/internal/secret"
 	"github.com/YuanZhe-99/WSLPilot/internal/store"
 	"github.com/YuanZhe-99/WSLPilot/internal/volume"
 	"github.com/YuanZhe-99/WSLPilot/internal/wsl"
@@ -34,6 +37,7 @@ type Core struct {
 	Projects compose.Projects
 	// ComposeBackup backs up a Compose project (its files and volumes);
 	// set by the compose wiring.
+	passwords     sync.Map // repository dir → password typed this session
 	ComposeBackup func(ctx context.Context, project string, w backup.Writer, o backup.Options) (backup.Item, error)
 	// AutostartCompose brings up the Compose projects marked autostart;
 	// set by the compose wiring.
@@ -57,6 +61,8 @@ func New() (*Core, error) {
 		Prober:  &capability.Prober{WSL: w, WSLc: c},
 	}
 	k.Scheduler = &scheduler.Service{Store: st, Do: k.BackupTarget}
+	k.ApplyPrefs(k.LoadPrefs())
+	backup.RepoPassword = k.repoPassword
 	return k, nil
 }
 
@@ -87,4 +93,50 @@ func AgentPath() string {
 		return "wslpilot-agent.exe"
 	}
 	return filepath.Join(filepath.Dir(exe), "wslpilot-agent.exe")
+}
+
+// SettingsDoc is the app preferences document shared by the GUI and the
+// agent (see doc/en-us/app-data.md).
+const SettingsDoc = "settings.json"
+
+// Prefs are the preferences in SettingsDoc.
+type Prefs struct {
+	Theme     string `json:"theme,omitempty"` // system, light, dark
+	BackupDir string `json:"backupDir,omitempty"`
+	// HelperImage is the image for volume transfers ("" = alpine:3.20).
+	HelperImage string `json:"helperImage,omitempty"`
+}
+
+// LoadPrefs reads the preferences (zero values when missing).
+func (k *Core) LoadPrefs() Prefs {
+	var p Prefs
+	k.Store.Load(SettingsDoc, 1, &p)
+	return p
+}
+
+// ApplyPrefs puts preferences that affect services into effect.
+func (k *Core) ApplyPrefs(p Prefs) { k.Volumes.SetImage(p.HelperImage) }
+
+// RememberPassword keeps an encrypted repository's password in memory for
+// this process (the user typed it to open the repository).
+func (k *Core) RememberPassword(dir, password string) {
+	k.passwords.Store(strings.ToLower(filepath.Clean(dir)), password)
+}
+
+// repoPassword finds the password of the repository in dir: one typed in
+// this session, else the DPAPI-protected one of a plan writing there.
+func (k *Core) repoPassword(dir string) (string, bool) {
+	key := strings.ToLower(filepath.Clean(dir))
+	if v, ok := k.passwords.Load(key); ok {
+		return v.(string), true
+	}
+	ps, _ := k.Scheduler.Plans()
+	for _, p := range ps {
+		if p.Destination.ProtectedPassword != "" && strings.ToLower(filepath.Clean(p.Destination.Path)) == key {
+			if pw, err := secret.Unprotect(p.Destination.ProtectedPassword); err == nil {
+				return pw, true
+			}
+		}
+	}
+	return "", false
 }

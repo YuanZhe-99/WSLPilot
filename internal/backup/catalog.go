@@ -93,7 +93,10 @@ func classifyDir(dir string) ([]Item, bool, error) {
 		if _, err := os.Stat(filepath.Join(dir, "snapshots")); err != nil {
 			return nil, false, nil
 		}
-		repo, err := wpbk.Open(dir, wpbk.OpenOptions{ReadOnly: true})
+		repo, err := openRepoReadOnly(dir)
+		if isLockedOut(err) {
+			return []Item{encryptedRepoItem(dir)}, true, nil
+		}
 		if err != nil {
 			return nil, true, err
 		}

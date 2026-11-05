@@ -99,7 +99,7 @@ func Verify(ctx context.Context, it Item) error {
 	case KindFolder:
 		return verifyFolder(ctx, it.Path)
 	case KindRepo:
-		r, err := wpbk.Open(it.Path, wpbk.OpenOptions{ReadOnly: true})
+		r, err := openRepoReadOnly(it.Path)
 		if err != nil {
 			return err
 		}

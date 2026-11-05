@@ -1,14 +1,19 @@
 package wpbk_test
 
-// This file is an independent wpbk v1 reader written only from
-// doc/en-us/backup-format.md. It deliberately uses nothing from package
-// wpbk except to create the repository under test; if the document stops
-// being sufficient to restore data, this test fails.
+// This file is an independent wpbk v1 reader, for unencrypted and encrypted
+// repositories, written only from doc/en-us/backup-format.md. It
+// deliberately uses nothing from package wpbk except to create the
+// repository under test; if the document stops being sufficient to restore
+// data, this test fails.
 
 import (
 	"archive/tar"
 	"bytes"
 	"context"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/hkdf"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/binary"
 	"encoding/hex"
@@ -22,6 +27,7 @@ import (
 	"github.com/YuanZhe-99/WSLPilot/internal/backup/wpbk"
 	"github.com/klauspost/compress/zstd"
 	"github.com/zeebo/blake3"
+	"golang.org/x/crypto/argon2"
 )
 
 // specBlob is a blob reference as specified for trailers and index files.
@@ -67,6 +73,97 @@ type specReader struct {
 	dir string
 	dec *zstd.Decoder
 	m   map[string]specLoc
+	// data and idKey are set for an encrypted repository ("Encryption").
+	data  cipher.AEAD
+	idKey []byte
+}
+
+// specKeys derives the data key and id key from config.json's encryption
+// object and the password, as in "Encryption" / "Keys".
+// Returns: ok false when the wrapped key does not open (wrong password).
+func specKeys(t *testing.T, raw json.RawMessage, password string) (data cipher.AEAD, idKey []byte, ok bool) {
+	t.Helper()
+	var e struct {
+		Algorithm string `json:"algorithm"`
+		KDF       struct {
+			Name    string `json:"name"`
+			Salt    string `json:"salt"`
+			Time    uint32 `json:"time"`
+			Memory  uint32 `json:"memory"`
+			Threads uint8  `json:"threads"`
+		} `json:"kdf"`
+		Key string `json:"key"`
+	}
+	if err := json.Unmarshal(raw, &e); err != nil || e.Algorithm != "aes-256-gcm" || e.KDF.Name != "argon2id" {
+		t.Fatalf("encryption %s: %v", raw, err)
+	}
+	salt, err := base64.StdEncoding.DecodeString(e.KDF.Salt)
+	if err != nil {
+		t.Fatal(err)
+	}
+	key, err := base64.StdEncoding.DecodeString(e.Key)
+	if err != nil || len(key) != 60 {
+		t.Fatalf("wrapped key: %v", err)
+	}
+	kek := argon2.IDKey([]byte(password), salt, e.KDF.Time, e.KDF.Memory, e.KDF.Threads, 32)
+	master, err := specGCM(t, kek).Open(nil, key[0:12], key[12:60], nil)
+	if err != nil {
+		return nil, nil, false
+	}
+	dk, err := hkdf.Key(sha256.New, master, nil, "wpbk v1 data key", 32)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ik, err := hkdf.Key(sha256.New, master, nil, "wpbk v1 chunk id key", 32)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return specGCM(t, dk), ik, true
+}
+
+// specGCM returns AES-256-GCM for key.
+func specGCM(t *testing.T, key []byte) cipher.AEAD {
+	t.Helper()
+	b, err := aes.NewCipher(key)
+	if err != nil {
+		t.Fatal(err)
+	}
+	g, err := cipher.NewGCM(b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return g
+}
+
+// unseal opens nonce(12) || ciphertext || tag with the data key; it is
+// the identity for an unencrypted repository.
+func (s *specReader) unseal(aad, sealed []byte) []byte {
+	if s.data == nil {
+		return sealed
+	}
+	if len(sealed) < 28 {
+		s.t.Fatal("sealed data too short")
+	}
+	plain, err := s.data.Open(nil, sealed[:12], sealed[12:], aad)
+	if err != nil {
+		s.t.Fatalf("unseal %q: %v", aad, err)
+	}
+	return plain
+}
+
+// chunkID hashes a chunk plaintext: BLAKE3-256, keyed with the id key in
+// an encrypted repository.
+func (s *specReader) chunkID(plain []byte) string {
+	if s.idKey == nil {
+		sum := blake3.Sum256(plain)
+		return hex.EncodeToString(sum[:])
+	}
+	h, err := blake3.NewKeyed(s.idKey)
+	if err != nil {
+		s.t.Fatal(err)
+	}
+	h.Write(plain)
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 // readTrailers builds the chunk map from pack trailers alone.
@@ -87,7 +184,7 @@ func (s *specReader) readTrailers() map[string]specLoc {
 			Version int        `json:"version"`
 			Blobs   []specBlob `json:"blobs"`
 		}
-		if err := json.Unmarshal(data[n-16-tl:n-16], &tr); err != nil || tr.Version != 1 {
+		if err := json.Unmarshal(s.unseal([]byte("wpbk trailer"), data[n-16-tl:n-16]), &tr); err != nil || tr.Version != 1 {
 			s.t.Fatalf("%s: trailer %v", f, err)
 		}
 		id := strings.TrimSuffix(filepath.Base(f), ".pack")
@@ -119,7 +216,7 @@ func (s *specReader) readIndex() map[string]specLoc {
 				Blobs []specBlob `json:"blobs"`
 			} `json:"packs"`
 		}
-		if err := json.Unmarshal(data, &idx); err != nil || idx.Version != 1 {
+		if err := json.Unmarshal(s.unseal([]byte("wpbk index"), data), &idx); err != nil || idx.Version != 1 {
 			s.t.Fatalf("%s: %v", f, err)
 		}
 		for _, p := range idx.Packs {
@@ -146,12 +243,12 @@ func (s *specReader) chunk(id string) []byte {
 	if _, err := f.ReadAt(buf, loc.blob.Offset); err != nil {
 		s.t.Fatal(err)
 	}
-	plain, err := s.dec.DecodeAll(buf, nil)
+	rawID, _ := hex.DecodeString(id)
+	plain, err := s.dec.DecodeAll(s.unseal(rawID, buf), nil)
 	if err != nil {
 		s.t.Fatal(err)
 	}
-	sum := blake3.Sum256(plain)
-	if hex.EncodeToString(sum[:]) != id || int64(len(plain)) != loc.blob.RawLength {
+	if s.chunkID(plain) != id || int64(len(plain)) != loc.blob.RawLength {
 		s.t.Fatalf("chunk %s fails verification", id)
 	}
 	return plain
@@ -169,7 +266,7 @@ func (s *specReader) restore(id string) []byte {
 		ID      string   `json:"id"`
 		Tree    []string `json:"tree"`
 	}
-	if err := json.Unmarshal(data, &snap); err != nil || snap.Version != 1 || snap.ID != id {
+	if err := json.Unmarshal(s.unseal([]byte("wpbk snapshot"), data), &snap); err != nil || snap.Version != 1 || snap.ID != id {
 		t.Fatalf("snapshot: %v", err)
 	}
 	var list []byte
@@ -274,6 +371,55 @@ func TestSpecReaderRestores(t *testing.T) {
 	dec, _ := zstd.NewReader(nil)
 	defer dec.Close()
 	s := &specReader{t: t, dir: dir, dec: dec}
+	fromIndex, fromTrailers := s.readIndex(), s.readTrailers()
+	if len(fromIndex) == 0 || len(fromIndex) != len(fromTrailers) {
+		t.Fatalf("index has %d chunks, trailers %d", len(fromIndex), len(fromTrailers))
+	}
+	for _, m := range []map[string]specLoc{fromIndex, fromTrailers} {
+		s.m = m
+		wpbk.CompareTarBytes(t, src, s.restore(snap.ID))
+	}
+}
+
+// TestSpecReaderRestoresEncrypted restores an encrypted repository with the
+// independent reader, deriving every key from config.json and the password.
+func TestSpecReaderRestoresEncrypted(t *testing.T) {
+	const password = "spec password ✓"
+	dir := filepath.Join(t.TempDir(), "repo")
+	r, err := wpbk.Init(dir, wpbk.InitOptions{Password: password})
+	if err != nil {
+		t.Fatal(err)
+	}
+	src := wpbk.SampleTar(t)
+	snap, err := r.Backup(context.Background(), bytes.NewReader(src), wpbk.SnapshotMeta{Source: wpbk.Source{Kind: "wsl-distro", Name: "spec"}}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r.Close()
+
+	cfgData, err := os.ReadFile(filepath.Join(dir, "config.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cfg struct {
+		Version    int             `json:"version"`
+		Encryption json.RawMessage `json:"encryption"`
+	}
+	json.Unmarshal(cfgData, &cfg)
+	if cfg.Version != 1 || len(cfg.Encryption) == 0 || string(cfg.Encryption) == "null" {
+		t.Fatalf("config %s", cfgData)
+	}
+	if _, _, ok := specKeys(t, cfg.Encryption, "not the password"); ok {
+		t.Fatal("a wrong password must fail the wrapped key's tag")
+	}
+	data, idKey, ok := specKeys(t, cfg.Encryption, password)
+	if !ok {
+		t.Fatal("the password does not open the wrapped key")
+	}
+
+	dec, _ := zstd.NewReader(nil)
+	defer dec.Close()
+	s := &specReader{t: t, dir: dir, dec: dec, data: data, idKey: idKey}
 	fromIndex, fromTrailers := s.readIndex(), s.readTrailers()
 	if len(fromIndex) == 0 || len(fromIndex) != len(fromTrailers) {
 		t.Fatalf("index has %d chunks, trailers %d", len(fromIndex), len(fromTrailers))

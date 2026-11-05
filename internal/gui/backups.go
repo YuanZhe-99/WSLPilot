@@ -13,8 +13,10 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/backup"
+	"github.com/YuanZhe-99/WSLPilot/internal/backup/wpbk"
 	"github.com/YuanZhe-99/WSLPilot/internal/jobs"
 	"github.com/YuanZhe-99/WSLPilot/internal/scheduler"
+	"github.com/YuanZhe-99/WSLPilot/internal/secret"
 	"github.com/YuanZhe-99/WSLPilot/internal/volume"
 	L "github.com/YuanZhe-99/WSLPilot/locales"
 )
@@ -47,7 +49,8 @@ type backupsPage struct {
 
 // restoreInput holds the restore dialog fields.
 type restoreInput struct {
-	mode     string // distro, volume, over-distro, over-volume, files
+	password string // unlock
+	mode     string // distro, volume, over-distro, over-volume, files, unlock
 	name     string
 	location string
 	dir      string
@@ -61,7 +64,10 @@ type planInput struct {
 	kind, every, at, weekday, day     string
 	keepLast, keepDaily, keepWeekly   string
 	keepMonthly, retries, compression string
-	options                           []scheduler.Target
+	// encrypt asks for a new password (pw1, pw2) for the repository.
+	encrypt  bool
+	pw1, pw2 string
+	options  []scheduler.Target
 }
 
 // locationsDoc is where the restore view remembers locations.
@@ -286,6 +292,9 @@ func groupTitle(g backup.Group) string {
 	case backup.SourceCompose:
 		return L.BkProject(g.Source.Name)
 	}
+	if it := g.Items[0]; it.Kind == backup.KindRepo && it.Note == backup.NoteEncrypted {
+		return L.BkEncryptedRepo(filepath.Base(it.Path))
+	}
 	return L.BkOutsideTar(filepath.Base(g.Items[0].Path))
 }
 
@@ -358,6 +367,10 @@ func (a *App) versions(c *ui.Context, g backup.Group) {
 		}
 	})
 	ui.Row(c).FillWidth().Gap(smallGap).Children(func() {
+		if it.Note == backup.NoteEncrypted {
+			ui.PrimaryButton(c, L.BkUnlock()).OnClick(func() { p.rin = restoreInput{mode: "unlock", dir: it.Path}; p.dlg = "restore" })
+			return
+		}
 		ui.Button(c, L.BkVerify()).OnClick(func() { a.verifyItem(it) })
 		switch it.Source.Kind {
 		case backup.SourceDistro, backup.SourceUnknown:
@@ -401,6 +414,8 @@ func (a *App) versions(c *ui.Context, g backup.Group) {
 // noteText localizes the notes Scan attaches.
 func noteText(n string) string {
 	switch {
+	case n == backup.NoteEncrypted:
+		return L.BkNoteEncrypted()
 	case strings.HasPrefix(n, "no WSLPilot metadata"):
 		return L.BkNoteNoMeta()
 	case strings.HasPrefix(n, "disk image"):
@@ -644,6 +659,7 @@ func (a *App) editPlan(pl *scheduler.Plan) {
 		r := pl.Retention
 		in.keepLast, in.keepDaily, in.keepWeekly, in.keepMonthly = itoa(r.KeepLast), itoa(r.KeepDaily), itoa(r.KeepWeekly), itoa(r.KeepMonthly)
 		in.retries = itoa(pl.Retry.Max)
+		in.encrypt = pl.Destination.ProtectedPassword != ""
 		if pl.Destination.Compression != "" {
 			in.compression = string(pl.Destination.Compression)
 		}
@@ -712,6 +728,18 @@ func (in *planInput) buildPlan() (scheduler.Plan, error) {
 	if len(p.Targets) == 0 {
 		return p, errors.New(L.BkNeedTarget())
 	}
+	keep := in.pw1 == "" && in.p.Destination.ProtectedPassword != ""
+	if in.kind == string(backup.KindRepo) && in.encrypt && !keep {
+		if len(in.pw1) < 8 {
+			return p, errors.New(L.BkPasswordShort())
+		}
+		if in.pw1 != in.pw2 {
+			return p, errors.New(L.BkPasswordMismatch())
+		}
+	}
+	if in.kind != string(backup.KindRepo) {
+		p.Destination.ProtectedPassword = ""
+	}
 	return p, p.Schedule.Validate()
 }
 
@@ -768,6 +796,27 @@ func (a *App) restoreDialog(c *ui.Context) {
 		muted(c, L.ConfirmTypeName(in.name))
 		ui.TextInput(c, &in.location).Label(L.ConfirmTypeName(in.name))
 		dialogButtons(c, a, L.BkRestore(), in.location == in.name, func() { a.restoreItem(it, *in) })
+	case "unlock":
+		ui.Text(c, L.BkUnlock()).FontSize(sectionSize).Bold()
+		muted(c, in.dir)
+		ui.Field(c, L.BkPassword(), func() { ui.TextInput(c, &in.password).Password().AutoFocus().Label(L.BkPassword()) })
+		dialogButtons(c, a, L.BkUnlock(), in.password != "", func() {
+			dir, pw := in.dir, in.password
+			a.async(func(ctx context.Context) func() {
+				err := checkRepoPassword(dir, pw)
+				if err == nil {
+					a.k.RememberPassword(dir, pw)
+				}
+				return func() {
+					if err != nil {
+						a.notify(L.BkWrongPassword(), true)
+						return
+					}
+					a.bk.loaded = false
+					a.loadCatalog()
+				}
+			})
+		})
 	case "extract":
 		ui.Text(c, L.BkExtractFiles()).FontSize(sectionSize).Bold()
 		folderField(c, a, L.BkIntoFolder(), &in.dir)
@@ -803,6 +852,13 @@ func (a *App) planDialog(c *ui.Context) {
 				})
 			}
 			folderField(c, a, L.BkDestination(), &in.p.Destination.Path)
+			if in.kind == string(backup.KindRepo) {
+				ui.Field(c, L.BkEncrypt(), func() { ui.Checkbox(c, &in.encrypt, L.BkEncryptOption()) }).Description(L.BkEncryptHelp())
+				if in.encrypt {
+					ui.Field(c, L.BkPassword(), func() { ui.TextInput(c, &in.pw1).Password().Label(L.BkPassword()) })
+					ui.Field(c, L.BkPasswordAgain(), func() { ui.TextInput(c, &in.pw2).Password().Label(L.BkPasswordAgain()) })
+				}
+			}
 			ui.Field(c, L.BkSchedule(), func() {
 				ui.Select(c, &in.every, []string{string(scheduler.Hourly), string(scheduler.Daily), string(scheduler.Weekly), string(scheduler.Monthly), string(scheduler.Manual)}).Label(L.BkSchedule())
 			})
@@ -837,6 +893,15 @@ func (a *App) planDialog(c *ui.Context) {
 	}
 	dialogButtons(c, a, L.Save(), err == nil, func() {
 		a.async(func(ctx context.Context) func() {
+			if in.encrypt && in.pw1 != "" {
+				prot, perr := secret.Protect(in.pw1)
+				if perr != nil {
+					return func() { a.notify(friendlyError(perr), true) }
+				}
+				plan.Destination.ProtectedPassword = prot
+			} else if !in.encrypt {
+				plan.Destination.ProtectedPassword = ""
+			}
 			serr := a.k.Scheduler.Save(plan)
 			return func() {
 				if serr != nil {
@@ -846,4 +911,13 @@ func (a *App) planDialog(c *ui.Context) {
 			}
 		})
 	})
+}
+
+// checkRepoPassword opens an encrypted repository read-only with password.
+func checkRepoPassword(dir, password string) error {
+	r, err := wpbk.Open(dir, wpbk.OpenOptions{ReadOnly: true, Password: password})
+	if err != nil {
+		return err
+	}
+	return r.Close()
 }

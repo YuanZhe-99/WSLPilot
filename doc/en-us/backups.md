@@ -81,6 +81,7 @@ Checking an archive compares the SHA-256 and the entry count with the sidecar.
 |---|---|---|
 | `.wslpilot/folder.json` | `folder` | distribution, volume, or files into a distribution |
 | `config.json` + `snapshots/` (wpbk) | `repo`, one item per snapshot | same |
+| an encrypted wpbk repository without its password | `repo`, one item with the note `encrypted` | nothing until unlocked: the password typed in the app is kept in memory for the session, or comes from a plan writing there |
 | `*.tar*` with a sidecar | `archive` | same |
 | `*.tar*` without a sidecar | `tar` (outside archive) | same; the interface says source and consistency are unknown |
 | `*.vhdx`, `*.vhd` | `vhdx` | new distribution only (`wsl --import --vhd`) |
@@ -113,7 +114,7 @@ log.
 | Field | Meaning |
 |---|---|
 | `targets` | sources to back up |
-| `destination` | `kind` (`folder`, `archive`, `repo`), `path`, `compression` |
+| `destination` | `kind` (`folder`, `archive`, `repo`), `path`, `compression`, `protectedPassword` (an encrypted repository's password, protected with DPAPI for the current Windows user; never stored in plain text) |
 | `schedule` | `every` (`hourly`, `daily`, `weekly`, `monthly`, `manual`), `at` (HH:MM), `weekday`, `day` (1–28) |
 | `retention` | `keepLast`, `keepDaily`, `keepWeekly`, `keepMonthly`, per source |
 | `retry` | `max` attempts after a failure; the delay starts at `initial` and doubles up to `limit` |

@@ -49,21 +49,25 @@ const (
 	errorCancelled        = 1223
 )
 
-// Run starts program with args through the "runas" verb, hidden, and waits.
+// Run starts program with a raw parameter string through the "runas" verb,
+// hidden, and waits.
+// Inputs: params is passed as is; build it with Args for programs that
+// parse their command line like the C runtime, or by cmd.exe's own rules
+// for cmd.exe (which does not understand \").
 // Returns: the exit code; ErrDeclined when the prompt was refused.
 // Notes: cancelling ctx stops waiting but leaves the elevated child to
 // finish, since this process may not terminate it.
-func Run(ctx context.Context, program string, args []string) (int, error) {
+func Run(ctx context.Context, program, params string) (int, error) {
 	verb, _ := windows.UTF16PtrFromString("runas")
 	file, err := windows.UTF16PtrFromString(program)
 	if err != nil {
 		return 0, err
 	}
-	params, err := windows.UTF16PtrFromString(joinArgs(args))
+	p16, err := windows.UTF16PtrFromString(params)
 	if err != nil {
 		return 0, err
 	}
-	info := shellExecuteInfo{fMask: seeMaskNoCloseProcess | seeMaskNoAsync, lpVerb: verb, lpFile: file, lpParameters: params, nShow: swHide}
+	info := shellExecuteInfo{fMask: seeMaskNoCloseProcess | seeMaskNoAsync, lpVerb: verb, lpFile: file, lpParameters: p16, nShow: swHide}
 	info.cbSize = uint32(unsafe.Sizeof(info))
 	r, _, callErr := shellExecuteExW.Call(uintptr(unsafe.Pointer(&info)))
 	if r == 0 {
@@ -90,8 +94,8 @@ func Run(ctx context.Context, program string, args []string) (int, error) {
 	return int(code), nil
 }
 
-// joinArgs quotes arguments the way the C runtime parses them.
-func joinArgs(args []string) string {
+// Args quotes arguments the way the C runtime parses them.
+func Args(args []string) string {
 	q := make([]string, len(args))
 	for i, a := range args {
 		q[i] = windows.EscapeArg(a)

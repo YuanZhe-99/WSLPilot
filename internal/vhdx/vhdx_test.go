@@ -30,16 +30,16 @@ func TestCompactRunsElevatedScript(t *testing.T) {
 	p := filepath.Join(t.TempDir(), "disk.vhdx")
 	os.WriteFile(p, make([]byte, 100), 0o644)
 	var gotProg string
-	var gotArgs []string
-	res, err := Compact(context.Background(), func(ctx context.Context, program string, args []string) (int, error) {
-		gotProg, gotArgs = program, args
+	var gotArgs string
+	res, err := Compact(context.Background(), func(ctx context.Context, program, params string) (int, error) {
+		gotProg, gotArgs = program, params
 		os.WriteFile(p, make([]byte, 10), 0o644)
 		return 0, nil
 	}, p, nil)
 	if err != nil || res.Before != 100 || res.After != 10 {
 		t.Fatalf("%v %+v", err, res)
 	}
-	if gotProg != "cmd.exe" || !strings.Contains(gotArgs[2], "diskpart.exe /s") {
+	if gotProg != "cmd.exe" || !strings.HasPrefix(gotArgs, `/d /s /c ""diskpart.exe" /s "`) || !strings.HasSuffix(gotArgs, `diskpart.log" 2>&1"`) {
 		t.Errorf("%s %q", gotProg, gotArgs)
 	}
 }

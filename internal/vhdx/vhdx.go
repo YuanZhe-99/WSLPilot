@@ -29,7 +29,7 @@ func Script(path string) (string, error) {
 
 // Elevator runs a program elevated (UAC prompt) and waits for it.
 // Returns: the exit code, or an error when the user declined the prompt.
-type Elevator func(ctx context.Context, program string, args []string) (int, error)
+type Elevator func(ctx context.Context, program, params string) (int, error)
 
 // ErrInUse means the disk is open by another process (a running
 // distribution or WSLc session).
@@ -70,7 +70,9 @@ func Compact(ctx context.Context, elevate Elevator, path string, log func(string
 	// diskpart writes to a console the elevated process owns; cmd
 	// redirects it to a file this process can read afterwards.
 	out := filepath.Join(dir, "diskpart.log")
-	code, err := elevate(ctx, "cmd.exe", []string{"/d", "/c", "diskpart.exe /s \"" + sp + "\" > \"" + out + "\" 2>&1"})
+	// cmd.exe rule: with /s, the first and last quote of the command are
+	// removed and the rest is run as typed, inner quotes included.
+	code, err := elevate(ctx, "cmd.exe", CmdLine(sp, out))
 	if b, rerr := os.ReadFile(out); rerr == nil && log != nil {
 		log(string(b))
 	}
@@ -95,4 +97,12 @@ func checkExclusive(path string) error {
 		return ErrInUse
 	}
 	return f.Close()
+}
+
+// CmdLine is the cmd.exe parameter string that runs diskpart on script and
+// writes its output to log.
+// Notes: cmd.exe does not understand C-runtime escaping (\"); with /s it
+// strips the outer pair of quotes and runs the rest as typed.
+func CmdLine(script, log string) string {
+	return `/d /s /c ""diskpart.exe" /s "` + script + `" > "` + log + `" 2>&1"`
 }

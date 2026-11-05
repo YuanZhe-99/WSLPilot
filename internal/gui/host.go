@@ -28,6 +28,12 @@ type Host interface {
 	OpenAtLogin() bool
 	// SetTheme chooses "system", "light" or "dark".
 	SetTheme(mode string)
+	// CheckForUpdates checks now and shows the update window.
+	CheckForUpdates()
+	// AutoUpdate reports whether updates are checked in the background.
+	AutoUpdate() bool
+	// SetAutoUpdate turns background update checks on or off.
+	SetAutoUpdate(on bool)
 }
 
 // Term is a running terminal session.

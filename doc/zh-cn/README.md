@@ -28,5 +28,6 @@ WSLPilot 是 Windows 11 原生桌面工具，用于管理 WSL 发行版与 WSL �
 |---|---|---|
 | Go | 1.27.3 | `go.mod` |
 | MyGo | v0.7.4 | `go.mod` |
+| WSLPilot | 0.1.0 | `internal/version`、`mygo.json` |
 | WSL（已测试，不随附） | 3.0.3.0 | `internal/upstream/tested.json`、`upstream.md` |
 | WSLc（已测试，不随附） | 3.0.3.0 | `upstream.md` |

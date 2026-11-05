@@ -4,7 +4,8 @@
 // Each tar entry's header is kept field by field and its content is split by
 // a content-defined chunker into chunks that are deduplicated across every
 // snapshot in the repository, compressed with zstd and stored in pack files.
-// The on-disk format is specified in doc/en-us/backup-format.md; this package
+// A repository may be created encrypted (AES-256-GCM under a master key
+// unlocked by an Argon2id-derived password key); see crypto.go. The on-disk format is specified in doc/en-us/backup-format.md; this package
 // is one implementation of that specification, and spec_test.go proves that
 // the document alone is enough to restore data.
 package wpbk
@@ -62,6 +63,14 @@ var (
 	ErrChunkMissing = errors.New("wpbk: chunk missing from repository")
 	// ErrChunkCorrupt reports a chunk whose bytes do not hash to its id.
 	ErrChunkCorrupt = errors.New("wpbk: chunk is corrupt")
+	// ErrEncrypted reports an encrypted repository opened without a
+	// password.
+	ErrEncrypted = errors.New("wpbk: repository is encrypted; a password is required")
+	// ErrPassword reports a wrong password for an encrypted repository.
+	ErrPassword = errors.New("wpbk: wrong repository password")
+	// ErrNotEncrypted reports a password operation on an unencrypted
+	// repository.
+	ErrNotEncrypted = errors.New("wpbk: repository is not encrypted")
 )
 
 // Config is the content of config.json, written once by Init.
@@ -93,8 +102,8 @@ func (c *Config) validate() error {
 	if c.Hash != HashBlake3 {
 		return fmt.Errorf("%w: hash %q", ErrUnsupportedVersion, c.Hash)
 	}
-	if len(c.Encryption) > 0 && string(c.Encryption) != "null" {
-		return fmt.Errorf("%w: encrypted repositories are not supported", ErrUnsupportedVersion)
+	if _, err := c.encryption(); err != nil {
+		return err
 	}
 	if _, err := hex.DecodeString(c.ID); err != nil || c.ID == "" {
 		return fmt.Errorf("%w: bad repository id", ErrNotRepository)
@@ -102,7 +111,18 @@ func (c *Config) validate() error {
 	return c.Chunker.validate()
 }
 
-// BlobRef locates one compressed chunk inside a pack.
+// encryption returns the parsed "encryption" object, or nil for an
+// unencrypted repository (field null or absent).
+func (c *Config) encryption() (*Encryption, error) {
+	if len(c.Encryption) == 0 || string(c.Encryption) == "null" {
+		return nil, nil
+	}
+	return parseEncryption(c.Encryption)
+}
+
+// BlobRef locates one stored chunk inside a pack. Length is the stored size
+// (compressed and, in an encrypted repository, sealed); RawLength is the
+// plaintext size.
 type BlobRef struct {
 	ID        string `json:"id"`
 	Offset    int64  `json:"offset"`
@@ -230,8 +250,9 @@ func (b *BString) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// hashID returns the lowercase hex BLAKE3-256 of data, the id of chunks,
-// packs and index files.
+// hashID returns the lowercase hex BLAKE3-256 of data: the id of packs and
+// index files, and of chunks in an unencrypted repository (see
+// Repo.chunkID).
 func hashID(data []byte) string {
 	sum := blake3.Sum256(data)
 	return hex.EncodeToString(sum[:])
