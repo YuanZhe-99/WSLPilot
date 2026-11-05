@@ -2,6 +2,7 @@ package gui
 
 import (
 	"context"
+	"maps"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -169,8 +170,8 @@ func (a *App) projectDetail(c *ui.Context, pr *compose.Project) {
 		muted(c, L.CmpBackendFixed())
 	})
 	ui.Row(c).Gap(smallGap).AlignItems(ui.Center).Children(func() {
-		proj := pr
 		ui.Switch(c, &pr.Autostart).Label(L.CmpAutostart()).OnChange(func() {
+			proj := snapshotProject(pr)
 			a.async(func(ctx context.Context) func() {
 				err := a.k.Projects.Save(proj)
 				return func() {
@@ -494,7 +495,7 @@ func (a *App) projectVolumes(c *ui.Context, pr *compose.Project) {
 						pr.Volumes[key] = compose.VolumeChoice{Mode: "bind", Path: strings.TrimSpace(*p.volPath[id])}
 					}
 				}
-				proj := pr
+				proj := snapshotProject(pr)
 				a.async(func(ctx context.Context) func() {
 					err := a.k.Projects.Save(proj)
 					return func() {
@@ -509,4 +510,15 @@ func (a *App) projectVolumes(c *ui.Context, pr *compose.Project) {
 			})
 		}
 	})
+}
+
+// snapshotProject copies a project for saving on a goroutine while the
+// view keeps editing the original.
+func snapshotProject(p *compose.Project) *compose.Project {
+	cp := *p
+	cp.Files = append([]string(nil), p.Files...)
+	cp.EnvFiles = append([]string(nil), p.EnvFiles...)
+	cp.Profiles = append([]string(nil), p.Profiles...)
+	cp.Volumes = maps.Clone(p.Volumes)
+	return &cp
 }

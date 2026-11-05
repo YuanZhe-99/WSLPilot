@@ -99,11 +99,11 @@ func (a *App) loadCatalog() {
 		return
 	}
 	p.loading = true
-	own := a.backupDir()
+	own, label := a.backupDir(), L.BkDefaultLocation()
 	a.async(func(ctx context.Context) func() {
 		var locs []backup.Location
 		a.k.Store.Load(locationsDoc, 1, &locs)
-		all := append([]backup.Location{{Path: own, Label: L.BkDefaultLocation()}}, locs...)
+		all := append([]backup.Location{{Path: own, Label: label}}, locs...)
 		var items []backup.Item
 		var errs []string
 		for _, l := range all {
@@ -446,15 +446,17 @@ func (a *App) restoreItem(it backup.Item, in restoreInput) {
 		if err := backup.Verify(ctx, it); err != nil {
 			return fmt.Errorf("%s: %w", L.BkVerifyFailed(), err)
 		}
-		a.k.Backup.Log = j.Logf
-		defer func() { a.k.Backup.Log = nil }()
+		// A copy of the runner, so this job's log does not catch other jobs' lines.
+		runner := *a.k.Backup
+		runner.Log = j.Logf
+		r := &runner
 		j.SetProgress(-1, title)
 		var err error
 		switch in.mode {
 		case "distro":
-			err = a.k.Backup.RestoreAsDistro(ctx, it, in.name, in.location)
+			err = r.RestoreAsDistro(ctx, it, in.name, in.location)
 		case "over-distro":
-			_, err = a.k.Backup.ReplaceDistro(ctx, it, in.name, a.safetyWriter())
+			_, err = r.ReplaceDistro(ctx, it, in.name, a.safetyWriter())
 		case "files":
 			prefix := strings.Trim(strings.TrimSpace(in.prefix), "/")
 			var filter func(string) bool
@@ -464,14 +466,14 @@ func (a *App) restoreItem(it backup.Item, in restoreInput) {
 					return n == prefix || strings.HasPrefix(n, prefix+"/")
 				}
 			}
-			err = a.k.Backup.RestoreIntoDistro(ctx, it, in.name, in.dir, filter)
+			err = r.RestoreIntoDistro(ctx, it, in.name, in.dir, filter)
 		case "volume":
-			err = a.k.Backup.RestoreToVolume(ctx, it, in.name, volume.ImportOptions{Create: true})
+			err = r.RestoreToVolume(ctx, it, in.name, volume.ImportOptions{Create: true})
 		case "over-volume":
-			if _, berr := a.k.Backup.BackupVolume(ctx, in.name, a.safetyWriter(), backupOptions()); berr != nil {
+			if _, berr := r.BackupVolume(ctx, in.name, a.safetyWriter(), backupOptions()); berr != nil {
 				return fmt.Errorf("%s: %w", L.JobBackupFailedStop(), berr)
 			}
-			err = a.k.Backup.RestoreToVolume(ctx, it, in.name, volume.ImportOptions{Replace: true})
+			err = r.RestoreToVolume(ctx, it, in.name, volume.ImportOptions{Replace: true})
 		case "extract":
 			err = extractFiles(ctx, it, in.dir)
 		default:
@@ -550,8 +552,6 @@ func (a *App) planDetail(c *ui.Context, pl scheduler.Plan) {
 		ui.PrimaryButton(c, L.BkRunNow()).OnClick(func() {
 			plan := pl
 			a.startJob(L.BkRunNow()+" "+plan.Name, func(ctx context.Context, j *jobs.Job) error {
-				a.k.Backup.Log = j.Logf
-				defer func() { a.k.Backup.Log = nil }()
 				r := a.k.Scheduler.Run(ctx, plan)
 				if r.Result != "ok" {
 					return errors.New(r.Result)

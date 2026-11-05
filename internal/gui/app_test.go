@@ -125,18 +125,36 @@ func testApp(t *testing.T) (*App, *fakeCmd, *fakeHost) {
 	k.WireCompose(false)
 	h := &fakeHost{}
 	var a *App
-	var mu sync.Mutex
-	a = New(k, h, func(fn func()) { mu.Lock(); fn(); mu.Unlock() })
+	// Updates queue up and run on the test goroutine (drain), as
+	// Window.Update runs them on the UI thread.
+	pending = make(chan func(), 1024)
+	a = New(k, h, func(fn func()) { pending <- fn })
 	a.probe = func(context.Context) capability.Report {
 		return capability.Report{WSL: wsl.Version{WSL: "3.0.3.0", Kernel: "6.18.54.1-1"}, Distros: []string{"Debian"}, WSLcErr: errors.New("not installed")}
 	}
 	return a, cmd, h
 }
 
+// pending holds UI updates from background work of the current test app.
+var pending chan func()
+
+// drain applies the queued updates.
+func drain() {
+	for {
+		select {
+		case fn := <-pending:
+			fn()
+		default:
+			return
+		}
+	}
+}
+
 // settle draws frames until cond holds (background work applies inline).
 func settle(t *testing.T, tt *ui.Tester, cond func() bool) {
 	t.Helper()
 	for i := 0; i < 200; i++ {
+		drain()
 		tt.Frame()
 		if cond() {
 			return
@@ -170,6 +188,7 @@ func TestRefreshRunsOneProbeAtATime(t *testing.T) {
 	a.Refresh() // ignored: the first probe has not reported yet
 	close(block)
 	for a.probing {
+		drain()
 		time.Sleep(time.Millisecond)
 	}
 	if calls != 1 {
