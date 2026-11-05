@@ -1,0 +1,435 @@
+# Source of the interface strings added since M0: Key<TAB>English<TAB>简体中文.
+# {name} is a text placeholder, {name:int} a number. tools/catalog merges this
+# file into en.json and zh-Hans.json; edit here, then run
+#   go run ./tools/catalog && go tool mygo generate
+Cancel	Cancel	取消
+Close	Close	关闭
+Save	Save	保存
+Delete	Delete	删除
+Edit	Edit	编辑
+Refresh	Refresh	刷新
+Retry	Try again	重试
+Start	Start	启动
+Stop	Stop	停止
+Restart	Restart	重启
+Browse	Browse…	浏览…
+More	More	更多
+ShowInExplorer	Show in Explorer	在资源管理器中显示
+DangerZone	Danger zone	危险操作
+ColName	Name	名称
+ColState	State	状态
+ColVersion	Version	版本
+ColDisk	Size	大小
+StateRunning	Running	运行中
+StateStopped	Stopped	已停止
+Sun	Sunday	星期日
+Mon	Monday	星期一
+Tue	Tuesday	星期二
+Wed	Wednesday	星期三
+Thu	Thursday	星期四
+Fri	Friday	星期五
+Sat	Saturday	星期六
+ConfirmBackupFirst	Back up first (recommended)	先备份（推荐）
+ConfirmTypeName	Type “{name}” to confirm	输入“{name}”以确认
+JobsButton	Jobs ({count:int})	任务（{count:int}）
+JobsTitle	Jobs	任务
+JobsClear	Clear finished	清除已完成
+JobsNone	No jobs yet.	暂无任务。
+JobDone	Finished: {title}	已完成：{title}
+JobFailed	Failed: {title}	失败：{title}
+JobStateDone	Done	完成
+JobStateCancelled	Cancelled	已取消
+JobStateFailed	Failed	失败
+JobStart	Start {name}	启动 {name}
+JobStop	Stop {name}	停止 {name}
+JobStopping	Stopping {name}…	正在停止 {name}…
+JobBackingUp	Backing up first…	正在先行备份…
+JobBackupFailedStop	The backup failed, so nothing was changed	备份失败，因此没有做任何更改
+JobTrim	Telling the disk which space is free (fstrim)…	正在通知磁盘哪些空间空闲（fstrim）…
+JobElevated	Waiting for administrator approval…	正在等待管理员授权…
+DashOpen	Open	打开
+DashInstallWSL	How to install WSL	如何安装 WSL
+DashUntested	WSL {version} is newer than the versions WSLPilot was tested with. Everything should work, but please report problems.	WSL {version} 比 WSLPilot 测试过的版本更新。功能应能正常使用，如遇问题请反馈。
+DashWSLcHint	WSL Containers come with WSL 3.0 or later. Update WSL to use containers.	WSL 容器随 WSL 3.0 及以后版本提供。更新 WSL 后即可使用容器。
+DashContainers	{running:int} running of {total:int} containers	{total:int} 个容器中有 {running:int} 个在运行
+DashNoPlans	No backup plans yet.	还没有备份计划。
+DashPlanOK	{name}: last backup {time}	{name}：上次备份于 {time}
+DashPlanFailed	{name}: the last backup failed	{name}：上次备份失败
+DashPlanNever	{name}: not run yet	{name}：尚未运行
+WSLDistros	Distributions	发行版
+WSLSettings	WSL settings	WSL 设置
+WSLInstall	Install…	安装…
+WSLImport	Import…	导入…
+WSLUpdate	Update WSL	更新 WSL
+WSLShutdown	Shut down WSL	关闭 WSL
+WSLShutdownTitle	Shut down WSL?	关闭 WSL？
+WSLShutdownMessage	Every running distribution and WSL container stops. Unsaved work in them is lost.	所有运行中的发行版与 WSL 容器都会停止，其中未保存的工作将丢失。
+WSLNone	No distributions	没有发行版
+WSLNoneHint	Install one from the list, or import a backup or a tar file.	从列表中安装一个，或导入备份或 tar 文件。
+WSLOverview	Overview	概览
+WSLDistroSettings	Settings (wsl.conf)	设置（wsl.conf）
+WSLFlavor	System	系统
+WSLDiskFile	Disk file	磁盘文件
+WSLFolder	Folder	目录
+WSLUsedInside	Used inside	内部已用
+WSLReclaimable	Up to {size} can be reclaimed by compacting	压缩最多可回收 {size}
+WSLMeasure	Measure used space	测量已用空间
+WSLOpenTerminal	Open terminal	打开终端
+WSLManage	Manage	管理
+WSLSetDefault	Make default	设为默认
+WSLBackupNow	Back up now	立即备份
+WSLExport	Export…	导出…
+WSLDefaultUser	Default user…	默认用户…
+WSLUserName	User name	用户名
+WSLConvert	Convert to WSL {version:int}	转换为 WSL {version:int}
+WSLConvertTitle	Convert {name} to WSL {version:int}?	将 {name} 转换为 WSL {version:int}？
+WSLConvertMessage	The distribution stops. Converting can take a long time for large distributions.	发行版会停止。较大的发行版转换可能需要很长时间。
+WSLDisk	Disk	磁盘
+WSLCompact	Compact disk	压缩磁盘
+WSLCompactTitle	Compact the disk of {name}?	压缩 {name} 的磁盘？
+WSLCompactMessage	WSL stops the distribution and shrinks its virtual disk to the space actually used.	WSL 会停止该发行版，并将其虚拟磁盘缩小到实际使用的空间。
+WSLCompactFallbackMessage	This WSL version cannot compact by itself. WSLPilot shuts down all of WSL and runs diskpart in a separate administrator window.	当前 WSL 版本无法自行压缩。WSLPilot 会关闭整个 WSL，并在单独的管理员窗口中运行 diskpart。
+WSLCompacted	Disk size: {before} → {after}	磁盘大小：{before} → {after}
+WSLMove	Move…	迁移…
+WSLMoveTitle	Move {name}	迁移 {name}
+WSLMoveHelp	WSL moves the virtual disk to the new folder. The distribution stops first.	WSL 会把虚拟磁盘移动到新目录。发行版会先停止。
+WSLNewLocation	New folder	新目录
+WSLResize	Resize…	调整大小…
+WSLResizeTitle	Resize the disk of {name}	调整 {name} 的磁盘大小
+WSLResizeHelp	The maximum size the disk may grow to, such as 256GB. The distribution stops first.	磁盘可增长到的最大大小，例如 256GB。发行版会先停止。
+WSLNewSize	Maximum size	最大大小
+WSLSparseOn	Reclaim space automatically	自动回收空间
+WSLSparseOff	Stop reclaiming automatically	停止自动回收
+WSLSparseHelp	A sparse disk shrinks by itself when files are deleted. WSL marks this as experimental.	稀疏磁盘会在删除文件后自行缩小。WSL 将其标记为实验性功能。
+WSLUnregister	Unregister…	注销…
+WSLUnregisterTitle	Unregister {name}?	注销 {name}？
+WSLUnregisterMessage	The distribution and its disk are deleted. This cannot be undone without a backup.	发行版及其磁盘会被删除。没有备份就无法恢复。
+WSLInstallTitle	Install a distribution	安装发行版
+WSLDistribution	Distribution	发行版
+WSLNameOptional	Name (optional)	名称（可选）
+WSLLocationOptional	Folder for the disk (optional)	磁盘目录（可选）
+WSLWebDownload	Download from the internet instead of the Microsoft Store	从互联网下载，而不是从 Microsoft Store
+WSLImportTitle	Import a distribution	导入发行版
+WSLImportHelp	A tar file (from wsl --export or a root file system) or a .vhdx disk becomes a new distribution.	tar 文件（来自 wsl --export 或根文件系统）或 .vhdx 磁盘将成为一个新的发行版。
+WSLImportFile	File	文件
+WSLLocation	Folder for the disk	磁盘目录
+WSLImportVHD	The file is a virtual disk (.vhdx)	该文件是虚拟磁盘（.vhdx）
+WSLBadName	Use letters, digits, “.”, “-” and “_” only.	只能使用字母、数字、“.”、“-”与“_”。
+WSLExportTitle	Export {name}	导出 {name}
+WSLExportHelp	The distribution stops first, so the copy is consistent.	发行版会先停止，以保证副本一致。
+WSLFormat	Format	格式
+WSLExportTo	Save to	保存到
+CfgDefault	Default	默认
+CfgDefaultIs	Default: {value}.	默认值：{value}。
+CfgAdvanced	Edit the file directly (advanced)	直接编辑文件（高级）
+CfgAdvancedHelp	Only lines you change are rewritten. The file is backed up before saving.	只会重写你修改的行。保存前会备份文件。
+CfgMissing	The file does not exist yet: every setting has its default. Saving creates it.	文件尚不存在：所有设置均为默认值。保存时会创建它。
+CfgOtherKeys	Other settings in this file, kept as they are: {keys}	文件中的其它设置（保持不变）：{keys}
+CfgReload	Reload	重新读取
+CfgReview	Review changes…	查看更改…
+CfgReviewTitle	Review changes	查看更改
+CfgNoChanges	Nothing changed.	没有更改。
+CfgBackupNote	The current file is backed up before it is replaced.	替换前会备份当前文件。
+CfgSave	Save	保存
+CfgSaved	Saved.	已保存。
+CfgConflict	The file changed outside WSLPilot. Reload it, then make your changes again.	文件已在 WSLPilot 之外被修改。请重新读取后再修改。
+CfgInvalid	This value is not valid.	该值无效。
+CfgBadLines	These lines are not “key=value”: {lines}	以下行不是“key=value”格式：{lines}
+CfgEffectDistro	Takes effect when {name} restarts (stop it, or wait about 8 seconds after its last window closes).	在 {name} 重新启动后生效（停止它，或在最后一个窗口关闭约 8 秒后）。
+CfgEffectWSL	Takes effect after “Shut down WSL”.	在“关闭 WSL”后生效。
+CfgEffectSession	Takes effect when the container session restarts.	在容器 session 重新启动后生效。
+CfgBootSystemd	Use systemd	使用 systemd
+CfgBootSystemdHelp	Start systemd as the init process (WSL 2).	以 systemd 作为 init 进程启动（WSL 2）。
+CfgBootCommand	Command at start	启动时命令
+CfgBootCommandHelp	Runs as root when the distribution starts.	发行版启动时以 root 运行。
+CfgUserDefault	Default user	默认用户
+CfgUserDefaultHelp	The user a new session runs as.	新会话使用的用户。
+CfgNetHostname	Host name	主机名
+CfgNetHostnameHelp	Name of the distribution on the network.	发行版在网络上的名称。
+CfgNetGenerateHosts	Generate /etc/hosts	生成 /etc/hosts
+CfgNetGenerateHostsHelp	Let WSL write /etc/hosts.	由 WSL 写入 /etc/hosts。
+CfgNetGenerateResolv	Generate /etc/resolv.conf	生成 /etc/resolv.conf
+CfgNetGenerateResolvHelp	Let WSL write the DNS servers.	由 WSL 写入 DNS 服务器。
+CfgInteropEnabled	Run Windows programs	运行 Windows 程序
+CfgInteropEnabledHelp	Allow starting .exe files from Linux.	允许从 Linux 启动 .exe 文件。
+CfgInteropPath	Add Windows PATH	加入 Windows PATH
+CfgInteropPathHelp	Append Windows folders to $PATH.	将 Windows 目录追加到 $PATH。
+CfgMountEnabled	Mount Windows drives	挂载 Windows 驱动器
+CfgMountEnabledHelp	Mount C:, D:… under the mount folder.	将 C:、D:… 挂载到挂载目录下。
+CfgMountRoot	Mount folder	挂载目录
+CfgMountRootHelp	Where drives appear, such as /mnt/.	驱动器出现的位置，例如 /mnt/。
+CfgMountOptions	Drive mount options	驱动器挂载选项
+CfgMountOptionsHelp	Such as metadata,uid=1000,gid=1000,umask=022.	例如 metadata,uid=1000,gid=1000,umask=022。
+CfgMountFsTab	Process /etc/fstab	处理 /etc/fstab
+CfgMountFsTabHelp	Mount the file systems listed in /etc/fstab at start.	启动时挂载 /etc/fstab 中列出的文件系统。
+CfgTimeZone	Use the Windows time zone	使用 Windows 时区
+CfgTimeZoneHelp	Keep the time zone in step with Windows.	与 Windows 时区保持同步。
+CfgGPUEnabled	GPU access	GPU 访问
+CfgGPUEnabledHelp	Let Linux programs use the Windows GPU.	允许 Linux 程序使用 Windows GPU。
+CfgMemory	Memory	内存
+CfgMemoryHelp	Memory for the WSL 2 virtual machine, such as 8GB. Default: half of the computer's memory.	WSL 2 虚拟机的内存，例如 8GB。默认：电脑内存的一半。
+CfgProcessors	Processors	处理器
+CfgProcessorsHelp	Number of processors. Default: all.	处理器数量。默认：全部。
+CfgSwap	Swap	交换区
+CfgSwapHelp	Swap size, 0 for none. Default: a quarter of memory.	交换区大小，0 表示不使用。默认：内存的四分之一。
+CfgSwapFile	Swap file	交换文件
+CfgSwapFileHelp	Path of the swap disk.	交换磁盘的路径。
+CfgNetworkingMode	Networking mode	网络模式
+CfgNetworkingModeHelp	nat shares the PC's address; mirrored gives Linux the same addresses as Windows.	nat 共享电脑的地址；mirrored 让 Linux 使用与 Windows 相同的地址。
+CfgLocalhostForwarding	Localhost forwarding	localhost 转发
+CfgLocalhostForwardingHelp	Reach Linux servers at localhost from Windows.	在 Windows 上通过 localhost 访问 Linux 服务。
+CfgDNSTunneling	DNS tunneling	DNS 隧道
+CfgDNSTunnelingHelp	Resolve names through Windows.	通过 Windows 解析域名。
+CfgFirewall	Windows Firewall	Windows 防火墙
+CfgFirewallHelp	Apply firewall rules to WSL traffic.	对 WSL 流量应用防火墙规则。
+CfgAutoProxy	Use the Windows proxy	使用 Windows 代理
+CfgAutoProxyHelp	Pass the Windows HTTP proxy to Linux.	将 Windows HTTP 代理传给 Linux。
+CfgGUIApps	Linux GUI apps	Linux 图形应用
+CfgGUIAppsHelp	Support graphical Linux programs (WSLg).	支持 Linux 图形程序（WSLg）。
+CfgNested	Nested virtualization	嵌套虚拟化
+CfgNestedHelp	Allow virtual machines inside WSL.	允许在 WSL 中运行虚拟机。
+CfgVMIdle	Idle shutdown (ms)	空闲关闭（毫秒）
+CfgVMIdleHelp	How long the VM stays on with nothing running.	没有任何程序运行时虚拟机保持开启的时长。
+CfgDefaultVHDSize	Size limit of new disks	新磁盘大小上限
+CfgDefaultVHDSizeHelp	Maximum size of new distribution disks, such as 512GB.	新发行版磁盘的最大大小，例如 512GB。
+CfgKernel	Custom kernel	自定义内核
+CfgKernelHelp	Path of a custom Linux kernel.	自定义 Linux 内核的路径。
+CfgInstanceIdle	Distribution idle shutdown (ms)	发行版空闲关闭（毫秒）
+CfgInstanceIdleHelp	-1 keeps distributions running.	-1 表示保持发行版运行。
+CfgInstallPath	Folder for new distributions	新发行版目录
+CfgInstallPathHelp	Where new distributions are installed.	新发行版的安装位置。
+CfgMemoryReclaim	Memory reclaim	内存回收
+CfgMemoryReclaimHelp	How cached memory goes back to Windows.	缓存内存返还给 Windows 的方式。
+CfgSparseVHD	Sparse new disks	新磁盘使用稀疏格式
+CfgSparseVHDHelp	New disks reclaim space automatically (experimental).	新磁盘自动回收空间（实验性）。
+CfgHostLoopback	Host address loopback	主机地址回环
+CfgHostLoopbackHelp	In mirrored mode, reach Windows through its own addresses.	在 mirrored 模式下，通过 Windows 自己的地址访问它。
+CfgSessionCPU	Processors	处理器
+CfgSessionCPUHelp	Processors for the container session. Default: all.	容器 session 的处理器数量。默认：全部。
+CfgSessionMemory	Memory	内存
+CfgSessionMemoryHelp	Memory for the container session, such as 8GB. Default: half.	容器 session 的内存，例如 8GB。默认：一半。
+CfgSessionStorageSize	Storage size limit	存储大小上限
+CfgSessionStorageSizeHelp	Maximum size of the images and containers disk.	镜像与容器磁盘的最大大小。
+CfgSessionStoragePath	Storage folder	存储目录
+CfgSessionStoragePathHelp	Changing it does not move existing images or containers: a new, empty session starts there.	修改它不会移动已有的镜像与容器：会在新位置启动一个空的 session。
+CfgSessionBinding	Published port address	发布端口的地址
+CfgSessionBindingHelp	0.0.0.0 makes published ports reachable from other computers.	0.0.0.0 让其它电脑也能访问已发布的端口。
+CfgSessionHostLoopback	Host name for Windows	Windows 的主机名
+CfgSessionHostLoopbackHelp	Name containers use to reach Windows; none to disable.	容器访问 Windows 时使用的名称；none 表示禁用。
+CfgSessionIdle	Idle shutdown (s)	空闲关闭（秒）
+CfgSessionIdleHelp	Seconds the session stays on when idle.	空闲时 session 保持开启的秒数。
+CfgCredentialStore	Registry credentials	镜像仓库凭据
+CfgCredentialStoreHelp	wincred uses Windows Credential Manager; file uses an encrypted file.	wincred 使用 Windows 凭据管理器；file 使用加密文件。
+CtrContainers	Containers	容器
+CtrImages	Images	镜像
+CtrNetworks	Networks	网络
+CtrRun	Run…	运行…
+CtrRunTitle	Run a container	运行容器
+CtrShowAll	Show all	显示全部
+CtrNone	No containers.	没有容器。
+CtrImage	Image	镜像
+CtrPorts	Ports	端口
+CtrPortsHelp	host:container, separated by commas. Ports bind to 127.0.0.1 unless an address is given.	host:container，以逗号分隔。未指定地址时绑定到 127.0.0.1。
+CtrEnv	Environment	环境变量
+CtrEnvHelp	One KEY=value per line.	每行一个 KEY=value。
+CtrVolumes	Volumes and folders	Volume 与目录
+CtrVolumesHelp	One per line: volume:/path or C:\folder:/path, add :ro for read-only.	每行一个：volume:/path 或 C:\folder:/path，追加 :ro 表示只读。
+CtrCommand	Command	命令
+CtrRestartPolicy	Restart policy	重启策略
+CtrRestartHelp	WSL Containers cannot restart containers itself; the WSLPilot agent does it while you are signed in.	WSL 容器本身不能重启容器；在你登录期间由 WSLPilot agent 执行。
+CtrCPU	CPU	CPU
+CtrMemory	Memory	内存
+CtrShell	Shell	Shell
+CtrLogs	Logs	日志
+CtrNetwork	Network	网络
+CtrMount	Mount	挂载
+CtrAddProfile	Add to Windows Terminal	添加到 Windows Terminal
+CtrProfileAdded	Added to Windows Terminal.	已添加到 Windows Terminal。
+CtrRemove	Remove	删除
+CtrRemoveTitle	Remove {name}?	删除 {name}？
+CtrRemoveMessage	The container is deleted. Named volumes are kept.	容器会被删除。命名 Volume 会保留。
+CtrPrune	Remove stopped	删除已停止的
+CtrPruneTitle	Remove all stopped containers?	删除所有已停止的容器？
+CtrPruneMessage	Every stopped container is deleted, also ones created outside WSLPilot.	所有已停止的容器都会被删除，包括在 WSLPilot 之外创建的。
+ImgPull	Pull image…	拉取镜像…
+ImgPrune	Remove unused	删除未使用的
+ImgPruneTitle	Remove unused images?	删除未使用的镜像？
+ImgPruneMessage	Dangling images that no container uses are deleted.	没有容器使用的悬空镜像会被删除。
+ImgRepository	Repository	仓库
+ImgTag	Tag	标签
+ImgCreated	Created	创建时间
+ImgRemove	Remove image	删除镜像
+ImgRemoveTitle	Remove {name}?	删除 {name}？
+ImgRemoveMessage	The image is deleted. Images in use by a container are not removed.	镜像会被删除。被容器使用的镜像不会删除。
+NetCreate	Create network…	创建网络…
+NetDriver	Driver	驱动
+NetSubnet	Subnet	子网
+NetRemove	Remove network	删除网络
+NetRemoveTitle	Remove {name}?	删除 {name}？
+NetRemoveMessage	Containers attached to it lose this network.	连接到它的容器会失去这个网络。
+VolCreate	Create volume…	创建 Volume…
+VolImport	Import TAR…	导入 TAR…
+VolImportInto	Import TAR into this volume…	向此 Volume 导入 TAR…
+VolExport	Export TAR…	导出 TAR…
+VolHelp	Files move in and out of volumes as tar, unpacked inside Linux, so owners, permissions and links are kept.	文件以 tar 形式进出 Volume，在 Linux 内解包，因此属主、权限与链接都会保留。
+VolUsedBy	Used by	使用者
+VolSize	Size	大小
+VolDriverHelp	guest keeps data in the session's disk; vhd gives the volume its own virtual disk of a fixed size.	guest 把数据保存在 session 的磁盘中；vhd 为 Volume 提供一个固定大小的独立虚拟磁盘。
+VolTarFile	TAR file (.tar, .tar.gz, .tar.zst)	TAR 文件（.tar、.tar.gz、.tar.zst）
+VolTarget	Into	导入到
+VolReplace	Empty the volume first	先清空 Volume
+VolReplaceWarning	Everything in the volume is replaced. A safety backup is made first.	Volume 中的全部内容会被替换。会先进行安全备份。
+VolImportHelp	The archive is unpacked by tar inside a helper container; nothing is unpacked on Windows.	归档由辅助容器内的 tar 解包；不会在 Windows 上解包。
+VolExportHelp	Stop containers that write to the volume first for a consistent copy.	为获得一致的副本，请先停止写入该 Volume 的容器。
+VolEntries	{count:int} entries, {size}	{count:int} 个条目，{size}
+VolImported	{count:int} entries imported; {found:int} found in the volume	已导入 {count:int} 个条目；Volume 中共有 {found:int} 个
+VolRemove	Remove volume…	删除 Volume…
+VolRemoveTitle	Remove {name}?	删除 {name}？
+VolRemoveMessage	The volume and all its data are deleted.	Volume 及其全部数据会被删除。
+VolCompactMessage	All containers stop while the container session is restarted, then diskpart runs in a separate administrator window.	容器 session 重启期间所有容器都会停止，然后 diskpart 会在单独的管理员窗口中运行。
+VolStoppingSession	Stopping the container session…	正在停止容器 session…
+CmpAdd	Add project…	添加项目…
+CmpAddHelp	Choose a compose.yaml. It stays where it is; WSLPilot only remembers where it is.	选择一个 compose.yaml。文件留在原处；WSLPilot 只记住它的位置。
+CmpHelp	Projects run on a backend chosen when they are added. A project never moves to another backend by itself.	项目运行在添加时选定的 Backend 上。项目绝不会自行切换到其它 Backend。
+CmpNameHelp	Lowercase letters, digits, “-” and “_”.	小写字母、数字、“-”与“_”。
+CmpBackend	Backend	Backend
+CmpBackendFixed	Fixed for this project	本项目固定
+CmpRunning	{running:int}/{total:int} running	{running:int}/{total:int} 运行中
+CmpUp	Up	启动（up）
+CmpDown	Down…	停止并删除（down）…
+CmpDownTitle	Take {name} down?	对 {name} 执行 down？
+CmpDownMessage	The project's containers and networks are removed. Volumes are kept unless you choose otherwise.	项目的容器与网络会被删除。除非你另行选择，Volume 会保留。
+CmpRemoveVolumes	Also remove the project's volumes	同时删除项目的 Volume
+CmpRemoveVolumesWarning	The data in the volumes is deleted.	Volume 中的数据会被删除。
+CmpAutostart	Start at sign-in	登录时启动
+CmpAutostartHelp	The WSLPilot agent brings the project up when you sign in.	登录时由 WSLPilot agent 启动该项目。
+CmpValid	The project is valid for this backend.	该项目适用于此 Backend。
+CmpServices	Services	服务
+CmpService	Service	服务
+CmpHealth	Health	健康状态
+CmpFile	Compose file	Compose 文件
+CmpNotUp	The project is not up.	项目未启动。
+CmpRemove	Forget project…	移除项目…
+CmpRemoveTitle	Forget {name}?	移除 {name}？
+CmpRemoveMessage	WSLPilot forgets the project. Its files, containers and volumes are not touched.	WSLPilot 会忘记该项目。其文件、容器与 Volume 不受影响。
+BkRestore	Restore	恢复
+BkPlans	Plans	计划
+BkOpenFolder	Open folder…	打开目录…
+BkOpenFile	Open archive or disk…	打开归档或磁盘…
+BkRestoreHelp	Everything restorable from every location, including backups from other computers and plain tar files. Outside locations are read-only.	列出所有位置中可恢复的内容，包括其它电脑的备份与普通 tar 文件。外部位置为只读。
+BkWhat	Backed up	已备份对象
+BkVersions	Versions	版本数
+BkLocations	Locations	位置
+BkDefaultLocation	This PC (default)	本机（默认）
+BkReadOnly	read-only	只读
+BkTakeOver	Use as this PC's location	作为本机位置使用
+BkForget	Forget location	移除位置
+BkPick	Choose what to restore.	选择要恢复的内容。
+BkDistro	Distribution {name}	发行版 {name}
+BkVolume	Volume {name}	Volume {name}
+BkProject	Compose project {name}	Compose 项目 {name}
+BkOutsideTar	Archive {name}	归档 {name}
+BkOutsideDisk	Disk {name}	磁盘 {name}
+BkWhen	When	时间
+BkKind	Kind	类型
+BkFrom	From	来源
+BkCheck	Check	校验
+BkCheckOK	OK	正常
+BkCheckBad	Damaged	已损坏
+BkKindFolder	Folder	目录
+BkKindArchive	Archive	归档
+BkKindRepo	Incremental	增量
+BkKindVHDX	Disk image	磁盘镜像
+BkKindTar	Plain tar	普通 tar
+BkInconsistent	taken while running	运行中备份
+BkOtherPlan	another plan	其它计划
+BkPath	Path	路径
+BkSnapshot	Snapshot	快照
+BkNoteNoMeta	Not made by WSLPilot: where it came from and whether it was consistent are unknown.	非 WSLPilot 生成：来源与是否一致均无法确认。
+BkNoteVHDX	A disk image restores only as a new distribution.	磁盘镜像只能恢复为新的发行版。
+BkNoteIncomplete	This backup did not finish.	这次备份没有完成。
+BkVerify	Check	校验
+BkVerifying	Checking the backup…	正在校验备份…
+BkVerifyFailed	The backup failed its check, so nothing was restored	备份未通过校验，因此没有恢复任何内容
+BkRestoreNewDistro	Restore as new distribution…	恢复为新发行版…
+BkRestoreNewVolume	Restore as new volume…	恢复为新 Volume…
+BkRestoreFiles	Restore files into a distribution…	将文件恢复到发行版…
+BkRestoreFilesHelp	Files keep their owners and permissions. Existing files with the same names are overwritten.	文件保留属主与权限。同名的已有文件会被覆盖。
+BkOnlyPath	Only this path (optional)	仅此路径（可选）
+BkIntoFolder	Into folder	恢复到目录
+BkRestoreOver	Restore over {name}…	覆盖恢复 {name}…
+BkRestoreOverMessage	The current state is backed up first, then replaced by this backup.	会先备份当前状态，然后用此备份替换。
+BkExtractFiles	Extract project files…	提取项目文件…
+BkDeleteTitle	Delete this backup?	删除此备份？
+BkDeleteMessage	The backup files are deleted from this location.	备份文件会从此位置删除。
+BkNewPlan	New plan…	新建计划…
+BkPlansHelp	Plans make backups on a schedule. Backups stay restorable even after a plan is deleted.	计划按时间表生成备份。删除计划后备份依然可以恢复。
+BkAgentMissing	Plans only run while WSLPilot is open: the background agent is not installed.	计划只会在 WSLPilot 打开时运行：后台 agent 未安装。
+BkSchedule	Schedule	时间表
+BkNext	Next	下次
+BkLast	Last result	上次结果
+BkLastOK	OK, {time}	正常，{time}
+BkPaused	paused	已暂停
+BkRunNow	Run now	立即运行
+BkTargets	What to back up	备份内容
+BkDestination	Destination	目标
+BkRetention	Keep	保留
+BkRetentionText	last {last:int}, daily {daily:int}, weekly {weekly:int}, monthly {monthly:int}	最近 {last:int} 个，每日 {daily:int} 个，每周 {weekly:int} 个，每月 {monthly:int} 个
+BkConsistency	Running sources	运行中的来源
+BkLive	Backed up while running	运行中备份
+BkHistory	History	历史
+BkHistoryOK	{items:int} backed up, {expired:int} expired	备份 {items:int} 项，过期 {expired:int} 项
+BkEveryHour	Every hour at :{minute}	每小时第 {minute} 分
+BkEveryDay	Every day at {time}	每天 {time}
+BkEveryWeek	Every {day} at {time}	每{day} {time}
+BkEveryMonth	Day {day:int} of every month at {time}	每月 {day:int} 日 {time}
+BkManual	Only when run by hand	仅手动运行
+BkDeletePlanTitle	Delete the plan {name}?	删除计划 {name}？
+BkDeletePlanMessage	The plan stops. The backups it made are kept.	计划会停止。它生成的备份会保留。
+BkPlan	Backup plan	备份计划
+BkKindHelp	Incremental stores only what changed; archive keeps one file per backup; folder stays browsable in Explorer.	增量只保存变化的部分；归档每次备份一个文件；目录可在资源管理器中浏览。
+BkCompression	Compression	压缩
+BkAt	Time (HH:MM)	时间（HH:MM）
+BkWeekday	Day of the week	星期
+BkDay	Day of the month (1–28)	每月日期（1–28）
+BkKeepLast	Most recent	最近
+BkKeepDaily	Daily	每日
+BkKeepWeekly	Weekly	每周
+BkKeepMonthly	Monthly	每月
+BkRetries	Retries after a failure	失败后重试次数
+BkLiveOption	Back up without stopping them	不停止直接备份
+BkLiveHelp	By default running distributions and containers stop for a consistent copy and start again afterwards.	默认情况下，运行中的发行版与容器会先停止以获得一致的副本，结束后再启动。
+BkNotify	Notifications	通知
+BkNotifyFail	When a backup fails	备份失败时
+BkNotifyOK	When a backup succeeds	备份成功时
+BkEnabled	Enabled	启用
+BkNeedName	Give the plan a name.	请为计划命名。
+BkNeedTarget	Choose at least one thing to back up.	至少选择一项备份内容。
+TermNew	New terminal	新建终端
+TermNone	No terminals open. Start one from a distribution or a container, or with New terminal.	没有打开的终端。可从发行版或容器启动，或点击“新建终端”。
+TermEnded	ended	已结束
+TermFailed	The terminal could not start: {error}	终端无法启动：{error}
+SetGeneral	General	常规
+SetWSLc	WSL Containers	WSL 容器
+SetAbout	About	关于
+SetTheme	Appearance	外观
+SetThemeSystem	Follow Windows	跟随 Windows
+SetThemeLight	Light	浅色
+SetThemeDark	Dark	深色
+SetOpenAtLogin	Open WSLPilot at sign-in	登录时打开 WSLPilot
+SetBackupDir	Default backup folder	默认备份目录
+SetBackupDirHelp	Manual and safety backups go here.	手动备份与安全备份保存在这里。
+SetAgent	Background agent	后台 agent
+SetAgentHelp	Runs backup plans, restart policies and Compose autostart while the window is closed, as you, without administrator rights.	在窗口关闭时以你的身份运行备份计划、重启策略与 Compose 自启，无需管理员权限。
+SetAgentOn	Installed	已安装
+SetInstallAgent	Install agent	安装 agent
+SetUninstallAgent	Uninstall	卸载
+SetAgentInstalled	The background agent is installed.	后台 agent 已安装。
+SetData	WSLPilot data	WSLPilot 数据
+SetRestartSession	Restart container session	重启容器 session
+SetRestartSessionMessage	Every running container stops; the next command starts a new session with the saved settings.	所有运行中的容器都会停止；下一条命令会用保存的设置启动新的 session。
+SetVersion	Version {version}	版本 {version}
+SetAboutText	Manages WSL distributions, WSL Containers, Compose projects and backups. Licensed under GPL-3.0.	管理 WSL 发行版、WSL 容器、Compose 项目与备份。以 GPL-3.0 授权。
+TrayOpen	Open WSLPilot	打开 WSLPilot
+TrayQuit	Quit	退出
+BkNone	No backups found yet. Back something up, or open a folder or archive from another computer.	还没有找到备份。可以先备份，或打开来自其它电脑的目录或归档。

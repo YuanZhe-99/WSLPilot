@@ -15,7 +15,13 @@ machine.
 | Config editing (`.wslconfig`, `wsl.conf`, `settings.yaml`) | implemented | unit tests |
 | diskpart compaction (elevated) | implemented | unit tests; UAC path not yet run |
 | `wpbk` repository | verified | unit, fault-injection and spec tests |
-| GUI shell (sidebar, dashboard) | implemented | view tests; native window not yet inspected |
+| Volume tar import/export (owners, modes, links) | verified | live test `internal/volume` |
+| Distribution backup (folder, archive, repository), verify, restore as new, partial restore | verified | live test `internal/backup` on `wslpilot-test-d1` |
+| Compose builtin backend up / update / down | verified | live test `internal/compose` (`wslpilot-test-compose`) |
+| Scheduler, retention, retries | implemented | unit tests; user-level `schtasks /Create /SC MINUTE` verified by hand |
+| Restart watcher | implemented | unit tests over recorded events |
+| GUI pages | implemented | view tests, page renders checked by eye; packaged app starts (10 s smoke run) |
+| Terminal plugin, tray, notifications, UAC prompt | implemented | not exercised by hand yet |
 
 ## Windows 11 x64
 

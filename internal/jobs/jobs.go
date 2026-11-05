@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -274,16 +275,29 @@ func (m *Manager) Audit(action, target, detail string, err error) {
 // ProgressWriter counts bytes written through it and reports the fraction
 // of total to the job (total <= 0: bytes only, unknown fraction).
 type ProgressWriter struct {
-	Job   *Job
-	Total int64
-	Step  string
-	n     int64
-	last  time.Time
+	Job *Job
+	// Writer, when set, receives the bytes (the counter is a pass-through).
+	Writer io.Writer
+	Total  int64
+	Step   string
+	n      int64
+	last   time.Time
 }
 
 // Write counts p and updates the job at most ten times a second.
 func (p *ProgressWriter) Write(b []byte) (int, error) {
-	p.n += int64(len(b))
+	if p.Writer != nil {
+		n, err := p.Writer.Write(b)
+		p.count(n)
+		return n, err
+	}
+	p.count(len(b))
+	return len(b), nil
+}
+
+// count adds n bytes and reports progress at most ten times a second.
+func (p *ProgressWriter) count(n int) {
+	p.n += int64(n)
 	if time.Since(p.last) > 100*time.Millisecond {
 		p.last = time.Now()
 		frac := -1.0
@@ -292,7 +306,6 @@ func (p *ProgressWriter) Write(b []byte) (int, error) {
 		}
 		p.Job.SetProgress(frac, p.Step+" "+FormatBytes(p.n))
 	}
-	return len(b), nil
 }
 
 // N is the number of bytes seen.
@@ -310,4 +323,23 @@ func FormatBytes(n int64) string {
 		exp++
 	}
 	return strconv.FormatFloat(float64(n)/float64(div), 'f', 1, 64) + " " + string("KMGTPE"[exp]) + "iB"
+}
+
+// ProgressReader reports the bytes read through it like ProgressWriter.
+type ProgressReader struct {
+	Job    *Job
+	Reader io.Reader
+	Total  int64
+	Step   string
+	w      ProgressWriter
+}
+
+// Read reads from Reader and counts.
+func (p *ProgressReader) Read(b []byte) (int, error) {
+	n, err := p.Reader.Read(b)
+	if p.w.Job == nil {
+		p.w = ProgressWriter{Job: p.Job, Total: p.Total, Step: p.Step}
+	}
+	p.w.count(n)
+	return n, err
 }

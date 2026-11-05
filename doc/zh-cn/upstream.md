@@ -56,6 +56,8 @@ Fixture：`internal/wsl/testdata/3.0.3.0/`（真实录制）、`internal/wsl/tes
 | `system events --format json` 持续输出 Docker 形式的事件（`Type`、`Action`、`Actor.Attributes`、`timeNano`），连接保持打开。 | `wslc.Client.Events`；重启策略监听 `die`。 |
 | `image save` 用 `--output` 写出，`image load` 用 `--input` 读取；`network connect` 使用 `--network-alias`。 | `Save`、`Load`、`Connect`。 |
 | `wslc build` 存在（`--file`、`--tag`、`--build-arg`、`--target`、`--progress plain`）。 | 通过它支持 Compose 的 `build`。 |
+| 带 `--health-cmd` 时 `inspect` 报告 `State.Health.Status`（`healthy`…）；`--memory 64M` 得到 `HostConfig.Memory` 64 MiB；容器的 `Image` 等于镜像 inspect 的 `Id`；label 同时出现在 `Config.Labels` 与顶层 `Labels` 中。 | Compose 据此等待健康状态，并按 ID 检测镜像变化。 |
+| `system session terminate` 停止 CLI session 虚拟机；下一条命令会启动新的 session。 | `TerminateSession`（使设置生效、可压缩 vhd Volume）。 |
 | `settings.yaml` 键（Microsoft Learn，2026-10-16）：`session.cpuCount`、`memorySize`、`maxStorageSize`、`storagePath`、`defaultBindingAddress`、`hostLoopback`、`idleTimeout` 以及 `credentialStore`；所有值都接受 `default`。修改 `storagePath` 不会移动已有数据。 | `configdoc.WSLcSettings`；数据位置迁移靠导出再导入。 |
 
 Fixture：`internal/wslc/testdata/3.0.3.0/`（用户名已替换为 `user`）。

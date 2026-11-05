@@ -1,0 +1,5 @@
+services:
+  base:
+    command: ["sleep", "infinity"]
+    labels:
+      from.base: "1"

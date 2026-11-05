@@ -1,0 +1,17 @@
+name: ignored-by-metadata
+include:
+  - included.yaml
+services:
+  web:
+    extends:
+      file: base.yaml
+      service: base
+    image: "alpine:${ALPINE_TAG}"
+    environment:
+      GREETING: "${GREETING:-hello}"
+      FROM_SHELL: "${WSLPILOT_TEST_SHELL:-unset}"
+    ports:
+      - "8080:80"
+  debug:
+    image: alpine:3.20
+    profiles: [debug]

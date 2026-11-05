@@ -465,3 +465,9 @@ func sortedKeys(m map[string]string) []string {
 	sort.Strings(keys)
 	return keys
 }
+
+// TerminateSession stops the WSLc session VM (all containers stop); the
+// next wslc command starts a new one, reading settings.yaml again.
+func (c *Client) TerminateSession(ctx context.Context) error {
+	return c.do(ctx, "system", "session", "terminate")
+}

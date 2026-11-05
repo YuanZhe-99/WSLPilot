@@ -38,7 +38,10 @@ for t in "${targets[@]}"; do
 		cmd=$(basename "$dir")
 		[ "$cmd" = wslpilot ] && continue
 		mkdir -p "$out"
-		CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" go build -trimpath -ldflags="-s -w" \
+		ldflags="-s -w"
+		# The agent is started by Task Scheduler and at sign-in: no console.
+		if [ "$cmd" = wslpilot-agent ]; then ldflags="$ldflags -H=windowsgui"; fi
+		CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" go build -trimpath -ldflags="$ldflags" \
 			-o "$out/$cmd.exe" "./cmd/$cmd"
 	done
 done

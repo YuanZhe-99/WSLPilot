@@ -58,6 +58,8 @@ Fixtures: `internal/wsl/testdata/3.0.3.0/` (captured), `internal/wsl/testdata/sy
 | `system events --format json` streams Docker-shaped events (`Type`, `Action`, `Actor.Attributes`, `timeNano`) and stays open. | `wslc.Client.Events`; restart policies watch `die`. |
 | `image save` writes with `--output`, `image load` reads with `--input`; `network connect` takes `--network-alias`. | `Save`, `Load`, `Connect`. |
 | `wslc build` exists (`--file`, `--tag`, `--build-arg`, `--target`, `--progress plain`). | Compose `build` is supported through it. |
+| `inspect` reports `State.Health.Status` (`healthy`…) for a `--health-cmd`; `--memory 64M` gives `HostConfig.Memory` 64 MiB; a container's `Image` equals the image's inspect `Id`; labels appear in both `Config.Labels` and the top-level `Labels`. | Compose waits on health and detects image changes by ID. |
+| `system session terminate` stops the CLI session VM; the next command starts a new one. | `TerminateSession` (settings take effect, vhd volumes can be compacted). |
 | `settings.yaml` keys (Microsoft Learn, 2026-10-16): `session.cpuCount`, `memorySize`, `maxStorageSize`, `storagePath`, `defaultBindingAddress`, `hostLoopback`, `idleTimeout`, and `credentialStore`; every value accepts `default`. Changing `storagePath` does not move existing data. | `configdoc.WSLcSettings`; data-location migration is export and re-import. |
 
 Fixtures: `internal/wslc/testdata/3.0.3.0/` (user name scrubbed to `user`).

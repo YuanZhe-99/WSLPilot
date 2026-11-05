@@ -16,6 +16,10 @@ go tool mygo build      # package into build/windows-<arch>/
 go tool mygo generate   # regenerate locales/catalog_gen.go after editing locales/*.json
 go run ./tools/icon     # re-render resources/icon.png after editing resources/icon.svg
 go test ./...           # unit and view tests (no window, no WSL needed)
+go run ./tools/catalog  # merge locales/messages.tsv into the catalogs, then run mygo generate
+scripts/build.sh -skip-installer windows/arm64   # package the app, agent and CLI
+WSLPILOT_LIVE=1 go test ./internal/...           # live tests on wslpilot-test-* objects
+WSLPILOT_SHOTS=<folder> go test -run Screenshots ./internal/gui   # render every page to PNG
 ```
 
 图标中的企鹅依据 Tux 重绘；修改图标时须保留 `THIRD_PARTY_NOTICES.md` 中的署名。
@@ -35,6 +39,9 @@ go run ./tools/checkdocs
 ## 实机测试
 
 运行真实 `wsl.exe` / `wslc.exe` 的测试需设置 `WSLPILOT_LIVE=1`，且只能创建和删除名为 `wslpilot-test-*` 的资源。
+
+需要 WSL 3.0.3.0 或更高版本、WSL 容器以及 `alpine:3.20` 镜像。覆盖 Volume tar 往返（`internal/volume`）、发行版备份到每种类型并恢复为新发行版
+（`internal/backup`，需要 `wslpilot-test-d1`），以及 Compose 项目的 up、更新与 down（`internal/compose`）。
 
 ## 录制 fixture
 

@@ -16,6 +16,9 @@ written in Go with [MyGo](https://github.com/egoist/mygo)'s native UI. It drives
 | [development.md](development.md) | Environment, commands, the dev loop |
 | [ci-cd.md](ci-cd.md) | Workflows, packaging, the upstream update procedure |
 | [backup-format.md](backup-format.md) | The `wpbk` incremental repository format, version 1 |
+| [backups.md](backups.md) | Backup kinds, folder and archive formats, catalog, restore, plans, restart policies |
+| [compose.md](compose.md) | Compose backends, project metadata, supported keys, migration |
+| [app-data.md](app-data.md) | What WSLPilot stores and where |
 | [translation-guide.md](translation-guide.md) | Mirror rules and the glossary |
 | [version-history.md](version-history.md) | Releases and the upstream versions they were tested with |
 | [functions/INDEX.md](functions/INDEX.md) | Per-package roles and key declarations |

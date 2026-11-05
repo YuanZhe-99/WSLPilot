@@ -14,7 +14,13 @@
 | 配置编辑（`.wslconfig`、`wsl.conf`、`settings.yaml`） | 已实现 | 单元测试 |
 | diskpart 压缩（提权） | 已实现 | 单元测试；尚未实际走过 UAC |
 | `wpbk` 仓库 | 已验证 | 单元、故障注入与规范测试 |
-| GUI 外壳（侧边栏、概览） | 已实现 | 视图测试；尚未检查原生窗口 |
+| Volume tar 导入导出（属主、权限、链接） | 已验证 | 实机测试 `internal/volume` |
+| 发行版备份（目录、归档、仓库）、校验、恢复为新发行版、部分恢复 | 已验证 | 在 `wslpilot-test-d1` 上运行实机测试 `internal/backup` |
+| Compose builtin Backend 的 up / 更新 / down | 已验证 | 实机测试 `internal/compose`（`wslpilot-test-compose`） |
+| 调度、保留策略、重试 | 已实现 | 单元测试；已手动验证用户级 `schtasks /Create /SC MINUTE` |
+| 重启监视 | 已实现 | 基于录制事件的单元测试 |
+| GUI 页面 | 已实现 | 视图测试，页面渲染已目检；打包后的应用可启动（10 秒冒烟运行） |
+| 终端插件、托盘、通知、UAC 提示 | 已实现 | 尚未手动操作验证 |
 
 ## Windows 11 x64
 

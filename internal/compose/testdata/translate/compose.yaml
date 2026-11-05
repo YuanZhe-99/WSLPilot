@@ -1,0 +1,56 @@
+services:
+  db:
+    image: alpine:3.20
+    command: ["sleep", "infinity"]
+    environment:
+      B: "2"
+      A: "1"
+    healthcheck:
+      test: ["CMD", "sh", "-c", "test -f '/tmp/ok'"]
+      interval: 1m30s
+      timeout: 5s
+      retries: 3
+    volumes:
+      - data:/data
+      - type: tmpfs
+        target: /cache
+    networks:
+      back:
+        aliases: [database]
+        ipv4_address: 10.77.0.10
+    restart: unless-stopped
+    stop_grace_period: 1500ms
+  web:
+    build:
+      context: ./web
+      args:
+        VERSION: "1"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["exec httpd -f"]
+    ports:
+      - "127.0.0.1:8080:80"
+      - "53/udp"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [back, front]
+    user: "1000"
+    working_dir: /srv
+    shm_size: 64m
+    ulimits:
+      nofile: {soft: 1024, hard: 2048}
+    dns: [1.1.1.1]
+    tty: true
+    deploy:
+      resources:
+        limits: {cpus: "1.5", memory: 512m}
+      restart_policy:
+        condition: on-failure
+networks:
+  back:
+    ipam:
+      config:
+        - subnet: 10.77.0.0/24
+  front: {}
+volumes:
+  data: {}

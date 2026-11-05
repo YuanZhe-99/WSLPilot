@@ -1,0 +1,6 @@
+services:
+  web:
+    environment:
+      OVERRIDDEN: "yes"
+    ports:
+      - "8443:443"
