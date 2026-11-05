@@ -1,0 +1,30 @@
+[
+  {
+    "CreatedAt": "2026-11-05T21:36:03Z",
+    "Driver": "guest",
+    "Labels": {
+      "io.wslpilot.test": "1"
+    },
+    "Mountpoint": "/var/lib/docker/volumes/wslpilot-test-vol/_data",
+    "Name": "wslpilot-test-vol",
+    "Options": null,
+    "Scope": "local"
+  },
+  {
+    "CreatedAt": "2026-11-05T21:36:11Z",
+    "Driver": "vhd",
+    "Labels": {
+      "io.wslpilot.test": "1"
+    },
+    "Mountpoint": "/var/lib/docker/volumes/wslpilot-test-vhd/_data",
+    "Name": "wslpilot-test-vhd",
+    "Options": {
+      "SizeBytes": "1073741824"
+    },
+    "Scope": "local",
+    "Status": {
+      "HostPath": "C:\\Users\\user\\AppData\\Local\\wslc\\sessions\\wslc-cli-user\\volumes\\wslpilot-test-vhd.vhdx",
+      "SizeBytes": "1073741824"
+    }
+  }
+]

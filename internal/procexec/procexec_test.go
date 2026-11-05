@@ -35,3 +35,12 @@ func TestDecode(t *testing.T) {
 		})
 	}
 }
+
+func TestTailBufferKeepsEnd(t *testing.T) {
+	tb := &tailBuffer{max: 4}
+	tb.Write([]byte("abc"))
+	tb.Write([]byte("defg"))
+	if got := string(tb.Bytes()); got != "defg" {
+		t.Fatalf("tail = %q", got)
+	}
+}

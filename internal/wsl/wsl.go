@@ -75,13 +75,17 @@ func ParseNames(out string) []string {
 	return names
 }
 
-// Client runs wsl.exe through a Runner.
+// Client runs wsl.exe. Tests replace the fields with fakes.
 type Client struct {
-	Run procexec.Runner
+	Run    procexec.Runner
+	Stream procexec.Streamer
+	// ReadRegistry lists WSL's per-user registry entries; nil reads the
+	// real registry (empty off Windows).
+	ReadRegistry func() []RegEntry
 }
 
 // New returns a Client that runs the real wsl.exe.
-func New() *Client { return &Client{Run: procexec.Run} }
+func New() *Client { return &Client{Run: procexec.Run, Stream: procexec.Stream} }
 
 // Version runs `wsl --version`.
 //

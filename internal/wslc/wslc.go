@@ -51,13 +51,17 @@ func ParseInfo(out string) (Info, error) {
 	return info, nil
 }
 
-// Client runs wslc.exe through a Runner.
+// Client runs wslc.exe. Tests replace Run and Stream with fakes.
 type Client struct {
-	Run procexec.Runner
+	Run    procexec.Runner
+	Stream procexec.Streamer
+	// Session selects a WSLc session (`--session`); "" is the default CLI
+	// session, which shows the same objects as the user's own wslc commands.
+	Session string
 }
 
 // New returns a Client that runs the real wslc.exe.
-func New() *Client { return &Client{Run: procexec.Run} }
+func New() *Client { return &Client{Run: procexec.Run, Stream: procexec.Stream} }
 
 // Info runs `wslc info --format json`.
 //

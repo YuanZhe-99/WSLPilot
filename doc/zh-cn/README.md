@@ -14,6 +14,7 @@ WSLPilot 是 Windows 11 原生桌面工具，用于管理 WSL 发行版与 WSL �
 | [platform-notes.md](platform-notes.md) | 各平台已实现与已验证的内容 |
 | [development.md](development.md) | 环境、命令、开发循环 |
 | [ci-cd.md](ci-cd.md) | 工作流、打包、上游更新流程 |
+| [backup-format.md](backup-format.md) | `wpbk` 增量仓库格式，版本 1 |
 | [translation-guide.md](translation-guide.md) | 镜像规则与术语表 |
 | [version-history.md](version-history.md) | 发布记录及其测试所用的上游版本 |
 | [functions/INDEX.md](functions/INDEX.md) | 各包职责与关键声明 |

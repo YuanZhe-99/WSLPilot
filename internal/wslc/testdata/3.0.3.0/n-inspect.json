@@ -1,0 +1,42 @@
+[
+  {
+    "Attachable": false,
+    "ConfigFrom": {
+      "Network": ""
+    },
+    "ConfigOnly": false,
+    "Containers": {
+      "bd5a5bc23b669c7023f4488cda09caa68cb4c14791e40da43eeaf10ff7e82652": {
+        "EndpointID": "eeb08876c0926ccb60bc4c311c4eeb00082597bd735358b37b01b5562e71f21e",
+        "IPv4Address": "172.18.0.2/16",
+        "IPv6Address": "",
+        "MacAddress": "02:42:ac:12:00:02",
+        "Name": "wslpilot-test-c1"
+      }
+    },
+    "Created": "2026-11-05T21:36:03.2055618Z",
+    "Driver": "bridge",
+    "EnableIPv4": true,
+    "EnableIPv6": false,
+    "IPAM": {
+      "Config": [
+        {
+          "Gateway": "172.18.0.1",
+          "Subnet": "172.18.0.0/16"
+        }
+      ],
+      "Driver": "default",
+      "Options": {}
+    },
+    "Id": "ddb70a46c6859c40f22a8c42a0cbaa939d7e11466bc490a0795b401bcea26bd9",
+    "Ingress": false,
+    "Internal": false,
+    "Labels": {
+      "io.wslpilot.test": "1"
+    },
+    "Name": "wslpilot-test-net",
+    "Options": {},
+    "Scope": "local",
+    "Status": {}
+  }
+]

@@ -48,15 +48,15 @@
 | WSLc 设置文件 `%LOCALAPPDATA%\wslc\settings.yaml`（本机尚不存在） | 可视化编辑需处理「文件不存在 = 全部默认值」；键名需从上游源码 / 文档核对 | `wslc info` |
 | WSL Containers 已 GA；原生 Compose 尚未提供，微软表示计划以 `wsl compose up` 形式支持现有 `compose.yaml`；有 NuGet 包 `Microsoft.WSL.Containers` | Native Compose Backend 的探测入口暂定为 `wslc compose` / `wsl compose` 子命令存在与否；SDK 待评估 | 新闻报道（Help Net Security 2026-09-30、next.ink），**未找到官方 API 文档，待核对** |
 
-待验证（M1 前必须得出结论）：
+待验证项进展（2026-11-05，已核对的结论已写入 `doc/en-us/upstream.md`）：
 
-1. `wsl --list --verbose` 在多语言系统下的列格式；默认发行版是否可改从注册表 `HKCU\Software\Microsoft\Windows\CurrentVersion\Lxss` 稳定读取（属内部实现，仅作只读回退）。
-2. `wslc list` / `images` / `volume list` / `network list` 是否有 JSON 输出（`--format` 未在所有命令出现）。
-3. `wslc events` 的输出格式与是否可长连接。
-4. Volume `guest` 与 `vhd` 驱动的数据位置、大小统计与迁移方式；WSLc 数据根目录能否迁移（需求 §3「数据存储位置迁移」）。
-5. `wslc` 多 session（`--session`）对容器可见性的影响；WSLPilot 应使用默认 CLI session 以便与用户 CLI 看到同一组对象。
-6. `Microsoft.WSL.Containers` SDK：是否为平面 C ABI、能否用 `golang.org/x/sys/windows` / purego 无 cgo 调用、与 CLI 版本的对应关系。
-7. 运行中发行版 `wsl --export` 的一致性；`--format vhd` 是否要求停机。
+1. ~~`-l -v` 列格式~~：已解决，只按位置读取 `*`、名称、版本；路径从注册表只读获取。
+2. ~~JSON 输出~~：已解决，list 为 JSON Lines，inspect 为 JSON 数组。
+3. ~~`wslc events`~~：已解决，长连接 JSON Lines。
+4. Volume 驱动：`vhd` 的 VHDX 位于 session 目录（已确认）；`guest` 的数据位于 session 的 storage.vhdx 内。WSLc 数据根目录：官方文档说明修改 `storagePath` 不会迁移已有数据 → 「数据位置迁移」实现为导出（镜像 save、Volume tar）→ 改设置 → 导入，作为向导提供。
+5. `--session`：WSLPilot 使用默认 CLI session（`Client.Session` 为空）；多 session 可见性仍待验证。
+6. `Microsoft.WSL.Containers` SDK：未评估，CLI 已满足需求，暂不做。
+7. 运行中 `--export` 的一致性：默认先终止（行为契约）。`--format vhd` 在一次中断导出后报 `ERROR_SHARING_VIOLATION`，需要在 `--shutdown` 后重测。
 
 ## 2. 需求可行性评估
 
@@ -82,7 +82,9 @@
 
 ### 2.1 VHDX 压缩（用户追加需求）
 
-WSL2 的 `ext4.vhdx` 只增不减：Linux 内删除文件后，Windows 侧文件大小不回落。官方只提供 `wsl --manage <Distro> --set-sparse true`（稀疏 VHD，自动回收，本机 `--help` 已确认存在），没有一次性手动压缩命令。WSLPilot 提供「压缩磁盘」：
+**更新（2026-11-05）**：WSL 3.0.3.0 已提供 `wsl --manage <Distro> --compact`（无需提权，实测 281 MB → 72 MB，会终止运行中的发行版）。WSLPilot 优先使用它；下面的 diskpart 流程只作为旧版 WSL 与 WSLc `vhd` Volume 的回退（`internal/vhdx`、`internal/elevate` 已实现，UAC 路径尚未实机走过）。
+
+WSL2 的 `ext4.vhdx` 只增不减：Linux 内删除文件后，Windows 侧文件大小不回落。旧版本只提供 `wsl --manage <Distro> --set-sparse true`。回退流程：
 
 1. 预估：显示 VHDX 文件当前大小，以及 Linux 内 `df` 的已用空间，二者之差即为可回收空间的上限，供用户判断是否值得做。
 2. 准备（发行版运行中）：`wsl -d X -u root -- fstrim -av`，让文件系统把空闲块告知虚拟磁盘。
@@ -189,14 +191,7 @@ type Backend interface {
 
 - **Folder**：目录结构可浏览；Linux 元数据另存 `.wslpilot/manifest.jsonl`（路径、uid、gid、mode、mtime、symlink 目标、xattr、硬链接组）；恢复时由 manifest + 文件重建 tar 流。特殊文件（设备、FIFO）只存于 manifest。
 - **Archive**：`.tar` / `.tar.zst` / `.tar.gz` + 旁置 `*.wpmeta.json`（格式版本、来源、时间、SHA-256、工具版本）；恢复前可校验。
-- **Incremental（`wpbk` 仓库）**：
-  - 布局：`config.json`（`format: "wpbk", version: 1`）、`packs/`、`index/`、`snapshots/`、`locks/`。
-  - 分块：FastCDC（内容定义，平均 1 MiB），块 ID = BLAKE3-256；zstd 压缩；块打包为 ~32 MiB pack，pack 尾部自带索引，可脱离 `index/` 重建。
-  - 快照：按 tar 条目记录元数据 + 内容块列表（而非整个 tar 的字节分块），以便逐文件浏览与恢复。
-  - 操作：backup、restore（任意快照）、check（结构 / 全量读取）、forget（保留策略）、prune（重打包回收空间）、upgrade（格式版本迁移，旧版本只读支持至少一个大版本）。
-  - 加密：v1 预留 `encryption` 字段，首版不加密（**待用户决定是否首版需要**）。
-  - 库选型（待核对许可证与 ARM64 性能）：`github.com/klauspost/compress/zstd`、`lukechampine.com/blake3` 或 `github.com/zeebo/blake3`、FastCDC 实现。
-  - 格式规范写入 `doc/en-us/backup-format.md`，附带「只用规范即可手工恢复」的验收测试。
+- **Incremental（`wpbk` 仓库）**：已实现（`internal/backup/wpbk`），格式规范见 `doc/en-us/backup-format.md`。剩余：加密（**待用户决定**）、`upgrade` 操作（v2 出现时再做）、并行压缩。
 
 ### 6.3 自动备份
 

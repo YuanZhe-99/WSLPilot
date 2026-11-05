@@ -23,6 +23,15 @@
 | restore | 恢复 |
 | retention policy | 保留策略 |
 | repository (backup) | 仓库 |
+| chunk | 数据块 |
+| pack (backup) | 包 |
+| index (backup) | 索引 |
+| prune | 清理 |
+| blob | blob |
+| compaction (disk) | 压缩 |
+| sparse VHD | 稀疏 VHD |
+| job | 任务 |
+| audit log | 审计日志 |
 | fixture | fixture |
 | adapter | 适配层 |
 | verified | 已验证 |

@@ -10,3 +10,16 @@ acknowledged if someone asks.
 ## MyGo
 
 WSLPilot is built with [MyGo](https://github.com/egoist/mygo) (MIT License).
+
+## Go modules
+
+Compiled into WSLPilot; each license is compatible with GPL-3.0.
+
+| Module | License | Used for |
+|---|---|---|
+| `github.com/compose-spec/compose-go/v2` | Apache-2.0 | Loading and validating Compose files |
+| `github.com/klauspost/compress` (zstd) | BSD-3-Clause, parts Apache-2.0 | Compression in `wpbk` repositories |
+| `github.com/zeebo/blake3` | CC0-1.0 | Chunk hashes in `wpbk` repositories |
+| `github.com/klauspost/cpuid/v2` | MIT | CPU feature detection for BLAKE3 |
+| `golang.org/x/sys` | BSD-3-Clause | Windows registry, process and file APIs |
+| `gopkg.in/yaml.v3` | MIT and Apache-2.0 | Validating `settings.yaml` |

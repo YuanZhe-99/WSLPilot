@@ -1,0 +1,80 @@
+[
+  {
+    "Config": {
+      "Cmd": [
+        "sleep",
+        "3600"
+      ],
+      "Entrypoint": null,
+      "Env": [
+        "A=1",
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      ],
+      "Healthcheck": null,
+      "Image": "alpine:3.20",
+      "Labels": {
+        "com.docker.compose.project": "demo",
+        "io.wslpilot.test": "1"
+      },
+      "StopTimeout": null,
+      "User": "",
+      "WorkingDir": "/"
+    },
+    "Created": "2026-11-05T21:36:03.4128106Z",
+    "HostConfig": {
+      "Memory": 0,
+      "NanoCpus": 0,
+      "NetworkMode": "wslpilot-test-net",
+      "Ulimits": []
+    },
+    "Id": "bd5a5bc23b669c7023f4488cda09caa68cb4c14791e40da43eeaf10ff7e82652",
+    "Image": "sha256:ab3fe4defd29ba6231229a4d41440ac8bde8218e85870e53876277faa24b35c4",
+    "Labels": {
+      "com.docker.compose.project": "demo",
+      "io.wslpilot.test": "1"
+    },
+    "Mounts": [
+      {
+        "Destination": "/data",
+        "Name": "wslpilot-test-vol",
+        "ReadWrite": true,
+        "Source": "wslpilot-test-vol",
+        "Type": "volume"
+      }
+    ],
+    "Name": "/wslpilot-test-c1",
+    "NetworkSettings": {
+      "Networks": {
+        "wslpilot-test-net": {
+          "Aliases": [
+            "web",
+            "bd5a5bc23b66"
+          ],
+          "DriverOpts": {},
+          "Gateway": "172.18.0.1",
+          "IPAMConfig": null,
+          "IPAddress": "172.18.0.2",
+          "IPPrefixLen": 16,
+          "Links": [],
+          "MacAddress": "02:42:ac:12:00:02"
+        }
+      }
+    },
+    "Ports": {
+      "80/tcp": [
+        {
+          "HostIp": "127.0.0.1",
+          "HostPort": "18080"
+        }
+      ]
+    },
+    "State": {
+      "ExitCode": 0,
+      "FinishedAt": "0001-01-01T00:00:00Z",
+      "Health": null,
+      "Running": true,
+      "StartedAt": "2026-11-05T21:36:04.3448239Z",
+      "Status": "running"
+    }
+  }
+]

@@ -1,0 +1,4 @@
+  名称                状态            版本
+* Debian              正在运行        2
+  wslpilot-test-d1    已停止          2
+  legacy              已停止          1

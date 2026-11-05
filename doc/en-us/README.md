@@ -15,6 +15,7 @@ written in Go with [MyGo](https://github.com/egoist/mygo)'s native UI. It drives
 | [platform-notes.md](platform-notes.md) | What is implemented and verified on each platform |
 | [development.md](development.md) | Environment, commands, the dev loop |
 | [ci-cd.md](ci-cd.md) | Workflows, packaging, the upstream update procedure |
+| [backup-format.md](backup-format.md) | The `wpbk` incremental repository format, version 1 |
 | [translation-guide.md](translation-guide.md) | Mirror rules and the glossary |
 | [version-history.md](version-history.md) | Releases and the upstream versions they were tested with |
 | [functions/INDEX.md](functions/INDEX.md) | Per-package roles and key declarations |
