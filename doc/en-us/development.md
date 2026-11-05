@@ -14,8 +14,12 @@ The MyGo CLI is a module tool: `go tool mygo` runs the version pinned in `go.mod
 go tool mygo dev        # build, run, and rebuild on change
 go tool mygo build      # package into build/windows-<arch>/
 go tool mygo generate   # regenerate locales/catalog_gen.go after editing locales/*.json
+go run ./tools/icon     # re-render resources/icon.png after editing resources/icon.svg
 go test ./...           # unit and view tests (no window, no WSL needed)
 ```
+
+The icon's penguin is a redrawing after Tux; keep the credit in `THIRD_PARTY_NOTICES.md` when
+changing it.
 
 ## Full local gate
 

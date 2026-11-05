@@ -11,3 +11,4 @@
 | `internal/gui` | Native UI: sidebar, pages, dashboard | `App`, `New`, `App.View`, `App.Refresh` |
 | `locales` | Generated message accessors from `locales/*.json` | `catalog_gen.go` |
 | `tools/checkdocs` | Verifies the `doc/` language mirror | `main` |
+| `tools/icon` | Renders the app icon SVG to PNG with MyGo's renderer | `render`, `matte` |

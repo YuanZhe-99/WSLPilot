@@ -29,4 +29,5 @@ Requirements and the full check list: [doc/en-us/development.md](doc/en-us/devel
 
 ## License
 
-GPL-3.0 — see [LICENSE](LICENSE).
+GPL-3.0 — see [LICENSE](LICENSE). Third-party credits, including the Tux-based icon:
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

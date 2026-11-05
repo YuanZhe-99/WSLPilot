@@ -65,6 +65,7 @@
 | §2 检测、安装、导入、启停、终止、删除发行版 | `wsl --list --online`、`--install --no-launch`、`--import(--vhd)`、`-d X -- true`（启动）、`--terminate`、`--shutdown`、`--unregister` | 首装 WSL 需管理员；`--unregister` 必须先提供导出备份选项 |
 | §2 默认发行版 / WSL 版本 | `--set-default`、`--set-version`、`--set-default-version` | WSL1↔2 转换耗时长，作为可取消长任务（取消 = 终止进程，需验证上游回滚行为） |
 | §2 迁移到指定磁盘 | `wsl --manage X --move <dir>` | 需求中的「迁移」不自行复制 VHDX |
+| §2+ VHDX 压缩（用户追加，官方未提供） | 见 §2.1 | 需要管理员权限与 `wsl --shutdown`；作为显式长任务 |
 | §2 导出 / 导入 / 备份恢复 | `--export --format tar|tar.gz|vhd`、`--import` | 一致性：默认先 `--terminate`（用户确认），见 §6 |
 | §2 状态、磁盘占用、资源 | 状态来自 CLI；VHDX 大小来自 BasePath 文件；内存 / CPU 通过 `wsl -d X -- cat /proc/...` 或 vmmem 进程 | 「可获取的」信息为准，界面注明来源 |
 | §2 `.wslconfig` / `wsl.conf` | 原始 INI 文档编辑 + 键模式库（类型、默认值、说明）；`wsl.conf` 以 `wsl -d X -u root -- sh -c` 读写，写前备份到 `/etc/wsl.conf.wslpilot-<ts>` | 修改后提示需要 `--shutdown` / `--terminate` 生效 |
@@ -78,6 +79,23 @@
 | §6 备份 | 见 §6 | — |
 | §7 托盘、自启、通知、自动更新 | MyGo 原生能力 | 自动更新需发布签名密钥（GitHub secrets） |
 | §8 各页面 | 见 §7 | — |
+
+### 2.1 VHDX 压缩（用户追加需求）
+
+WSL2 的 `ext4.vhdx` 只增不减：Linux 内删除文件后，Windows 侧文件大小不回落。官方只提供 `wsl --manage <Distro> --set-sparse true`（稀疏 VHD，自动回收，本机 `--help` 已确认存在），没有一次性手动压缩命令。WSLPilot 提供「压缩磁盘」：
+
+1. 预估：显示 VHDX 文件当前大小，以及 Linux 内 `df` 的已用空间，二者之差即为可回收空间的上限，供用户判断是否值得做。
+2. 准备（发行版运行中）：`wsl -d X -u root -- fstrim -av`，让文件系统把空闲块告知虚拟磁盘。
+3. 停机：VHDX 挂在 WSL 的实用虚拟机上，必须 `wsl --shutdown`。这会同时停止**所有**发行版和 WSLc 容器，所以要列出将受影响的对象，由用户确认。
+4. 压缩：放在单独提权的子进程里执行，GUI 本身不提权：
+   - 首选 `diskpart`（Windows 家庭版也有）：`select vdisk file="…"` → `attach vdisk readonly` → `compact vdisk` → `detach vdisk`。脚本写入临时文件，路径要正确转义。
+   - 可选 `Optimize-VHD -Mode Full`：需要 Hyper-V PowerShell 模块，仅在检测到时提供。
+5. 校验：比较压缩前后的文件大小；重新启动发行版并检查 `wsl -d X -- true`。失败时确保 VHDX 已 detach，并在日志里记录 diskpart 的输出。
+6. 安全：压缩前检查目标盘的剩余空间；如果最近没有备份，默认勾选「先导出备份」；禁止对正在被其它进程打开的 VHDX 执行。
+
+同一流程也用于 WSLc 的 `vhd` 驱动 Volume 和 WSLc 自身的数据磁盘（这两者的位置取决于 §1 待验证项 4）。
+
+待验证：已设为 sparse 的 VHDX 能否再用 diskpart 压缩，以及效果如何；`attach vdisk readonly` 对 ext4 VHDX 做 compact 实际能回收多少（对照 `fstrim` 前后的结果）；ARM64 上 diskpart 与 Optimize-VHD 的行为。
 
 ## 3. 架构
 
@@ -203,7 +221,7 @@ Sidebar：Dashboard / WSL / WSLc / Compose / Volumes / Backups / Terminal / Sett
 |---|---|---|
 | **M0 初始化**（本次） | 仓库结构、AGENTS / PLAN / 文档、MyGo 原生 UI 壳、版本号、WSL/WSLc 探测、CI | `go test ./...`、`go tool mygo vet .`、`i18n check`、`checkdocs` 通过；应用可启动并显示探测结果 |
 | M1 基础设施 | `procexec`（UTF-16/UTF-8、取消、流式）、`capability`、`jobs`、`store`、fixture 体系、gated live tests；解决 §1 待验证 1–5、7 | 适配层 contract 测试；实机记录写入 `doc/en-us/upstream.md` |
-| M2 WSL 管理 | 发行版全生命周期、迁移、导入导出、`.wslconfig` / `wsl.conf` 编辑、终端、WT Profile、更新；`wslpilot-cli` | 在 `wslpilot-test-*` 发行版上完成全部操作的实机验证 |
+| M2 WSL 管理 | 发行版全生命周期、迁移、导入导出、VHDX 压缩与 sparse 开关、`.wslconfig` / `wsl.conf` 编辑、终端、WT Profile、更新；`wslpilot-cli` | 在 `wslpilot-test-*` 发行版上完成全部操作的实机验证 |
 | M3 WSLc 与 Compose builtin | 容器 / 镜像 / 网络 / 日志 / stats / exec 终端 / settings.yaml；Compose 加载、校验、up/down/restart/redeploy、日志聚合、不支持特性报告 | Compose 规划器单元测试 + 多服务示例项目实机 up/down |
 | M4 Volume | Volume 管理、helper rootfs、TAR 导入导出、迁移、Compose 中 native/bind 选择 | 权限 / 属主 / symlink / 硬链接 / 大文件往返测试 |
 | M5 备份 Folder + Archive + 调度 | 统一模型、两种模式、计划任务、保留策略、通知、`wslpilot-agent`、重启策略与 Compose 自启 | 备份 → 删除 → 恢复往返，比对 manifest |
@@ -221,7 +239,7 @@ Sidebar：Dashboard / WSL / WSLc / Compose / Volumes / Backups / Terminal / Sett
 
 ## 10. 待用户决定
 
-1. 正式产品名与图标（目前为 WSLPilot + MyGo 模板图标）。
+1. 正式产品名（目前为 WSLPilot）。图标已定为方案 B1（Windows 窗口 + 终端 + 走出窗口的扁平企鹅），源文件为 `resources/icon.svg`；16px 托盘小图标可能需要单独简化，留待 M7 处理。
 2. 许可证（暂定 GPL-3.0）。
 3. Git 远程：是否与其它项目一样使用私有 Gitea `origin` + GitHub `github` 双远程。
 4. wpbk 首版是否需要加密。

@@ -11,3 +11,4 @@
 | `internal/gui` | 原生 UI：侧边栏、页面、概览 | `App`、`New`、`App.View`、`App.Refresh` |
 | `locales` | 由 `locales/*.json` 生成的消息访问函数 | `catalog_gen.go` |
 | `tools/checkdocs` | 校验 `doc/` 语言镜像 | `main` |
+| `tools/icon` | 使用 MyGo 渲染器将应用图标 SVG 渲染为 PNG | `render`、`matte` |

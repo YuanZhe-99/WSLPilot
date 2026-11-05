@@ -14,8 +14,11 @@ MyGo CLI 是模块工具：`go tool mygo` 运行 `go.mod` 固定的版本。
 go tool mygo dev        # build, run, and rebuild on change
 go tool mygo build      # package into build/windows-<arch>/
 go tool mygo generate   # regenerate locales/catalog_gen.go after editing locales/*.json
+go run ./tools/icon     # re-render resources/icon.png after editing resources/icon.svg
 go test ./...           # unit and view tests (no window, no WSL needed)
 ```
+
+图标中的企鹅依据 Tux 重绘；修改图标时须保留 `THIRD_PARTY_NOTICES.md` 中的署名。
 
 ## 完整本地检查
 

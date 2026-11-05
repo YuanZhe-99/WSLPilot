@@ -36,6 +36,7 @@ gui  →  domain packages (compose, volume, backup, …)  →  adapters (wsl, ws
 | `cmd/wslpilot` | GUI 入口 |
 | `internal/` | 全部应用包（见 `functions/INDEX.md`） |
 | `locales/` | ARB 目录与生成的 `catalog_gen.go` |
-| `resources/` | 应用图标与打包资源 |
+| `resources/` | 应用图标（`icon.svg` 为源文件，`icon.png` 由其渲染）与打包资源 |
 | `tools/checkdocs` | 文档镜像校验 |
+| `tools/icon` | 将 `resources/icon.svg` 渲染为 1024×1024 的 `resources/icon.png` |
 | `.agents/skills/` | Agent 技能（MyGo 维护） |
