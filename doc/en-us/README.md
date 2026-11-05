@@ -14,6 +14,7 @@ written in Go with [MyGo](https://github.com/egoist/mygo)'s native UI. It drives
 | [upstream.md](upstream.md) | Verified `wsl.exe`, `wslc.exe` and MyGo behavior and quirks |
 | [platform-notes.md](platform-notes.md) | What is implemented and verified on each platform |
 | [development.md](development.md) | Environment, commands, the dev loop |
+| [ci-cd.md](ci-cd.md) | Workflows, packaging, the upstream update procedure |
 | [translation-guide.md](translation-guide.md) | Mirror rules and the glossary |
 | [version-history.md](version-history.md) | Releases and the upstream versions they were tested with |
 | [functions/INDEX.md](functions/INDEX.md) | Per-package roles and key declarations |
@@ -24,5 +25,5 @@ written in Go with [MyGo](https://github.com/egoist/mygo)'s native UI. It drives
 |---|---|---|
 | Go | 1.27.3 | `go.mod` |
 | MyGo | v0.7.4 | `go.mod` |
-| WSL (tested, not bundled) | 3.0.3.0 | `upstream.md` |
+| WSL (tested, not bundled) | 3.0.3.0 | `internal/upstream/tested.json`, `upstream.md` |
 | WSLc (tested, not bundled) | 3.0.3.0 | `upstream.md` |

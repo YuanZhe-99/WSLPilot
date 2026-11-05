@@ -180,7 +180,7 @@ e.g. `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>` with the real mod
 ## Remotes and secrets
 
 - `origin` → `<local_gitea_address>` (private Gitea)
-- No `github` remote yet.
+- `github` → `git@github.com:YuanZhe-99/WSLPilot.git` (public; CI and releases run here)
 
 Run `git remote -v` instead of assuming which remotes exist. Keep the `origin` URL written as
 `<local_gitea_address>` in every committed file; never write the underlying host or port anywhere

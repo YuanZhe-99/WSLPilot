@@ -40,4 +40,7 @@ gui  →  domain packages (compose, volume, backup, …)  →  adapters (wsl, ws
 | `resources/` | 应用图标（`icon.svg` 为源文件，`icon.png` 由其渲染）与打包资源 |
 | `tools/checkdocs` | 文档镜像校验 |
 | `tools/icon` | 将 `resources/icon.svg` 渲染为 1024×1024 的 `resources/icon.png` |
+| `tools/deps` | 上游版本检查（见 `ci-cd.md`） |
+| `scripts/build.sh` | windows/amd64 与 windows/arm64 的发布打包 |
+| `.github/workflows` | CI、发布与每周上游检查 |
 | `.agents/skills/` | Agent 技能（MyGo 维护） |

@@ -5,6 +5,8 @@ it was observed on. Unverified assumptions belong in `PLAN.md`.
 
 ## Tested versions
 
+The machine-readable list is `internal/upstream/tested.json`; keep it and this table in step.
+
 | Component | Version | Machine |
 |---|---|---|
 | WSL | 3.0.3.0 (kernel 6.18.54.1-1) | Windows 11 ARM64, build 26300 |

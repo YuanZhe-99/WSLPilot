@@ -14,33 +14,118 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
-    name: Checks (${{ matrix.os }})
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, windows-11-arm]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
+  # Whether anything but documentation changed: a docs-only push or pull
+  # request runs the checks (the docs mirror among them) but not the Windows
+  # tests and packages.
+  changes:
+    name: Changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-go@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - id: diff
+        shell: bash
+        env:
+          BEFORE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          code=true
+          if [ "$GITHUB_EVENT_NAME" != workflow_dispatch ] && [ -n "$BEFORE" ] &&
+            git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            if ! git diff --name-only "$BEFORE" HEAD | grep -qvE '^(doc|design)/|\.md$'; then
+              code=false
+            fi
+          fi
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "code changed: $code"
+
+  # Platform-independent checks. The app only targets Windows, so vet and
+  # the advisory scan run with GOOS=windows.
+  check:
+    name: Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # the secret scan reads the history
+
+      # The Go version comes from go.mod, so a Go release never changes the
+      # build underneath a working checkout.
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: go.mod
+
       - name: Formatting
         run: |
           unformatted=$(gofmt -l cmd internal tools)
           if [ -n "$unformatted" ]; then
             echo "gofmt needed:"; echo "$unformatted"; exit 1
           fi
-      - run: go vet ./...
-      - run: go test ./...
-      - run: CGO_ENABLED=0 go test ./...
-      - run: go tool mygo vet .
+
+      - run: GOOS=windows GOARCH=amd64 go vet ./...
+      - run: GOOS=windows GOARCH=arm64 go vet ./...
       - name: Interface catalogs
         run: go tool mygo i18n check
       - name: Documentation mirror
         run: go run ./tools/checkdocs
-      - run: go build ./...
+
+      # Fails only on a vulnerability the code can reach on Windows (the Go
+      # toolchain's own included). Installed once: GOOS on `go run` would
+      # build the tool itself for Windows.
+      - name: Go advisories
+        run: |
+          GOBIN="$RUNNER_TEMP" go install golang.org/x/vuln/cmd/govulncheck@v1.9.0
+          GOOS=windows "$RUNNER_TEMP/govulncheck" ./...
+
+      - name: Secret scan
+        run: go run github.com/zricethezav/gitleaks/v8@v8.30.1 git --no-banner --redact .
+
+      # Informational here; the weekly upstream workflow opens an issue.
+      - name: Upstream versions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: go run ./tools/deps check
+
+  # The full gate on both architectures WSLPilot ships for. Hosted runners
+  # have no WSL, so the live adapter tests (WSLPILOT_LIVE=1) do not run here;
+  # the parsers run against the captured fixtures.
+  test:
+    name: Test (${{ matrix.os }})
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, target: windows/amd64 }
+          - { os: windows-11-arm, target: windows/arm64 }
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+      - run: go vet ./...
+      - run: go test -timeout 5m ./...
+      - run: CGO_ENABLED=0 go test -timeout 5m ./...
+      - run: go tool mygo vet .
+      # Data races between the job goroutines and the view state they hand
+      # to the UI thread. The detector needs cgo, which the x64 runner has.
+      - name: Race detector
+        if: matrix.os == 'windows-latest'
+        run: CGO_ENABLED=1 go test -race -timeout 10m ./...
+      # The packaged app, without the installer: proves `mygo build` still
+      # accepts mygo.json and the resources.
+      - name: Package
+        run: scripts/build.sh -skip-installer ${{ matrix.target }}
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: wslpilot-${{ matrix.os }}
+          path: build/
+          retention-days: 7
+          if-no-files-found: error

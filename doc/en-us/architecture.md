@@ -45,4 +45,7 @@ gui  →  domain packages (compose, volume, backup, …)  →  adapters (wsl, ws
 | `resources/` | App icon (`icon.svg` is the source, `icon.png` is rendered from it) and packaged resources |
 | `tools/checkdocs` | Documentation mirror check |
 | `tools/icon` | Renders `resources/icon.svg` to the 1024×1024 `resources/icon.png` |
+| `tools/deps` | Upstream version check (see `ci-cd.md`) |
+| `scripts/build.sh` | Release packaging for windows/amd64 and windows/arm64 |
+| `.github/workflows` | CI, release and the weekly upstream check |
 | `.agents/skills/` | Agent skills (MyGo maintenance) |

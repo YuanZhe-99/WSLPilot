@@ -6,3 +6,5 @@ mygo_windows_*.syso
 /wslpilot.exe
 /wslpilot-agent.exe
 /wslpilot-cli.exe
+# Helper programs compiled by scripts/build.sh for packaging
+/resources/windows-*/

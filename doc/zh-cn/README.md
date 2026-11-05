@@ -13,6 +13,7 @@ WSLPilot 是 Windows 11 原生桌面工具，用于管理 WSL 发行版与 WSL �
 | [upstream.md](upstream.md) | 已验证的 `wsl.exe`、`wslc.exe` 与 MyGo 行为及特殊情况 |
 | [platform-notes.md](platform-notes.md) | 各平台已实现与已验证的内容 |
 | [development.md](development.md) | 环境、命令、开发循环 |
+| [ci-cd.md](ci-cd.md) | 工作流、打包、上游更新流程 |
 | [translation-guide.md](translation-guide.md) | 镜像规则与术语表 |
 | [version-history.md](version-history.md) | 发布记录及其测试所用的上游版本 |
 | [functions/INDEX.md](functions/INDEX.md) | 各包职责与关键声明 |
@@ -23,5 +24,5 @@ WSLPilot 是 Windows 11 原生桌面工具，用于管理 WSL 发行版与 WSL �
 |---|---|---|
 | Go | 1.27.3 | `go.mod` |
 | MyGo | v0.7.4 | `go.mod` |
-| WSL（已测试，不随附） | 3.0.3.0 | `upstream.md` |
+| WSL（已测试，不随附） | 3.0.3.0 | `internal/upstream/tested.json`、`upstream.md` |
 | WSLc（已测试，不随附） | 3.0.3.0 | `upstream.md` |

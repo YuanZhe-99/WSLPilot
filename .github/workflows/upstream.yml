@@ -1,0 +1,54 @@
+name: Upstream versions
+
+# WSLPilot keeps MyGo at its latest release and records the WSL releases it
+# was tested with (internal/upstream/tested.json). This weekly check opens
+# an issue when either has moved on.
+on:
+  schedule:
+    - cron: "23 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+
+      - name: Compare pins with the latest releases
+        id: deps
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          go run ./tools/deps check -strict > report.txt 2>&1
+          status=$?
+          cat report.txt
+          echo "outdated=$([ $status -ne 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+      - name: Open an issue
+        if: steps.deps.outputs.outdated == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          title="Upstream update available (MyGo / WSL)"
+          if gh issue list --state open --search "$title in:title" --json number --jq '.[0].number' | grep -q .; then
+            echo "An issue is already open."
+            exit 0
+          fi
+          {
+            echo "\`go run ./tools/deps check\` reports:"
+            echo
+            echo '```'
+            cat report.txt
+            echo '```'
+            echo
+            echo "Follow the upstream update procedure in doc/en-us/ci-cd.md."
+          } > body.md
+          gh issue create --title "$title" --body-file body.md
