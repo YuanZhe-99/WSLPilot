@@ -22,7 +22,7 @@
 | `tools/checkdocs` | Verifies the `doc/` language mirror | `main` |
 | `tools/icon` | Renders the app icon SVG to PNG with MyGo's renderer | `render`, `matte` |
 | `tools/deps` | Compares the MyGo and WSL pins with the latest releases | `check` |
-| `internal/core` | Wires the services for each process; Compose wiring (backup, autostart) | `Core`, `New`, `BackupTarget`, `WireCompose`, `FindProject`, `AgentPath` |
+| `internal/core` | Wires the services for each process; Compose wiring (backup, autostart) | `Core`, `New`, `BackupTarget`, `WireCompose`, `FindProject`, `MoveWSLcData`, `AgentPath` |
 | `internal/compose` | Compose: backend interface, project metadata, loader, validation, planner, builtin and native backends, migration (see `compose.md`) | `Backend`, `Registry`, `Project`, `Projects`, `Load`, `Translate`, `Diff`, `Builtin`, `Native`, `Migrate` |
 | `internal/volume` | Volume import/export as tar through a helper container | `Pipeline`, `Import`, `Export`, `Decompress`, `HelperImage` |
 | `internal/backup` | Sources → tar → folder/archive/repository; catalog, verify, restore, retention (see `backups.md`) | `Runner`, `FolderWriter`, `ArchiveWriter`, `RepoWriter`, `Scan`, `GroupBySource`, `Open`, `Verify`, `PlanRetention`, `Delete` |

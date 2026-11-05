@@ -195,6 +195,11 @@ func (a *App) distroDetail(c *ui.Context, d wsl.Distro) {
 					a.distroJob(L.JobStart(d.Name), d.Name, "", func(ctx context.Context, j *jobs.Job) error { return a.k.WSL.Start(ctx, d.Name) })
 				})
 			}
+			if cmd := updateCommand(d.Flavor); cmd != "" {
+				ui.Button(c, L.WSLUpdatePackages()).OnClick(func() {
+					a.openTerminal(d.Name, []string{"wsl.exe", "--distribution", d.Name, "--user", "root", "--exec", "sh", "-c", cmd + "; echo; echo Done.; sleep 600"})
+				})
+			}
 			if d.BasePath != "" {
 				ui.Button(c, L.ShowInExplorer()).OnClick(func() { a.host.OpenPath(d.BasePath) })
 			}
@@ -631,4 +636,25 @@ func (a *App) wslconfigView(c *ui.Context) {
 		_, err := f.snap.Save(text)
 		return err
 	}, reload)
+}
+
+// updateCommand is the package update command for a distribution flavor
+// (os-release ID, as WSL records it), run in a terminal the user watches.
+// Returns: "" for a flavor WSLPilot does not know.
+func updateCommand(flavor string) string {
+	switch strings.ToLower(flavor) {
+	case "ubuntu", "debian", "kali", "kali-linux", "pengwin":
+		return "apt-get update && apt-get -y full-upgrade"
+	case "fedora", "almalinux", "rocky", "rhel", "centos", "ol":
+		return "dnf -y upgrade"
+	case "opensuse-tumbleweed":
+		return "zypper --non-interactive dup"
+	case "opensuse-leap", "sles", "opensuse":
+		return "zypper --non-interactive up"
+	case "arch", "archlinux":
+		return "pacman -Syu --noconfirm"
+	case "alpine":
+		return "apk update && apk upgrade"
+	}
+	return ""
 }

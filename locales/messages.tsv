@@ -433,3 +433,14 @@ SetAboutText	Manages WSL distributions, WSL Containers, Compose projects and bac
 TrayOpen	Open WSLPilot	打开 WSLPilot
 TrayQuit	Quit	退出
 BkNone	No backups found yet. Back something up, or open a folder or archive from another computer.	还没有找到备份。可以先备份，或打开来自其它电脑的目录或归档。
+SetMoveData	Move container data…	迁移容器数据…
+SetMoveDataHelp	Images and volumes move to another folder or drive.	镜像与 Volume 会移动到其它目录或驱动器。
+SetMoveDataMessage	All containers stop. Images and volumes are exported, the storage folder is changed and they are imported again. Containers themselves are not moved and must be created again (Compose projects: Up). The old data stays where it is until you delete it.	所有容器都会停止。镜像与 Volume 会被导出，存储目录修改后再导入。容器本身不会迁移，需要重新创建（Compose 项目：执行 up）。旧数据会保留在原处，直到你删除它。
+SetMoveDataDone	Moved {images:int} images and {volumes:int} volumes. Create these containers again: {containers}. Exported copies: {staging}	已迁移 {images:int} 个镜像与 {volumes:int} 个 Volume。请重新创建这些容器：{containers}。导出的副本：{staging}
+CtrEdit	Edit configuration…	编辑配置…
+CtrEditTitle	Edit {name}	编辑 {name}
+CtrEditWarning	A container cannot be changed in place: it is replaced by a new one with these settings. Volumes are kept; files written inside the container itself are lost.	容器无法原地修改：会用这些设置创建新容器来替换它。Volume 会保留；写在容器自身内部的文件会丢失。
+WSLUpdatePackages	Update packages	更新软件包
+CmpVolumes	Volumes	Volume
+CmpVolumesHelp	native keeps data in a WSL Containers volume; bind uses a Windows folder instead.	native 把数据保存在 WSL 容器的 Volume 中；bind 改用一个 Windows 目录。
+CmpVolumesWarning	Existing data is not moved between a volume and a folder. Back the volume up first if it holds data.	已有数据不会在 Volume 与目录之间移动。如果 Volume 中有数据，请先备份。

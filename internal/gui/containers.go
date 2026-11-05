@@ -2,12 +2,17 @@ package gui
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 
+	"github.com/YuanZhe-99/WSLPilot/internal/backup"
 	"github.com/YuanZhe-99/WSLPilot/internal/jobs"
 	"github.com/YuanZhe-99/WSLPilot/internal/restart"
 	"github.com/YuanZhe-99/WSLPilot/internal/wslc"
@@ -45,6 +50,8 @@ type ctrInput struct {
 	image, name, ports, env, volumes, command, restart, network, ref string
 	subnet                                                           string
 	start                                                            bool
+	// replace is the ID of the container the dialog recreates ("" = new).
+	replace, replaceName string
 }
 
 // logBuffer collects streamed log text, bounded, safe across goroutines.
@@ -226,6 +233,9 @@ func (a *App) containerDetail(c *ui.Context, s wslc.ContainerSummary) {
 			})
 		}
 		ui.Button(c, L.CtrLogs()).OnClick(func() { a.openLogs(s.ID) })
+		if d.ID != "" && d.Labels["com.docker.compose.project"] == "" {
+			ui.Button(c, L.CtrEdit()).OnClick(func() { p.in = editInput(d); p.dlg = "run" })
+		}
 	})
 	ui.Scroll(c).Grow(1).FillWidth().Gap(gap).Children(func() {
 		card(c, "", func() {
@@ -409,7 +419,12 @@ func (a *App) containerDialogs(c *ui.Context) {
 		ui.Column(c).Width(dialogWidth).Gap(gap).Children(func() {
 			switch p.dlg {
 			case "run":
-				ui.Text(c, L.CtrRunTitle()).FontSize(sectionSize).Bold()
+				if p.in.replace != "" {
+					ui.Text(c, L.CtrEditTitle(p.in.replaceName)).FontSize(sectionSize).Bold()
+					ui.Text(c, L.CtrEditWarning()).TextColor(c.Theme().Warning)
+				} else {
+					ui.Text(c, L.CtrRunTitle()).FontSize(sectionSize).Bold()
+				}
 				ui.Form(c, func() {
 					ui.Field(c, L.CtrImage(), func() { ui.TextInput(c, &p.in.image).Placeholder("nginx:latest").Label(L.CtrImage()) })
 					ui.Field(c, L.ColName(), func() { ui.TextInput(c, &p.in.name).Label(L.ColName()) })
@@ -423,6 +438,10 @@ func (a *App) containerDialogs(c *ui.Context) {
 				})
 				dialogButtons(c, a, L.CtrRun(), strings.TrimSpace(p.in.image) != "", func() {
 					spec := runSpec(p.in)
+					if p.in.replace != "" {
+						a.recreate(p.in.replace, spec)
+						return
+					}
 					a.wslcJob(L.CtrRun()+" "+spec.Image, "", func(ctx context.Context) error {
 						id, err := a.k.WSLc.Create(ctx, spec)
 						if err != nil {
@@ -509,4 +528,89 @@ func runSpec(in ctrInput) wslc.ContainerSpec {
 // splitList splits "a, b c" on commas and spaces.
 func splitList(s string) []string {
 	return strings.FieldsFunc(s, func(r rune) bool { return r == ',' || r == ' ' || r == '\n' })
+}
+
+// editInput fills the run dialog from a container's inspect data.
+// Notes: environment variables the image sets (such as PATH) are shown
+// too; they are passed again unchanged.
+func editInput(d wslc.Container) ctrInput {
+	in := ctrInput{image: d.Config.Image, name: d.DisplayName(), start: d.State.Running, replace: d.ID, replaceName: d.DisplayName(), restart: restart.No}
+	in.env = strings.Join(d.Config.Env, "\n")
+	in.command = strings.Join(d.Config.Cmd, " ")
+	var ports []string
+	for cport, binds := range d.Ports {
+		for _, b := range binds {
+			p := b.HostPort + ":" + cport
+			if b.HostIP != "" {
+				p = b.HostIP + ":" + p
+			}
+			ports = append(ports, strings.TrimSuffix(p, "/tcp"))
+		}
+	}
+	sort.Strings(ports)
+	in.ports = strings.Join(ports, ", ")
+	var vols []string
+	for _, m := range d.Mounts {
+		src := m.Source
+		if m.Type == "volume" {
+			src = m.Name
+		}
+		if m.Type == "tmpfs" || src == "" {
+			continue
+		}
+		v := src + ":" + m.Destination
+		if !m.ReadWrite {
+			v += ":ro"
+		}
+		vols = append(vols, v)
+	}
+	in.volumes = strings.Join(vols, "\n")
+	if pol := d.Labels[restart.Label]; pol != "" {
+		in.restart = pol
+	}
+	return in
+}
+
+// recreate replaces a container by one made from spec. The new spec is
+// tried first under a temporary name, so an invalid configuration never
+// costs the old container.
+func (a *App) recreate(oldID string, spec wslc.ContainerSpec) {
+	a.wslcJob(L.CtrEdit()+" "+spec.Name, "wslc.container.recreate", func(ctx context.Context) error {
+		probe := spec
+		probe.Name = spec.Name + "-wslpilot-check"
+		probe.Ports = nil // the old container still holds them
+		id, err := a.k.WSLc.Create(ctx, probe)
+		if err != nil {
+			return err
+		}
+		a.k.WSLc.Remove(ctx, true, false, id)
+		// Safety copy of the container's own files (wslc exports only
+		// stopped containers).
+		if err := a.k.WSLc.Stop(ctx, -1, oldID); err != nil {
+			return err
+		}
+		dir := filepath.Join(a.backupDir(), "Safety")
+		os.MkdirAll(dir, 0o755)
+		safety := filepath.Join(dir, backup.SafeName("container-"+spec.Name)+"-"+time.Now().Format("20060102-150405")+".tar")
+		f, err := os.Create(safety)
+		if err != nil {
+			return err
+		}
+		err = a.k.WSLc.ExportContainer(ctx, oldID, f)
+		if cerr := f.Close(); err == nil {
+			err = cerr
+		}
+		if err != nil {
+			os.Remove(safety)
+			return fmt.Errorf("%s: %w", L.JobBackupFailedStop(), err)
+		}
+		if err := a.k.WSLc.Remove(ctx, true, false, oldID); err != nil {
+			return err
+		}
+		id, err = a.k.WSLc.Create(ctx, spec)
+		if err != nil {
+			return err
+		}
+		return a.k.WSLc.Start(ctx, id)
+	})
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/egoist/mygo/ui"
@@ -22,6 +23,9 @@ type composePage struct {
 	projects        []*compose.Project
 	ps              map[string][]compose.ContainerStatus
 	reports         map[string]*compose.Report
+	volKeys         map[string][]string // project ID → named volume keys
+	volMode         map[string]*string  // "id NUL key" → native | bind
+	volPath         map[string]*string
 	pl, svc         ui.ListState
 	sel             int
 	tab             int // 0 services, 1 file, 2 logs
@@ -73,6 +77,15 @@ func (a *App) validate(pr *compose.Project) {
 		if err == nil {
 			r, err = b.Validate(ctx, pr)
 		}
+		var keys []string
+		if loaded, lerr := compose.Load(ctx, pr); lerr == nil {
+			for k, v := range loaded.Volumes {
+				if !bool(v.External) {
+					keys = append(keys, k)
+				}
+			}
+			sort.Strings(keys)
+		}
 		return func() {
 			if a.cmp.reports == nil {
 				a.cmp.reports = map[string]*compose.Report{}
@@ -81,6 +94,10 @@ func (a *App) validate(pr *compose.Project) {
 				r = compose.Report{Errors: []compose.Issue{{Message: friendlyError(err)}}}
 			}
 			a.cmp.reports[pr.ID] = &r
+			if a.cmp.volKeys == nil {
+				a.cmp.volKeys = map[string][]string{}
+			}
+			a.cmp.volKeys[pr.ID] = keys
 		}
 	})
 }
@@ -180,6 +197,7 @@ func (a *App) projectDetail(c *ui.Context, pr *compose.Project) {
 			ui.Text(c.Key("w"+itoa(i)), "! "+is.String()).TextColor(t.Warning).Selectable()
 		}
 	}
+	a.projectVolumes(c, pr)
 	ui.Tabs(c, &p.tab, L.CmpServices(), L.CmpFile(), L.CtrLogs())
 	switch p.tab {
 	case 0:
@@ -423,4 +441,72 @@ func defaultProjectName(file string) string {
 		}
 	}
 	return strings.Trim(b.String(), "-_")
+}
+
+// projectVolumes chooses, per named volume, a WSLc volume or a Windows
+// folder (bind mount).
+func (a *App) projectVolumes(c *ui.Context, pr *compose.Project) {
+	p := &a.cmp
+	keys := p.volKeys[pr.ID]
+	if len(keys) == 0 {
+		return
+	}
+	if p.volMode == nil {
+		p.volMode, p.volPath = map[string]*string{}, map[string]*string{}
+	}
+	card(c, L.CmpVolumes(), func() {
+		muted(c, L.CmpVolumesHelp())
+		changed := false
+		for _, key := range keys {
+			id := pr.ID + "\x00" + key
+			if p.volMode[id] == nil {
+				ch := pr.Volumes[key]
+				mode, path := ch.Mode, ch.Path
+				if mode == "" {
+					mode = "native"
+				}
+				p.volMode[id], p.volPath[id] = &mode, &path
+			}
+			mode, path := p.volMode[id], p.volPath[id]
+			cur := pr.Volumes[key]
+			if (cur.Mode == "" && *mode != "native") || (cur.Mode != "" && cur.Mode != *mode) || cur.Path != *path {
+				changed = true
+			}
+			ui.Row(c.Key(id)).FillWidth().Gap(smallGap).AlignItems(ui.Center).Children(func() {
+				ui.Text(c, key).Width(140)
+				ui.Select(c, mode, []string{"native", "bind"}).Label(key)
+				if *mode == "bind" {
+					ui.TextInput(c, path).Placeholder(`C:\data\` + key).Label(key).Grow(1)
+				}
+			})
+		}
+		if changed {
+			ui.Text(c, L.CmpVolumesWarning()).TextColor(c.Theme().Warning)
+			ui.PrimaryButton(c, L.Save()).OnClick(func() {
+				if pr.Volumes == nil {
+					pr.Volumes = map[string]compose.VolumeChoice{}
+				}
+				for _, key := range keys {
+					id := pr.ID + "\x00" + key
+					if *p.volMode[id] == "native" {
+						delete(pr.Volumes, key)
+					} else {
+						pr.Volumes[key] = compose.VolumeChoice{Mode: "bind", Path: strings.TrimSpace(*p.volPath[id])}
+					}
+				}
+				proj := pr
+				a.async(func(ctx context.Context) func() {
+					err := a.k.Projects.Save(proj)
+					return func() {
+						if err != nil {
+							a.notify(friendlyError(err), true)
+							return
+						}
+						delete(a.cmp.reports, proj.ID)
+						a.notify(L.CfgSaved(), false)
+					}
+				})
+			})
+		}
+	})
 }

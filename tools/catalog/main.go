@@ -40,14 +40,12 @@ func main() {
 			fail(err)
 		}
 		for _, r := range rows {
-			text, types := expand(r[c.col])
+			text, _ := expand(r[c.col])
 			es = set(es, r[0], mustJSON(text))
-			if c.meta && len(types) > 0 {
-				ph := map[string]map[string]string{}
-				for name, t := range types {
-					ph[name] = map[string]string{"type": t}
+			if c.meta {
+				if meta := placeholderMeta(r[1]); meta != nil {
+					es = set(es, "@"+r[0], meta)
 				}
-				es = set(es, "@"+r[0], mustJSON(map[string]any{"placeholders": ph}))
 			}
 		}
 		if err := writeCatalog(c.file, es); err != nil {
@@ -170,4 +168,33 @@ func mustJSON(v any) json.RawMessage {
 func fail(err error) {
 	fmt.Fprintln(os.Stderr, "catalog:", err)
 	os.Exit(1)
+}
+
+// placeholderMeta returns the ARB metadata of the placeholders of an
+// English message, in order of appearance: the generated accessors take
+// their arguments in this order, so it must not be sorted.
+func placeholderMeta(s string) json.RawMessage {
+	ms := placeholder.FindAllStringSubmatch(s, -1)
+	if len(ms) == 0 {
+		return nil
+	}
+	var b bytes.Buffer
+	b.WriteString(`{"placeholders":{`)
+	seen := map[string]bool{}
+	for _, m := range ms {
+		if seen[m[1]] {
+			continue
+		}
+		if len(seen) > 0 {
+			b.WriteString(",")
+		}
+		seen[m[1]] = true
+		t := "String"
+		if m[2] != "" {
+			t = "int"
+		}
+		fmt.Fprintf(&b, `%q:{"type":%q}`, m[1], t)
+	}
+	b.WriteString("}}")
+	return b.Bytes()
 }

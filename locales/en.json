@@ -256,10 +256,10 @@
   "WSLCompacted": "Disk size: {before} → {after}",
   "@WSLCompacted": {
     "placeholders": {
-      "after": {
+      "before": {
         "type": "String"
       },
-      "before": {
+      "after": {
         "type": "String"
       }
     }
@@ -728,16 +728,16 @@
   "BkRetentionText": "last {last}, daily {daily}, weekly {weekly}, monthly {monthly}",
   "@BkRetentionText": {
     "placeholders": {
-      "daily": {
-        "type": "int"
-      },
       "last": {
         "type": "int"
       },
-      "monthly": {
+      "daily": {
         "type": "int"
       },
       "weekly": {
+        "type": "int"
+      },
+      "monthly": {
         "type": "int"
       }
     }
@@ -748,10 +748,10 @@
   "BkHistoryOK": "{items} backed up, {expired} expired",
   "@BkHistoryOK": {
     "placeholders": {
-      "expired": {
+      "items": {
         "type": "int"
       },
-      "items": {
+      "expired": {
         "type": "int"
       }
     }
@@ -864,5 +864,39 @@
   "SetAboutText": "Manages WSL distributions, WSL Containers, Compose projects and backups. Licensed under GPL-3.0.",
   "TrayOpen": "Open WSLPilot",
   "TrayQuit": "Quit",
-  "BkNone": "No backups found yet. Back something up, or open a folder or archive from another computer."
+  "BkNone": "No backups found yet. Back something up, or open a folder or archive from another computer.",
+  "SetMoveData": "Move container data…",
+  "SetMoveDataHelp": "Images and volumes move to another folder or drive.",
+  "SetMoveDataMessage": "All containers stop. Images and volumes are exported, the storage folder is changed and they are imported again. Containers themselves are not moved and must be created again (Compose projects: Up). The old data stays where it is until you delete it.",
+  "SetMoveDataDone": "Moved {images} images and {volumes} volumes. Create these containers again: {containers}. Exported copies: {staging}",
+  "@SetMoveDataDone": {
+    "placeholders": {
+      "images": {
+        "type": "int"
+      },
+      "volumes": {
+        "type": "int"
+      },
+      "containers": {
+        "type": "String"
+      },
+      "staging": {
+        "type": "String"
+      }
+    }
+  },
+  "CtrEdit": "Edit configuration…",
+  "CtrEditTitle": "Edit {name}",
+  "@CtrEditTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "CtrEditWarning": "A container cannot be changed in place: it is replaced by a new one with these settings. Volumes are kept; files written inside the container itself are lost.",
+  "WSLUpdatePackages": "Update packages",
+  "CmpVolumes": "Volumes",
+  "CmpVolumesHelp": "native keeps data in a WSL Containers volume; bind uses a Windows folder instead.",
+  "CmpVolumesWarning": "Existing data is not moved between a volume and a folder. Back the volume up first if it holds data."
 }

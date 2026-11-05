@@ -451,5 +451,16 @@
   "SetAboutText": "管理 WSL 发行版、WSL 容器、Compose 项目与备份。以 GPL-3.0 授权。",
   "TrayOpen": "打开 WSLPilot",
   "TrayQuit": "退出",
-  "BkNone": "还没有找到备份。可以先备份，或打开来自其它电脑的目录或归档。"
+  "BkNone": "还没有找到备份。可以先备份，或打开来自其它电脑的目录或归档。",
+  "SetMoveData": "迁移容器数据…",
+  "SetMoveDataHelp": "镜像与 Volume 会移动到其它目录或驱动器。",
+  "SetMoveDataMessage": "所有容器都会停止。镜像与 Volume 会被导出，存储目录修改后再导入。容器本身不会迁移，需要重新创建（Compose 项目：执行 up）。旧数据会保留在原处，直到你删除它。",
+  "SetMoveDataDone": "已迁移 {images} 个镜像与 {volumes} 个 Volume。请重新创建这些容器：{containers}。导出的副本：{staging}",
+  "CtrEdit": "编辑配置…",
+  "CtrEditTitle": "编辑 {name}",
+  "CtrEditWarning": "容器无法原地修改：会用这些设置创建新容器来替换它。Volume 会保留；写在容器自身内部的文件会丢失。",
+  "WSLUpdatePackages": "更新软件包",
+  "CmpVolumes": "Volume",
+  "CmpVolumesHelp": "native 把数据保存在 WSL 容器的 Volume 中；bind 改用一个 Windows 目录。",
+  "CmpVolumesWarning": "已有数据不会在 Volume 与目录之间移动。如果 Volume 中有数据，请先备份。"
 }

@@ -37,6 +37,8 @@ and never rewrites it.
 | Path | Written when |
 |---|---|
 | `<backup folder>` (default `%USERPROFILE%\WSLPilot Backups`) | manual backups (`Repository\`), safety backups before danger actions (`Safety\`) |
+| `<backup folder>\Safety\container-<name>-<time>.tar` | a container's own files, exported before "Edit configuration" replaces it |
+| `<backup folder>\WSLc move <time>\` | images (`images.tar`) and volumes (`volumes\*.tar`) exported while moving WSLc data to a new `storagePath`; the old session storage also stays in place |
 | `<file>.wslpilot-<time>.bak` | before a Windows config file (`.wslconfig`, `settings.yaml`, a Compose file) is replaced |
 | `/etc/wsl.conf.wslpilot-<time>` | inside a distribution, before its `wsl.conf` is replaced |
 | `%LOCALAPPDATA%\Microsoft\Windows Terminal\Fragments\WSLPilot\wslpilot.json` | Windows Terminal profiles WSLPilot adds |

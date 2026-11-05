@@ -22,6 +22,8 @@ machine.
 | Restart watcher | implemented | unit tests over recorded events |
 | GUI pages | implemented | view tests, page renders checked by eye; packaged app starts (10 s smoke run) |
 | Terminal plugin, tray, notifications, UAC prompt | implemented | not exercised by hand yet |
+| Container edit (safety export, validated recreate) | verified | live test `internal/gui` (`wslpilot-test-edit`) |
+| WSLc data location move | implemented | not run: it changes the user's real WSLc session |
 
 ## Windows 11 x64
 

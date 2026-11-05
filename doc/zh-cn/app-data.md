@@ -35,6 +35,8 @@ WSLPilot 只保存自身的元数据（行为契约：状态归上游所有）�
 | 路径 | 写入时机 |
 |---|---|
 | `<备份目录>`（默认 `%USERPROFILE%\WSLPilot Backups`） | 手动备份（`Repository\`）、危险操作前的安全备份（`Safety\`） |
+| `<备份目录>\Safety\container-<name>-<time>.tar` | “编辑配置”替换容器之前导出的容器自身文件 |
+| `<备份目录>\WSLc move <time>\` | 迁移 WSLc 数据到新 `storagePath` 时导出的镜像（`images.tar`）与 Volume（`volumes\*.tar`）；旧 session 存储也保留在原处 |
 | `<file>.wslpilot-<time>.bak` | 替换 Windows 配置文件（`.wslconfig`、`settings.yaml`、Compose 文件）之前 |
 | `/etc/wsl.conf.wslpilot-<time>` | 在发行版内替换其 `wsl.conf` 之前 |
 | `%LOCALAPPDATA%\Microsoft\Windows Terminal\Fragments\WSLPilot\wslpilot.json` | WSLPilot 添加的 Windows Terminal 配置 |

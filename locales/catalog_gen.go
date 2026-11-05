@@ -1122,14 +1122,14 @@ func (msgs Messages) WSLCompactFallbackMessage() string {
 
 // WSLCompacted says "Disk size: {before} → {after}"
 // in the language the app shows.
-func WSLCompacted(after string, before string) string {
-	return In(i18n.Locale()).WSLCompacted(after, before)
+func WSLCompacted(before string, after string) string {
+	return In(i18n.Locale()).WSLCompacted(before, after)
 }
 
 // WSLCompacted says "Disk size: {before} → {after}"
 // in the language of msgs.
-func (msgs Messages) WSLCompacted(after string, before string) string {
-	return Catalog.Format(msgs.locale, "WSLCompacted", map[string]any{"after": after, "before": before})
+func (msgs Messages) WSLCompacted(before string, after string) string {
+	return Catalog.Format(msgs.locale, "WSLCompacted", map[string]any{"before": before, "after": after})
 }
 
 // WSLMove says "Move…"
@@ -3974,14 +3974,14 @@ func (msgs Messages) BkRetention() string {
 
 // BkRetentionText says "last {last}, daily {daily}, weekly {weekly}, monthly {monthly}"
 // in the language the app shows.
-func BkRetentionText(daily int, last int, monthly int, weekly int) string {
-	return In(i18n.Locale()).BkRetentionText(daily, last, monthly, weekly)
+func BkRetentionText(last int, daily int, weekly int, monthly int) string {
+	return In(i18n.Locale()).BkRetentionText(last, daily, weekly, monthly)
 }
 
 // BkRetentionText says "last {last}, daily {daily}, weekly {weekly}, monthly {monthly}"
 // in the language of msgs.
-func (msgs Messages) BkRetentionText(daily int, last int, monthly int, weekly int) string {
-	return Catalog.Format(msgs.locale, "BkRetentionText", map[string]any{"daily": daily, "last": last, "monthly": monthly, "weekly": weekly})
+func (msgs Messages) BkRetentionText(last int, daily int, weekly int, monthly int) string {
+	return Catalog.Format(msgs.locale, "BkRetentionText", map[string]any{"last": last, "daily": daily, "weekly": weekly, "monthly": monthly})
 }
 
 // BkConsistency says "Running sources"
@@ -4016,12 +4016,12 @@ func (msgs Messages) BkHistory() string {
 
 // BkHistoryOK says "{items} backed up, {expired} expired"
 // in the language the app shows.
-func BkHistoryOK(expired int, items int) string { return In(i18n.Locale()).BkHistoryOK(expired, items) }
+func BkHistoryOK(items int, expired int) string { return In(i18n.Locale()).BkHistoryOK(items, expired) }
 
 // BkHistoryOK says "{items} backed up, {expired} expired"
 // in the language of msgs.
-func (msgs Messages) BkHistoryOK(expired int, items int) string {
-	return Catalog.Format(msgs.locale, "BkHistoryOK", map[string]any{"expired": expired, "items": items})
+func (msgs Messages) BkHistoryOK(items int, expired int) string {
+	return Catalog.Format(msgs.locale, "BkHistoryOK", map[string]any{"items": items, "expired": expired})
 }
 
 // BkEveryHour says "Every hour at :{minute}"
@@ -4562,4 +4562,116 @@ func BkNone() string { return In(i18n.Locale()).BkNone() }
 // in the language of msgs.
 func (msgs Messages) BkNone() string {
 	return Catalog.Format(msgs.locale, "BkNone", nil)
+}
+
+// SetMoveData says "Move container data…"
+// in the language the app shows.
+func SetMoveData() string { return In(i18n.Locale()).SetMoveData() }
+
+// SetMoveData says "Move container data…"
+// in the language of msgs.
+func (msgs Messages) SetMoveData() string {
+	return Catalog.Format(msgs.locale, "SetMoveData", nil)
+}
+
+// SetMoveDataHelp says "Images and volumes move to another folder or drive."
+// in the language the app shows.
+func SetMoveDataHelp() string { return In(i18n.Locale()).SetMoveDataHelp() }
+
+// SetMoveDataHelp says "Images and volumes move to another folder or drive."
+// in the language of msgs.
+func (msgs Messages) SetMoveDataHelp() string {
+	return Catalog.Format(msgs.locale, "SetMoveDataHelp", nil)
+}
+
+// SetMoveDataMessage says "All containers stop. Images and volumes are exported, the storage folder is changed and they are imported again. Cont…"
+// in the language the app shows.
+func SetMoveDataMessage() string { return In(i18n.Locale()).SetMoveDataMessage() }
+
+// SetMoveDataMessage says "All containers stop. Images and volumes are exported, the storage folder is changed and they are imported again. Cont…"
+// in the language of msgs.
+func (msgs Messages) SetMoveDataMessage() string {
+	return Catalog.Format(msgs.locale, "SetMoveDataMessage", nil)
+}
+
+// SetMoveDataDone says "Moved {images} images and {volumes} volumes. Create these containers again: {containers}. Exported copies: {staging}"
+// in the language the app shows.
+func SetMoveDataDone(images int, volumes int, containers string, staging string) string {
+	return In(i18n.Locale()).SetMoveDataDone(images, volumes, containers, staging)
+}
+
+// SetMoveDataDone says "Moved {images} images and {volumes} volumes. Create these containers again: {containers}. Exported copies: {staging}"
+// in the language of msgs.
+func (msgs Messages) SetMoveDataDone(images int, volumes int, containers string, staging string) string {
+	return Catalog.Format(msgs.locale, "SetMoveDataDone", map[string]any{"images": images, "volumes": volumes, "containers": containers, "staging": staging})
+}
+
+// CtrEdit says "Edit configuration…"
+// in the language the app shows.
+func CtrEdit() string { return In(i18n.Locale()).CtrEdit() }
+
+// CtrEdit says "Edit configuration…"
+// in the language of msgs.
+func (msgs Messages) CtrEdit() string {
+	return Catalog.Format(msgs.locale, "CtrEdit", nil)
+}
+
+// CtrEditTitle says "Edit {name}"
+// in the language the app shows.
+func CtrEditTitle(name string) string { return In(i18n.Locale()).CtrEditTitle(name) }
+
+// CtrEditTitle says "Edit {name}"
+// in the language of msgs.
+func (msgs Messages) CtrEditTitle(name string) string {
+	return Catalog.Format(msgs.locale, "CtrEditTitle", map[string]any{"name": name})
+}
+
+// CtrEditWarning says "A container cannot be changed in place: it is replaced by a new one with these settings. Volumes are kept; files writ…"
+// in the language the app shows.
+func CtrEditWarning() string { return In(i18n.Locale()).CtrEditWarning() }
+
+// CtrEditWarning says "A container cannot be changed in place: it is replaced by a new one with these settings. Volumes are kept; files writ…"
+// in the language of msgs.
+func (msgs Messages) CtrEditWarning() string {
+	return Catalog.Format(msgs.locale, "CtrEditWarning", nil)
+}
+
+// WSLUpdatePackages says "Update packages"
+// in the language the app shows.
+func WSLUpdatePackages() string { return In(i18n.Locale()).WSLUpdatePackages() }
+
+// WSLUpdatePackages says "Update packages"
+// in the language of msgs.
+func (msgs Messages) WSLUpdatePackages() string {
+	return Catalog.Format(msgs.locale, "WSLUpdatePackages", nil)
+}
+
+// CmpVolumes says "Volumes"
+// in the language the app shows.
+func CmpVolumes() string { return In(i18n.Locale()).CmpVolumes() }
+
+// CmpVolumes says "Volumes"
+// in the language of msgs.
+func (msgs Messages) CmpVolumes() string {
+	return Catalog.Format(msgs.locale, "CmpVolumes", nil)
+}
+
+// CmpVolumesHelp says "native keeps data in a WSL Containers volume; bind uses a Windows folder instead."
+// in the language the app shows.
+func CmpVolumesHelp() string { return In(i18n.Locale()).CmpVolumesHelp() }
+
+// CmpVolumesHelp says "native keeps data in a WSL Containers volume; bind uses a Windows folder instead."
+// in the language of msgs.
+func (msgs Messages) CmpVolumesHelp() string {
+	return Catalog.Format(msgs.locale, "CmpVolumesHelp", nil)
+}
+
+// CmpVolumesWarning says "Existing data is not moved between a volume and a folder. Back the volume up first if it holds data."
+// in the language the app shows.
+func CmpVolumesWarning() string { return In(i18n.Locale()).CmpVolumesWarning() }
+
+// CmpVolumesWarning says "Existing data is not moved between a volume and a folder. Back the volume up first if it holds data."
+// in the language of msgs.
+func (msgs Messages) CmpVolumesWarning() string {
+	return Catalog.Format(msgs.locale, "CmpVolumesWarning", nil)
 }

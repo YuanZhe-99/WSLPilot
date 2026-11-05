@@ -4,11 +4,14 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/configdoc"
 	"github.com/YuanZhe-99/WSLPilot/internal/core"
+	"github.com/YuanZhe-99/WSLPilot/internal/jobs"
 	"github.com/YuanZhe-99/WSLPilot/internal/scheduler"
 	"github.com/YuanZhe-99/WSLPilot/internal/version"
 	L "github.com/YuanZhe-99/WSLPilot/locales"
@@ -34,6 +37,8 @@ type settingsPage struct {
 	agentChecked   bool
 	tab            int
 	wslc           confForm
+	moving         bool
+	moveTo         string
 }
 
 // loadPrefs reads preferences once and applies the theme.
@@ -207,9 +212,45 @@ func (a *App) wslcSettings(c *ui.Context) {
 		_, err := f.snap.Save(text)
 		return err
 	}, reload)
+	ui.Row(c).Gap(smallGap).Children(func() {
+		ui.Button(c, L.SetMoveData()).OnClick(func() { a.settings.moveTo = ""; a.settings.moving = true })
+		muted(c, L.SetMoveDataHelp())
+	})
+	a.moveDataDialog(c, path)
 	ui.Button(c, L.SetRestartSession()).OnClick(func() {
 		a.ask(L.SetRestartSession(), L.SetRestartSessionMessage(), L.SetRestartSession(), func(bool) {
 			a.wslcJob(L.SetRestartSession(), "wslc.session.terminate", a.k.WSLc.TerminateSession)
+		})
+	})
+}
+
+// moveDataDialog asks where WSL Containers data should go and moves it.
+func (a *App) moveDataDialog(c *ui.Context, settingsPath string) {
+	s := &a.settings
+	if !s.moving {
+		return
+	}
+	ui.Modal(c, &s.moving, func() {
+		ui.Column(c).Width(dialogWidth).Gap(gap).Children(func() {
+			ui.Text(c, L.SetMoveData()).FontSize(sectionSize).Bold()
+			ui.Text(c, L.SetMoveDataMessage()).TextColor(c.Theme().Warning)
+			folderField(c, a, L.WSLNewLocation(), &s.moveTo)
+			ui.Row(c).FillWidth().Gap(smallGap).Justify(ui.End).Children(func() {
+				ui.Button(c, L.Cancel()).OnClick(func() { s.moving = false })
+				ui.PrimaryButton(c, L.SetMoveData()).Disabled(!filepath.IsAbs(s.moveTo)).OnClick(func() {
+					s.moving = false
+					dest := s.moveTo
+					staging := filepath.Join(a.backupDir(), "WSLc move "+time.Now().Format("20060102-150405"))
+					a.startJob(L.SetMoveData(), func(ctx context.Context, j *jobs.Job) error {
+						res, err := a.k.MoveWSLcData(ctx, dest, settingsPath, staging, func(s string) { j.SetProgress(-1, s); j.Logf(s) })
+						a.k.Jobs.Audit("wslc.storage.move", dest, staging, err)
+						if err == nil {
+							j.Logf(L.SetMoveDataDone(res.Images, res.Volumes, strings.Join(res.Containers, ", "), res.Staging))
+						}
+						return err
+					}, func() { a.settings.wslc.loaded = false; a.loadContainers(); a.loadVolumes() })
+				})
+			})
 		})
 	})
 }
