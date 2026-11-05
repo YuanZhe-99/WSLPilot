@@ -532,6 +532,9 @@ func (a *App) exportDialog(c *ui.Context) {
 	p := &a.wsl
 	ui.Text(c, L.WSLExportTitle(p.in.distro)).FontSize(sectionSize).Bold()
 	muted(c, L.WSLExportHelp())
+	if p.in.format == string(wsl.FormatVHD) {
+		ui.Text(c, L.WSLExportVHDWarning()).TextColor(c.Theme().Warning)
+	}
 	ui.Field(c, L.WSLFormat(), func() {
 		ui.Select(c, &p.in.format, []string{"tar", "tar.gz", "tar.xz", "vhd"}).Label(L.WSLFormat())
 	})
@@ -543,7 +546,16 @@ func (a *App) exportDialog(c *ui.Context) {
 			if err != nil {
 				return err
 			}
-			if d.Running {
+			switch {
+			case in.format == string(wsl.FormatVHD):
+				// The utility VM keeps the disk attached after --terminate
+				// (ERROR_SHARING_VIOLATION, verified on 3.0.3.0): only a
+				// shutdown releases it.
+				j.SetProgress(-1, L.WSLShutdown())
+				if err := a.k.WSL.Shutdown(ctx); err != nil {
+					return err
+				}
+			case d.Running:
 				j.SetProgress(-1, L.JobStopping(in.distro))
 				if err := a.k.WSL.Terminate(ctx, in.distro); err != nil {
 					return err

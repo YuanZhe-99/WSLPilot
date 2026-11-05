@@ -63,7 +63,7 @@ WSLImport	Import…	导入…
 WSLUpdate	Update WSL	更新 WSL
 WSLShutdown	Shut down WSL	关闭 WSL
 WSLShutdownTitle	Shut down WSL?	关闭 WSL？
-WSLShutdownMessage	Every running distribution and WSL container stops. Unsaved work in them is lost.	所有运行中的发行版与 WSL 容器都会停止，其中未保存的工作将丢失。
+WSLShutdownMessage	Every running distribution stops and unsaved work in it is lost. WSL containers keep running.	所有运行中的发行版都会停止，其中未保存的工作将丢失。WSL 容器会继续运行。
 WSLNone	No distributions	没有发行版
 WSLNoneHint	Install one from the list, or import a backup or a tar file.	从列表中安装一个，或导入备份或 tar 文件。
 WSLOverview	Overview	概览
@@ -461,3 +461,4 @@ BkUnlock	Unlock…	解锁…
 BkWrongPassword	The password is wrong.	密码错误。
 BkEncryptedRepo	Encrypted repository {name}	加密仓库 {name}
 BkNoteEncrypted	Encrypted: enter its password to see and restore its backups.	已加密：输入密码后才能查看并恢复其中的备份。
+WSLExportVHDWarning	A disk image can only be copied while WSL is shut down: every running distribution stops. WSL containers keep running.	磁盘镜像只能在 WSL 关闭时复制：所有运行中的发行版都会停止。WSL 容器会继续运行。

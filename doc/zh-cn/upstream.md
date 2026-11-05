@@ -28,7 +28,8 @@
 | `--manage <Distro> --compact` 已存在（3.0.3.0），无需提权，可对运行中的发行版执行并会终止它。一个删除了 200 MB 的 281 MB 磁盘缩小到 72 MB。 | `wsl.Client.Compact`；`SupportsCompact` 在 `--help` 中查找字面量 `--compact`。 |
 | `--manage --set-sparse true` 成功，并提示稀疏 VHD 仍属实验性。`--manage --move` 移动磁盘并更新 `BasePath`。 | `SetSparse`、`Move`。 |
 | `--export <Distro> -` 把 tar 流输出到 stdout；读取方必须读完，否则 wsl.exe 会阻塞。 | `wsl.Client.Export` 传入 writer。 |
-| 一次中断的导出之后，`--export --format vhd` 返回 `ERROR_SHARING_VIOLATION`，发行版终止后依旧；尚未在 `--shutdown` 之后重试（未验证）。 | GUI 仅在关闭 WSL 后提供 VHD 导出。 |
+| 发行版运行时以及 `--terminate` 之后，`--export --format vhd` 都返回 `ERROR_SHARING_VIOLATION`（实用虚拟机仍挂载着磁盘）；`wsl --shutdown` 之后不到一秒即可复制磁盘，且该副本可用 `--import --vhd` 导入。 | VHD 导出会在警告后先关闭 WSL。 |
+| `wsl --shutdown` 不会停止 WSL 容器的 session 虚拟机（`vmmemwslc-*` 继续运行）。 | 关闭确认中说明容器会继续运行。 |
 | `--install` 选项：`--name`、`--location`、`--version`、`--fixed-vhd`、`--vhd-size`、`--web-download`、`--from-file`、`--no-launch`。 | `wsl.InstallArgs` 总是附加 `--no-launch`。 |
 | `--distribution X --user U --exec argv…` 不经 Linux shell 运行 argv。 | `wsl.ExecArgs`。 |
 

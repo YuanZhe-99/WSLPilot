@@ -858,11 +858,11 @@ func (msgs Messages) WSLShutdownTitle() string {
 	return Catalog.Format(msgs.locale, "WSLShutdownTitle", nil)
 }
 
-// WSLShutdownMessage says "Every running distribution and WSL container stops. Unsaved work in them is lost."
+// WSLShutdownMessage says "Every running distribution stops and unsaved work in it is lost. WSL containers keep running."
 // in the language the app shows.
 func WSLShutdownMessage() string { return In(i18n.Locale()).WSLShutdownMessage() }
 
-// WSLShutdownMessage says "Every running distribution and WSL container stops. Unsaved work in them is lost."
+// WSLShutdownMessage says "Every running distribution stops and unsaved work in it is lost. WSL containers keep running."
 // in the language of msgs.
 func (msgs Messages) WSLShutdownMessage() string {
 	return Catalog.Format(msgs.locale, "WSLShutdownMessage", nil)
@@ -4844,4 +4844,14 @@ func BkNoteEncrypted() string { return In(i18n.Locale()).BkNoteEncrypted() }
 // in the language of msgs.
 func (msgs Messages) BkNoteEncrypted() string {
 	return Catalog.Format(msgs.locale, "BkNoteEncrypted", nil)
+}
+
+// WSLExportVHDWarning says "A disk image can only be copied while WSL is shut down: every running distribution stops. WSL containers keep running."
+// in the language the app shows.
+func WSLExportVHDWarning() string { return In(i18n.Locale()).WSLExportVHDWarning() }
+
+// WSLExportVHDWarning says "A disk image can only be copied while WSL is shut down: every running distribution stops. WSL containers keep running."
+// in the language of msgs.
+func (msgs Messages) WSLExportVHDWarning() string {
+	return Catalog.Format(msgs.locale, "WSLExportVHDWarning", nil)
 }

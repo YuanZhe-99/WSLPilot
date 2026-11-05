@@ -128,7 +128,9 @@ func (c *Client) Terminate(ctx context.Context, name string) error {
 	return err
 }
 
-// Shutdown stops every distribution, WSL Containers and the utility VM.
+// Shutdown stops every distribution and the WSL utility VM.
+// Notes: the WSL Containers session VM keeps running (verified on
+// 3.0.3.0); wslc has its own "system session terminate".
 func (c *Client) Shutdown(ctx context.Context) error {
 	_, err := c.Run(ctx, Exe, "--shutdown")
 	return err

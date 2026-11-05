@@ -82,7 +82,7 @@
   "WSLUpdate": "更新 WSL",
   "WSLShutdown": "关闭 WSL",
   "WSLShutdownTitle": "关闭 WSL？",
-  "WSLShutdownMessage": "所有运行中的发行版与 WSL 容器都会停止，其中未保存的工作将丢失。",
+  "WSLShutdownMessage": "所有运行中的发行版都会停止，其中未保存的工作将丢失。WSL 容器会继续运行。",
   "WSLNone": "没有发行版",
   "WSLNoneHint": "从列表中安装一个，或导入备份或 tar 文件。",
   "WSLOverview": "概览",
@@ -479,5 +479,6 @@
   "BkUnlock": "解锁…",
   "BkWrongPassword": "密码错误。",
   "BkEncryptedRepo": "加密仓库 {name}",
-  "BkNoteEncrypted": "已加密：输入密码后才能查看并恢复其中的备份。"
+  "BkNoteEncrypted": "已加密：输入密码后才能查看并恢复其中的备份。",
+  "WSLExportVHDWarning": "磁盘镜像只能在 WSL 关闭时复制：所有运行中的发行版都会停止。WSL 容器会继续运行。"
 }

@@ -29,7 +29,8 @@ The machine-readable list is `internal/upstream/tested.json`; keep it and this t
 | `--manage <Distro> --compact` exists (3.0.3.0), needs no elevation, works on a running distribution and terminates it. A 281 MB disk with 200 MB deleted shrank to 72 MB. | `wsl.Client.Compact`; `SupportsCompact` looks for the literal `--compact` in `--help`. |
 | `--manage --set-sparse true` succeeds and warns that sparse VHDs are experimental. `--manage --move` moves the disk and updates `BasePath`. | `SetSparse`, `Move`. |
 | `--export <Distro> -` streams the tar to stdout; the reader must drain it, or wsl.exe blocks. | `wsl.Client.Export` with a writer. |
-| `--export --format vhd` failed with `ERROR_SHARING_VIOLATION` after an interrupted export, also with the distribution terminated; not retried after `--shutdown` (not verified). | The GUI offers VHD export only after a shutdown. |
+| `--export --format vhd` fails with `ERROR_SHARING_VIOLATION` while the distribution runs and also after `--terminate` (the utility VM keeps the disk attached); after `wsl --shutdown` it copies the disk in under a second, and `--import --vhd` of the copy works. | VHD export shuts WSL down first, after a warning. |
+| `wsl --shutdown` does not stop the WSL Containers session VM (`vmmemwslc-*` keeps running). | The shutdown confirmation says containers keep running. |
 | `--install` options: `--name`, `--location`, `--version`, `--fixed-vhd`, `--vhd-size`, `--web-download`, `--from-file`, `--no-launch`. | `wsl.InstallArgs` always adds `--no-launch`. |
 | `--distribution X --user U --exec argv…` runs argv without a Linux shell. | `wsl.ExecArgs`. |
 

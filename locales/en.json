@@ -196,7 +196,7 @@
   "WSLUpdate": "Update WSL",
   "WSLShutdown": "Shut down WSL",
   "WSLShutdownTitle": "Shut down WSL?",
-  "WSLShutdownMessage": "Every running distribution and WSL container stops. Unsaved work in them is lost.",
+  "WSLShutdownMessage": "Every running distribution stops and unsaved work in it is lost. WSL containers keep running.",
   "WSLNone": "No distributions",
   "WSLNoneHint": "Install one from the list, or import a backup or a tar file.",
   "WSLOverview": "Overview",
@@ -922,5 +922,6 @@
       }
     }
   },
-  "BkNoteEncrypted": "Encrypted: enter its password to see and restore its backups."
+  "BkNoteEncrypted": "Encrypted: enter its password to see and restore its backups.",
+  "WSLExportVHDWarning": "A disk image can only be copied while WSL is shut down: every running distribution stops. WSL containers keep running."
 }

@@ -12,7 +12,6 @@
 
 | 项目 | 说明 |
 |---|---|
-| `wsl --export --format vhd` | 一次中断的导出后报 `ERROR_SHARING_VIOLATION`；需在 `wsl --shutdown` 后重测（会停止所有发行版） |
 | 终端插件、托盘、通知、计划任务实际触发、更新窗口 | 需要人工在原生窗口中操作一次；更新检查要等 0.1.0 发布后才有对象 |
 | Windows 11 x64 真机 | CI 已在 x64 上测试与打包；安装、升级尚未在真机验证 |
 | 多 WSLc session 的对象可见性 | WSLPilot 固定使用默认 CLI session |
