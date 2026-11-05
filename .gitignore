@@ -1,0 +1,8 @@
+/build/
+/.mygo/
+/.dev/
+mygo_windows_*.syso
+# Stray build outputs at the repository root
+/wslpilot.exe
+/wslpilot-agent.exe
+/wslpilot-cli.exe

@@ -1,0 +1,28 @@
+# Translation guide
+
+## Mirror rules
+
+- `doc/en-us/` is authoritative. Every other language directory has the same files, the same
+  number of headings and table rows, and byte-identical fenced code blocks.
+- `go run ./tools/checkdocs` enforces this.
+- Code identifiers, commands, paths and flags stay in English in every language.
+- Interface strings are translated in `locales/*.json`, not here.
+
+## Glossary
+
+| English | 简体中文 |
+|---|---|
+| distribution | 发行版 |
+| container | 容器 |
+| image | 镜像 |
+| volume | Volume |
+| bind mount | Bind Mount |
+| backend | Backend |
+| backup | 备份 |
+| snapshot | 快照 |
+| restore | 恢复 |
+| retention policy | 保留策略 |
+| repository (backup) | 仓库 |
+| fixture | fixture |
+| adapter | 适配层 |
+| verified | 已验证 |

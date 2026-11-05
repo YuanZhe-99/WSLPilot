@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.png binary
+*.ico binary
+# Captured upstream output is kept byte-for-byte (UTF-16LE, CRLF).
+**/testdata/** -text

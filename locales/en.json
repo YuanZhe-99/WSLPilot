@@ -1,0 +1,40 @@
+{
+  "@@locale": "en",
+  "AppName": "WSLPilot",
+  "NavDashboard": "Dashboard",
+  "NavWSL": "WSL",
+  "NavWSLc": "Containers",
+  "NavCompose": "Compose",
+  "NavVolumes": "Volumes",
+  "NavBackups": "Backups",
+  "NavTerminal": "Terminal",
+  "NavSettings": "Settings",
+  "DashChecking": "Checking WSL and WSL Containers…",
+  "DashRefresh": "Check again",
+  "DashWSL": "WSL",
+  "DashWSLc": "WSL Containers",
+  "DashCompose": "Compose",
+  "DashNotFound": "Not found",
+  "DashWSLVersion": "Version {version} · kernel {kernel}",
+  "@DashWSLVersion": {
+    "placeholders": {
+      "version": { "type": "String" },
+      "kernel": { "type": "String" }
+    }
+  },
+  "DashDistros": "{count, plural, =0 {No distributions installed} one {# distribution} other {# distributions}}",
+  "@DashDistros": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "DashWSLcVersion": "Version {version}",
+  "@DashWSLcVersion": {
+    "placeholders": {
+      "version": { "type": "String" }
+    }
+  },
+  "DashComposeBuiltin": "Built-in Compose (native Compose not available yet)",
+  "DashComposeNative": "Native Compose detected. Existing projects keep their current backend.",
+  "PageComingSoon": "This page arrives in a later milestone. See PLAN.md."
+}

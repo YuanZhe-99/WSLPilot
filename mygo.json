@@ -1,0 +1,13 @@
+{
+  "name": "WSLPilot",
+  "identifier": "com.yuanzhe.wslpilot",
+  "version": "0.0.1",
+  "copyright": "Copyright (C) 2026 YuanZhe",
+  "main": "./cmd/wslpilot",
+  "out": "build",
+  "i18n": {
+    "dir": "locales",
+    "source": "en"
+  },
+  "description": "Manage WSL distributions, WSL containers, Compose projects and backups"
+}
