@@ -32,6 +32,7 @@ type fakeHost struct {
 	mu        sync.Mutex
 	terminals [][]string
 	ops       []WindowOp
+	language  string
 }
 
 func (h *fakeHost) PickFiles(string, bool, ...string) []string      { return nil }
@@ -42,6 +43,7 @@ func (h *fakeHost) Notify(string, string)                           {}
 func (h *fakeHost) SetOpenAtLogin(bool) error                       { return nil }
 func (h *fakeHost) OpenAtLogin() bool                               { return false }
 func (h *fakeHost) SetTheme(string)                                 {}
+func (h *fakeHost) SetLanguage(tag string)                          { h.language = tag }
 func (h *fakeHost) Window(op WindowOp)                              { h.mu.Lock(); h.ops = append(h.ops, op); h.mu.Unlock() }
 func (h *fakeHost) Maximized() bool                                 { return false }
 func (h *fakeHost) UpdatesEnabled() bool                            { return false }

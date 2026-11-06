@@ -13,6 +13,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/backup"
+	"github.com/YuanZhe-99/WSLPilot/internal/compose"
 	"github.com/YuanZhe-99/WSLPilot/internal/elevate"
 	"github.com/YuanZhe-99/WSLPilot/internal/jobs"
 	"github.com/YuanZhe-99/WSLPilot/internal/vhdx"
@@ -30,6 +31,8 @@ type volumesPage struct {
 	sizes           map[string]int64    // vhd volume → VHDX file size
 	ls              ui.ListState
 	sel             int
+	// focus is a volume to select once the list loads (from the Compose page).
+	focus string
 
 	dlg string
 	in  volInput
@@ -75,7 +78,17 @@ func (a *App) loadVolumes() {
 				}
 			}
 		}
-		return func() { p.loading, p.loaded, p.err, p.list, p.users, p.sizes = false, true, err, vs, users, sizes }
+		return func() {
+			p.loading, p.loaded, p.err, p.list, p.users, p.sizes = false, true, err, vs, users, sizes
+			if p.focus != "" {
+				for i, v := range vs {
+					if v.Name == p.focus {
+						p.sel = i
+					}
+				}
+				p.focus = ""
+			}
+		}
 	})
 }
 
@@ -86,9 +99,12 @@ func (a *App) volumesView(c *ui.Context) {
 	if !p.loaded && !p.loading {
 		a.loadVolumes()
 	}
+	if !a.cmp.loaded && !a.cmp.loading && a.k.Compose != nil {
+		a.loadProjects()
+	}
 	a.head(c, paneHead{icon: iconDatabase, title: L.NavVolumes(), sub: L.VolSubtitle(), actions: func() {
 		iconButtonAction(c, "refresh", iconRefresh, L.Refresh(), a.loadVolumes)
-		unused := p.unused()
+		unused := a.unusedVolumes()
 		if ui.Button(c.Key("prune"), L.VolRemoveUnused()).Disabled(len(unused) == 0).Clicked() {
 			a.removeVolumes(unused)
 		}
@@ -125,11 +141,7 @@ func (a *App) volumesView(c *ui.Context) {
 							ui.Text(c, "—")
 						}
 					case 3:
-						if us := p.users[v.Name]; len(us) > 0 {
-							ui.Text(c, strings.Join(us, ", ")).SingleLine()
-						} else {
-							ui.Text(c, L.VolNotInUse())
-						}
+						a.volumeUsers(c, v, row == p.sel)
 					}
 				}).FillWidth().Height(min(float32(len(p.list)+1)*44+8, 420))
 				ui.Box(c).Height(1).FillWidth().Background(c.Theme().Border)
@@ -141,11 +153,14 @@ func (a *App) volumesView(c *ui.Context) {
 	a.volumeDialogs(c)
 }
 
-// unused lists the volumes no container uses.
-func (p *volumesPage) unused() []string {
+// unusedVolumes lists the volumes no container uses and no added Compose
+// project owns: a project taken down has no containers, but its volumes
+// still hold its data.
+func (a *App) unusedVolumes() []string {
+	p := &a.vol
 	var ns []string
 	for _, v := range p.list {
-		if len(p.users[v.Name]) == 0 {
+		if len(p.users[v.Name]) == 0 && a.projectIndex(v.Labels[compose.LabelProject]) < 0 {
 			ns = append(ns, v.Name)
 		}
 	}
@@ -178,6 +193,17 @@ func (a *App) volumeActions(c *ui.Context) {
 			a.removeVolumes([]string{v.Name})
 		}
 	})
+	if has {
+		if i := a.projectIndex(v.Labels[compose.LabelProject]); i >= 0 {
+			name := a.cmp.projects[i].Name
+			callout(c, "of-project", toneAccent, iconInfo, L.VolOfProject(name), func() {
+				if ui.Button(c.Key("backup-project"), L.CmpBackUp()).Clicked() {
+					a.openProject(i)
+					a.cmp.in, a.cmp.dlg = composeInput{}, "backup"
+				}
+			})
+		}
+	}
 	if !has {
 		small(c, L.VolPickHint())
 	} else if v.Status.HostPath != "" {
@@ -447,4 +473,60 @@ func parseSize(s string) int64 {
 		return 0
 	}
 	return n * mult
+}
+
+// projectIndex is the index of the added Compose project named name, or -1.
+func (a *App) projectIndex(name string) int {
+	if name == "" {
+		return -1
+	}
+	for i, pr := range a.cmp.projects {
+		if pr.Name == name {
+			return i
+		}
+	}
+	return -1
+}
+
+// openProject shows a Compose project's page.
+func (a *App) openProject(i int) {
+	a.page = PageCompose
+	a.cmp.sel = i
+}
+
+// volumeUsers is the Used by cell: the owning Compose project (a link to
+// it) and the containers mounting the volume.
+func (a *App) volumeUsers(c *ui.Context, v wslc.Volume, selected bool) {
+	t := c.Theme()
+	us := a.vol.users[v.Name]
+	project := v.Labels[compose.LabelProject]
+	if project == "" {
+		if len(us) > 0 {
+			ui.Text(c, strings.Join(us, ", ")).SingleLine()
+		} else {
+			ui.Text(c, L.VolNotInUse()).TextColor(t.TextMuted)
+		}
+		return
+	}
+	ui.Row(c).Gap(6).AlignItems(ui.Center).MinWidth(0).Children(func() {
+		i := a.projectIndex(project)
+		label := L.VolProject(project)
+		if i >= 0 {
+			link := ui.ButtonBase(c.Key("proj-" + v.Name)).Label(label)
+			link.Children(func() {
+				col := toneColor(t, selTone(toneAccent, selected))
+				ui.Text(c, label).TextColor(col).FontWeight(600).SingleLine()
+			})
+			if link.Clicked() {
+				a.openProject(i)
+			}
+		} else {
+			ui.Text(c, label+" · "+L.VolProjectNotAdded()).SingleLine()
+		}
+		rest := L.VolProjectStopped()
+		if len(us) > 0 {
+			rest = strings.Join(us, ", ")
+		}
+		ui.Text(c, "· "+rest).SingleLine().Shrink(1)
+	})
 }

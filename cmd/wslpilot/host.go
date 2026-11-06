@@ -53,6 +53,10 @@ func (h *host) SetOpenAtLogin(on bool) error { return mygo.App.SetOpenAtLogin(on
 func (h *host) OpenAtLogin() bool { return mygo.App.OpenAtLogin() }
 
 // SetTheme applies "system", "light" or "dark".
+// SetLanguage shows the app in tag, or in the Windows display language for
+// ""; MyGo keeps the choice for the next launches too.
+func (h *host) SetLanguage(tag string) { mygo.App.SetLocale(tag) }
+
 func (h *host) SetTheme(mode string) {
 	switch mode {
 	case "light":

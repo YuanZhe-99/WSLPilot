@@ -14,6 +14,7 @@ import (
 
 	"github.com/YuanZhe-99/WSLPilot/internal/backup"
 	"github.com/YuanZhe-99/WSLPilot/internal/backup/wpbk"
+	"github.com/YuanZhe-99/WSLPilot/internal/compose"
 	"github.com/YuanZhe-99/WSLPilot/internal/jobs"
 	"github.com/YuanZhe-99/WSLPilot/internal/scheduler"
 	"github.com/YuanZhe-99/WSLPilot/internal/secret"
@@ -45,6 +46,11 @@ type backupsPage struct {
 	dlg  string
 	rin  restoreInput
 	plan planInput
+
+	// manifests holds the contents of project backups by item key: nil
+	// while reading or for a version 1 backup (see manifestDone).
+	manifests    map[string]*backup.ProjectManifest
+	manifestDone map[string]bool
 }
 
 // restoreInput holds the restore dialog fields.
@@ -55,6 +61,15 @@ type restoreInput struct {
 	location string
 	dir      string
 	prefix   string
+	// vols are the volumes a project restore brings back.
+	vols []volChoice
+}
+
+// volChoice is one volume of a project restore: the volume in the backup,
+// the volume to restore it into, and the typed name confirming a replace.
+type volChoice struct {
+	from, key, into, confirm string
+	on                       bool
 }
 
 // planInput holds the plan editor fields.
@@ -68,6 +83,11 @@ type planInput struct {
 	encrypt  bool
 	pw1, pw2 string
 	options  []scheduler.Target
+	// hour and minute make up at; volProject maps a volume to the Compose
+	// project that owns it; external lists each project.s external volumes.
+	hour, minute string
+	volProject   map[string]string
+	external     map[string][]string
 }
 
 // locationsDoc is where the restore view remembers locations.
@@ -298,8 +318,8 @@ func (a *App) restoreItem(it backup.Item, in restoreInput) {
 				return fmt.Errorf("%s: %w", L.JobBackupFailedStop(), berr)
 			}
 			err = r.RestoreToVolume(ctx, it, in.name, volume.ImportOptions{Replace: true})
-		case "extract":
-			err = extractFiles(ctx, it, in.dir)
+		case "project":
+			err = a.restoreProject(ctx, j, r, it, in)
 		default:
 			err = errors.New("unknown restore mode")
 		}
@@ -310,16 +330,54 @@ func (a *App) restoreItem(it backup.Item, in restoreInput) {
 	}, func() { a.loadDistros(); a.loadVolumes(); a.bk.loaded = false })
 }
 
-// extractFiles writes a Compose project backup's files into a folder.
-// Notes: these are Windows files to begin with (compose.yaml, .env), so
-// unpacking them on Windows loses nothing.
-func extractFiles(ctx context.Context, it backup.Item, dir string) error {
-	rc, err := backup.Open(ctx, it)
-	if err != nil {
-		return err
+// restoreProject writes a project backup's files and folders into a
+// folder, then each chosen volume into a volume: a new one, or an
+// existing one after a safety backup (the person typed its name).
+func (a *App) restoreProject(ctx context.Context, j *jobs.Job, r *backup.Runner, it backup.Item, in restoreInput) error {
+	if in.dir != "" {
+		j.SetProgress(-1, L.BkRestoreFilesStep())
+		placed, err := backup.ExtractProject(ctx, it, in.dir)
+		for _, p := range placed {
+			j.Logf(p)
+		}
+		if err != nil {
+			return err
+		}
 	}
-	defer rc.Close()
-	return backup.ExtractFlat(rc, dir)
+	existing := map[string]bool{}
+	if vs, err := a.k.WSLc.Volumes(ctx); err == nil {
+		for _, v := range vs {
+			existing[v.Name] = true
+		}
+	}
+	for _, v := range in.vols {
+		if !v.on {
+			continue
+		}
+		into := strings.TrimSpace(v.into)
+		j.SetProgress(-1, L.BkRestoreVolumeStep(into))
+		o := volume.ImportOptions{Create: true}
+		if into == v.from && v.key != "" {
+			o.Labels = map[string]string{compose.LabelProject: it.Source.Name, compose.LabelVolume: v.key, compose.LabelBackend: string(compose.BackendBuiltin)}
+		}
+		if existing[into] {
+			if v.confirm != into {
+				return fmt.Errorf("%s: %s", into, L.BkVolumeNotConfirmed())
+			}
+			if _, err := r.BackupVolume(ctx, into, a.safetyWriter(), backupOptions()); err != nil {
+				return fmt.Errorf("%s: %w", L.JobBackupFailedStop(), err)
+			}
+			o = volume.ImportOptions{Replace: true}
+		}
+		err := r.RestoreProjectVolume(ctx, it, v.from, into, o)
+		if existing[into] {
+			a.k.Jobs.Audit("backup.restore-over", into, it.Path, err)
+		}
+		if err != nil {
+			return fmt.Errorf("%s: %w", into, err)
+		}
+	}
+	return nil
 }
 
 // scheduleText describes a schedule.
@@ -360,10 +418,15 @@ func (a *App) editPlan(pl *scheduler.Plan) {
 			in.compression = string(pl.Destination.Compression)
 		}
 	}
+	in.hour, in.minute = "02", "00"
+	if h, m, ok := strings.Cut(in.at, ":"); ok {
+		in.hour, in.minute = h, m
+	}
 	a.bk.plan, a.bk.dlg = in, "plan"
 	// Offer every distribution, volume and project as a target.
 	a.async(func(ctx context.Context) func() {
 		var opts []scheduler.Target
+		volProject, external := map[string]string{}, map[string][]string{}
 		if ds, err := a.k.WSL.List(ctx); err == nil {
 			for _, d := range ds {
 				opts = append(opts, scheduler.Target{Kind: backup.SourceDistro, Name: d.Name})
@@ -372,16 +435,23 @@ func (a *App) editPlan(pl *scheduler.Plan) {
 		if vs, err := a.k.WSLc.Volumes(ctx); err == nil {
 			for _, v := range vs {
 				opts = append(opts, scheduler.Target{Kind: backup.SourceVolume, Name: v.Name})
+				if pr := v.Labels[compose.LabelProject]; pr != "" {
+					volProject[v.Name] = pr
+				}
 			}
 		}
 		if ps, err := a.k.Projects.List(); err == nil {
 			for _, p := range ps {
 				opts = append(opts, scheduler.Target{Kind: backup.SourceCompose, Name: p.Name})
+				if d, err := a.k.ProjectData(ctx, p); err == nil {
+					external[p.Name] = d.External
+				}
 			}
 		}
 		return func() {
 			pi := &a.bk.plan
 			pi.options = opts
+			pi.volProject, pi.external = volProject, external
 			for _, o := range opts {
 				on := false
 				for _, t := range pi.p.Targets {
@@ -406,6 +476,7 @@ func (in *planInput) buildPlan() (scheduler.Plan, error) {
 	}
 	p.Destination.Kind = backup.Kind(in.kind)
 	p.Destination.Compression = backup.Compression(in.compression)
+	in.at = in.hour + ":" + in.minute
 	p.Schedule = scheduler.Schedule{Every: scheduler.Every(in.every), At: in.at}
 	for i := 0; i < 7; i++ {
 		if weekdayName(time.Weekday(i)) == in.weekday {
@@ -513,22 +584,53 @@ func (a *App) restoreDialog(c *ui.Context) {
 				}
 			})
 		})
-	case "extract":
-		ui.Text(c, L.BkExtractFiles()).FontSize(16).Bold()
-		folderField(c, a, L.BkIntoFolder(), &in.dir)
-		dialogButtons(c, a, L.BkRestore(), in.dir != "", func() { a.restoreItem(it, *in) })
+	case "project":
+		ui.Text(c, L.BkRestoreProjectTitle(it.Source.Name)).FontSize(16).Bold()
+		muted(c, L.BkRestoreProjectHelp())
+		folderField(c, a, L.BkFilesInto(), &in.dir)
+		small(c, L.BkFilesIntoHelp())
+		exists := map[string]bool{}
+		for _, v := range a.vol.list {
+			exists[v.Name] = true
+		}
+		some, valid := in.dir != "", true
+		for i := range in.vols {
+			v := &in.vols[i]
+			ui.Checkbox(c.Key("vol-"+v.from), &v.on, L.BkRestoreVolumeCheck(v.from))
+			if !v.on {
+				continue
+			}
+			into := strings.TrimSpace(v.into)
+			ui.Column(c.Key("into-"+v.from)).FillWidth().Gap(6).Padding(0, 0, 0, 28).Children(func() {
+				ui.Field(c, L.BkVolumeInto(), func() { ui.TextInput(c, &v.into).Label(L.BkVolumeInto()) })
+				if exists[into] {
+					ui.Text(c, L.BkVolumeExists(into)).TextColor(c.Theme().Warning)
+					ui.TextInput(c, &v.confirm).Placeholder(into).Label(L.ConfirmTypeName(into))
+					small(c, L.ConfirmTypeName(into))
+				}
+			})
+			some = true
+			if into == "" || (exists[into] && v.confirm != into) {
+				valid = false
+			}
+		}
+		dialogButtons(c, a, L.BkRestore(), some && valid, func() { a.restoreItem(it, *in) })
 	}
 }
 
 func (a *App) planDialog(c *ui.Context) {
 	in := &a.bk.plan
 	ui.Text(c, L.BkPlan()).FontSize(16).Bold()
-	ui.Scroll(c).MaxHeight(560).FillWidth().Children(func() {
+	ui.Scroll(c.Key("plan-form")).MaxHeight(560).FillWidth().Children(func() {
 		ui.Form(c, func() {
 			ui.Field(c, L.ColName(), func() { ui.TextInput(c, &in.p.Name).Label(L.ColName()) })
 			ui.Fieldset(c, L.BkTargets(), func() {
 				if in.options == nil {
 					ui.Spinner(c)
+				}
+				chosen := func(kind, name string) bool {
+					on := in.targets[kind+"\x00"+name]
+					return on != nil && *on
 				}
 				for _, o := range in.options {
 					on := in.targets[o.Kind+"\x00"+o.Name]
@@ -537,14 +639,22 @@ func (a *App) planDialog(c *ui.Context) {
 					}
 					label := groupTitle(backup.Group{Source: backup.Source{Kind: o.Kind, Name: o.Name}, Items: []backup.Item{{}}})
 					ui.Checkbox(c.Key(o.Kind+o.Name), on, label)
+					switch {
+					case o.Kind == backup.SourceVolume && in.volProject[o.Name] != "" && chosen(backup.SourceCompose, in.volProject[o.Name]):
+						small(c, L.BkInProject(in.volProject[o.Name])).Padding(0, 0, 0, 28)
+					case o.Kind == backup.SourceCompose && *on && len(in.external[o.Name]) > 0:
+						small(c, L.BkProjectExternal(strings.Join(in.external[o.Name], ", "))).TextColor(c.Theme().Warning).Padding(0, 0, 0, 28)
+					}
 				}
 			})
 			ui.Field(c, L.BkKind(), func() {
-				ui.Select(c, &in.kind, []string{string(backup.KindRepo), string(backup.KindArchive), string(backup.KindFolder)}).Label(L.BkKind())
+				labeledSelect(c, "kind", &in.kind, []string{string(backup.KindRepo), string(backup.KindArchive), string(backup.KindFolder)},
+					func(v string) string { return kindLabel(backup.Kind(v)) }).Label(L.BkKind())
 			}).Description(L.BkKindHelp())
 			if in.kind == string(backup.KindArchive) {
 				ui.Field(c, L.BkCompression(), func() {
-					ui.Select(c, &in.compression, []string{string(backup.CompressZstd), string(backup.CompressGzip), string(backup.CompressNone)}).Label(L.BkCompression())
+					labeledSelect(c, "compression", &in.compression, []string{string(backup.CompressZstd), string(backup.CompressGzip), string(backup.CompressNone)},
+						compressionLabel).Label(L.BkCompression())
 				})
 			}
 			folderField(c, a, L.BkDestination(), &in.p.Destination.Path)
@@ -556,31 +666,47 @@ func (a *App) planDialog(c *ui.Context) {
 				}
 			}
 			ui.Field(c, L.BkSchedule(), func() {
-				ui.Select(c, &in.every, []string{string(scheduler.Hourly), string(scheduler.Daily), string(scheduler.Weekly), string(scheduler.Monthly), string(scheduler.Manual)}).Label(L.BkSchedule())
+				labeledSelect(c, "every", &in.every, []string{string(scheduler.Daily), string(scheduler.Weekly), string(scheduler.Monthly), string(scheduler.Hourly), string(scheduler.Manual)},
+					everyLabel).Label(L.BkSchedule())
 			})
-			if in.every != string(scheduler.Manual) {
-				ui.Field(c, L.BkAt(), func() { ui.TextInput(c, &in.at).Placeholder("02:00").Label(L.BkAt()) })
-			}
 			if in.every == string(scheduler.Weekly) {
-				days := []string{L.Sun(), L.Mon(), L.Tue(), L.Wed(), L.Thu(), L.Fri(), L.Sat()}
+				days := []string{L.Mon(), L.Tue(), L.Wed(), L.Thu(), L.Fri(), L.Sat(), L.Sun()}
 				ui.Field(c, L.BkWeekday(), func() { ui.Select(c, &in.weekday, days).Label(L.BkWeekday()) })
 			}
 			if in.every == string(scheduler.Monthly) {
-				ui.Field(c, L.BkDay(), func() { ui.TextInput(c, &in.day).Label(L.BkDay()) })
+				ui.Field(c, L.BkDay(), func() {
+					labeledSelect(c, "day", &in.day, numbers(1, 28, 1), func(v string) string { return v }).Label(L.BkDay())
+				})
+			}
+			switch in.every {
+			case string(scheduler.Manual):
+			case string(scheduler.Hourly):
+				ui.Field(c, L.BkAtMinute(), func() {
+					labeledSelect(c, "minute", &in.minute, numbers(0, 55, 5), func(v string) string { return ":" + v }).Label(L.BkAtMinute())
+				})
+			default:
+				ui.Field(c, L.BkAt(), func() {
+					ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
+						labeledSelect(c, "hour", &in.hour, numbers(0, 23, 1), func(v string) string { return v }).MinWidth(80).Label(L.BkHour())
+						ui.Text(c, ":")
+						labeledSelect(c, "minute", &in.minute, numbers(0, 55, 5), func(v string) string { return v }).MinWidth(80).Label(L.BkMinute())
+					})
+				})
 			}
 			ui.Fieldset(c, L.BkRetention(), func() {
-				ui.Field(c, L.BkKeepLast(), func() { ui.TextInput(c, &in.keepLast).Label(L.BkKeepLast()) })
-				ui.Field(c, L.BkKeepDaily(), func() { ui.TextInput(c, &in.keepDaily).Label(L.BkKeepDaily()) })
-				ui.Field(c, L.BkKeepWeekly(), func() { ui.TextInput(c, &in.keepWeekly).Label(L.BkKeepWeekly()) })
-				ui.Field(c, L.BkKeepMonthly(), func() { ui.TextInput(c, &in.keepMonthly).Label(L.BkKeepMonthly()) })
+				small(c, L.BkRetentionHelp())
+				ui.Field(c, L.BkKeepLast(), func() { ui.TextInput(c, &in.keepLast).Width(90).Label(L.BkKeepLast()) })
+				ui.Field(c, L.BkKeepDaily(), func() { ui.TextInput(c, &in.keepDaily).Width(90).Label(L.BkKeepDaily()) })
+				ui.Field(c, L.BkKeepWeekly(), func() { ui.TextInput(c, &in.keepWeekly).Width(90).Label(L.BkKeepWeekly()) })
+				ui.Field(c, L.BkKeepMonthly(), func() { ui.TextInput(c, &in.keepMonthly).Width(90).Label(L.BkKeepMonthly()) })
 			})
-			ui.Field(c, L.BkRetries(), func() { ui.TextInput(c, &in.retries).Label(L.BkRetries()) })
+			ui.Field(c, L.BkRetries(), func() { ui.TextInput(c, &in.retries).Width(90).Label(L.BkRetries()) }).Description(L.BkRetriesHelp())
 			ui.Field(c, L.BkConsistency(), func() { ui.Checkbox(c, &in.p.Live, L.BkLiveOption()) }).Description(L.BkLiveHelp())
 			ui.Field(c, L.BkNotify(), func() {
 				ui.Checkbox(c, &in.p.Notify, L.BkNotifyFail())
 				ui.Checkbox(c, &in.p.NotifySuccess, L.BkNotifyOK())
 			})
-			ui.Field(c, L.BkEnabled(), func() { ui.Switch(c, &in.p.Enabled).Label(L.BkEnabled()) })
+			ui.Field(c, L.BkEnabled(), func() { ui.Switch(c, &in.p.Enabled).Label(L.BkEnabled()) }).Description(L.BkEnabledHelp())
 		})
 	})
 	plan, err := in.buildPlan()
@@ -616,4 +742,39 @@ func checkRepoPassword(dir, password string) error {
 		return err
 	}
 	return r.Close()
+}
+
+// numbers lists from..to by step as two-digit strings ("00", "05", …).
+func numbers(from, to, step int) []string {
+	var out []string
+	for n := from; n <= to; n += step {
+		out = append(out, fmt.Sprintf("%02d", n))
+	}
+	return out
+}
+
+// everyLabel names a schedule frequency.
+func everyLabel(v string) string {
+	switch scheduler.Every(v) {
+	case scheduler.Hourly:
+		return L.BkEveryHourly()
+	case scheduler.Daily:
+		return L.BkEveryDaily()
+	case scheduler.Weekly:
+		return L.BkEveryWeekly()
+	case scheduler.Monthly:
+		return L.BkEveryMonthly()
+	}
+	return L.BkEveryManual()
+}
+
+// compressionLabel names an archive compression.
+func compressionLabel(v string) string {
+	switch backup.Compression(v) {
+	case backup.CompressZstd:
+		return L.BkCompZstd()
+	case backup.CompressGzip:
+		return L.BkCompGzip()
+	}
+	return L.BkCompNone()
 }

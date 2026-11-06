@@ -1,5 +1,23 @@
 # Version history
 
+## 0.1.2
+
+Released 2026-11-06. Tested with WSL 3.0.3.0, WSLc 3.0.3.0 and MyGo v0.8.0 on Windows 11 ARM64.
+
+- A Compose project backup is one item holding the project's files, its bind folders and its named
+  volumes (layout version 2, `backups.md`); the project stops for a consistent copy and its
+  services start again. It works in folder, archive and incremental backups. Restoring brings back
+  the whole project or one volume. Backups from 0.1.0 and 0.1.1 still restore.
+- The Compose project page shows each service's ports and mounts and a Data card that lists the
+  project's volumes and folders the way the Volumes page does; Back up project… says what the
+  backup holds first. The Volumes page names the project that owns a volume.
+- Fix: Remove unused no longer deletes the volumes of a Compose project that was taken down.
+- Clearer wording: Remove containers… (compose down), Remove from WSLPilot…, the validation
+  result, and the backup plan editor (schedules and kinds in words, the time from lists, what each
+  retention rule keeps); the plan card is one column of label and value.
+- Settings › General has a Language choice (same as Windows, English, 简体中文).
+- MyGo v0.8.0.
+
 ## 0.1.1
 
 Released 2026-11-05. A redesigned interface; the data layer and formats are unchanged. Tested with

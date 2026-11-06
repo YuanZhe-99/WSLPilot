@@ -10,7 +10,7 @@
 |---|---|---|---|
 | WSL 发行版 | `wsl-distro` | `wsl --export <name> -` | 先终止，结束后再启动；用户选择运行中备份时除外 |
 | WSLc Volume | `wslc-volume` | 辅助容器：`tar -cpf - --numeric-owner -C /src .` | 挂载它的运行中容器会被停止并在结束后启动；运行中备份时除外 |
-| Compose 项目 | `compose-project` | 项目的 Compose 文件与 env 文件（Windows 文件），以及每个原生命名 Volume 各一个备份项 | Volume 同上 |
+| Compose 项目 | `compose-project` | 一个 tar，包含项目的 Compose 与 env 文件、bind 目录与命名 Volume（见 [Compose 项目备份](#compose-项目备份布局版本-2)） | 停止项目中运行的容器，结束后再启动这些服务；运行中备份时除外 |
 
 运行中备份会被标注：sidecar 与目录元数据中为 `consistent: false`，仓库快照带 `inconsistent` 标签。界面显示为“运行中备份”。
 
@@ -67,6 +67,32 @@ manifest 每行是一个 JSON 对象：
 
 校验归档时比较 SHA-256 与条目数是否与 sidecar 一致。
 
+## Compose 项目备份（布局版本 2）
+
+一个 Compose 项目备份是一个 tar，与其它来源一样保存为目录、归档或仓库。第一个条目是清单，其余条目的布局如下：
+
+```
+wslpilot-project.json   manifest (first entry)
+compose.yaml, .env      the project's files, at the root
+folders/<id>/…          each bind folder's content; a bound single file as folders/<id>/<name>
+volumes/<name>/…        each named volume's tar, every header kept (owners, modes, links)
+```
+
+| 清单字段 | 含义 |
+|---|---|
+| `format`、`version` | `wslpilot-compose`、2 |
+| `project`、`workingDir` | Compose 项目名，以及项目运行时所在的 Windows 目录 |
+| `files` | 根目录中文件的名称 |
+| `folders` | `id`、`source`（Windows 路径）、`relative`（项目目录内以斜杠分隔的相对路径；位于项目目录外时省略）、`file`（绑定的是单个文件）、`services` |
+| `volumes` | `key`（Compose 键）、`name`（WSLc Volume）、`services` |
+| `external` | 项目使用但不是由它创建的 Volume；它们不在备份中 |
+
+Windows 文件与目录的权限为 0644 与 0755；bind 目录中的链接不会被跟随，并会列在任务日志中。Volume 的条目就是其导出内容，
+加上前缀 `volumes/<name>/`（导出的 `./` 根目录即前缀本身），硬链接目标也加上同样的前缀。手动还原 Volume 时，取出该前缀下的条目，
+去掉前缀（硬链接目标也去掉），以 root 用 `tar -xpf - --numeric-owner` 解包。
+
+版本 1 的备份（WSLPilot 0.1.0 与 0.1.1）只在根目录保存文件，没有清单；当时命名 Volume 是单独的 `wslc-volume` 备份项。两个版本都能读取。
+
 ## 目录：打开任意备份
 
 `backup.Scan(location)` 列出一个位置（向下两层目录）中的内容：
@@ -94,7 +120,8 @@ manifest 每行是一个 JSON 对象：
 | 恢复文件到发行版 | 以 root 执行 `tar -xpf - --numeric-owner -C <dir>`，可只恢复某个路径 |
 | 新 Volume | 创建 Volume，由辅助容器解包 tar |
 | 覆盖 Volume | 安全备份、清空 Volume、解包 tar |
-| 项目文件 | 把 Compose 与 env 文件写入 Windows 目录（它们本就是 Windows 文件） |
+| 项目 | 把文件与 bind 目录写入一个空目录或新的 Windows 目录（原本位于项目目录内的目录按相对路径放置，其它放到 `outside-folders<id>`）；所选的每个 Volume 还原为新 Volume（使用原名时恢复项目的标签），或在安全备份并输入其名称后覆盖已有 Volume |
+| 项目中的单个 Volume | 只取出该 Volume 的条目，按上述方式还原为新 Volume 或覆盖已有 Volume |
 
 覆盖已有对象时需要用户输入其名称，并写入审计日志。
 

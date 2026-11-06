@@ -187,34 +187,40 @@ func (a *App) head(c *ui.Context, h paneHead) {
 	t := c.Theme()
 	ui.Row(c.Key("pane-head")).Height(paneHeaderH+12).Shrink(0).FillWidth().Padding(6, 8, 0, panePadX).Gap(10).AlignItems(ui.Center).Children(func() {
 		ui.Column(c.Key("pane-title")).MinWidth(0).Shrink(1).Gap(1).DragWindow().Children(func() {
-			if h.crumb != "" {
-				link := ui.ButtonBase(c.Key("crumb")).Label(h.crumb)
-				link.Children(func() {
-					ui.Row(c).Gap(4).AlignItems(ui.Center).Children(func() {
-						ui.Text(c, h.crumb).FontSize(sizeSmall).TextColor(t.Accent)
-						ui.Icon(c, iconChevron).Size(12, 12).TextColor(t.Accent)
-					})
-				})
-				if link.Clicked() && h.onCrumb != nil {
-					h.onCrumb()
-				}
-			}
-			ui.Row(c).Gap(10).AlignItems(ui.Center).Children(func() {
+			ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
 				if h.icon != nil && h.crumb == "" {
 					ui.Icon(c, h.icon).Size(20, 20).TextColor(t.TextMuted)
 				}
-				ui.Text(c, h.title).FontSize(sizeTitle).Bold().SingleLine()
-				if h.badge != nil {
-					h.badge()
+				if h.crumb != "" {
+					link := ui.ButtonBase(c.Key("crumb")).Label(h.crumb)
+					link.Children(func() {
+						col := t.TextMuted
+						if link.Hovered() {
+							col = t.Accent
+						}
+						ui.Text(c, h.crumb).FontSize(sizeTitle).TextColor(col).SingleLine()
+					})
+					if link.Clicked() && h.onCrumb != nil {
+						h.onCrumb()
+					}
+					ui.Icon(c, iconChevron).Size(16, 16).TextColor(t.TextMuted)
 				}
+				ui.Text(c, h.title).FontSize(sizeTitle).Bold().SingleLine().Shrink(0)
 			})
-			if h.sub != "" {
-				small(c, h.sub).SingleLine()
+			if h.badge != nil || h.sub != "" {
+				ui.Row(c).Gap(6).AlignItems(ui.Center).MinWidth(0).Children(func() {
+					if h.badge != nil {
+						h.badge()
+					}
+					if h.sub != "" {
+						small(c, h.sub).SingleLine().Shrink(1).MinWidth(0).Tooltip(h.sub)
+					}
+				})
 			}
 		})
 		ui.Box(c.Key("pane-drag")).Grow(1).FillHeight().DragWindow()
 		if h.actions != nil {
-			ui.Row(c.Key("pane-actions")).Gap(8).AlignItems(ui.Center).Children(h.actions)
+			ui.Row(c.Key("pane-actions")).Gap(8).Shrink(0).AlignItems(ui.Center).Children(h.actions)
 		}
 		a.windowButtons(c, "win", false)
 	})

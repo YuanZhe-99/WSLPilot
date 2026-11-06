@@ -584,8 +584,8 @@
     }
   },
   "CmpUp": "Up",
-  "CmpDown": "Down…",
-  "CmpDownTitle": "Take {name} down?",
+  "CmpDown": "Remove containers…",
+  "CmpDownTitle": "Remove the containers of {name}?",
   "@CmpDownTitle": {
     "placeholders": {
       "name": {
@@ -593,19 +593,19 @@
       }
     }
   },
-  "CmpDownMessage": "The project's containers and networks are removed. Volumes are kept unless you choose otherwise.",
+  "CmpDownMessage": "The project's containers and networks are removed (compose down). Its files, folders and volumes are kept unless you choose otherwise.",
   "CmpRemoveVolumes": "Also remove the project's volumes",
   "CmpRemoveVolumesWarning": "The data in the volumes is deleted.",
   "CmpAutostart": "Start at sign-in",
   "CmpAutostartHelp": "The WSLPilot agent brings the project up when you sign in.",
-  "CmpValid": "The project is valid for this backend.",
+  "CmpValid": "No problems found: the project can run on this backend.",
   "CmpServices": "Services",
   "CmpService": "Service",
   "CmpHealth": "Health",
   "CmpFile": "Compose file",
   "CmpNotUp": "The project is not up.",
-  "CmpRemove": "Forget project…",
-  "CmpRemoveTitle": "Forget {name}?",
+  "CmpRemove": "Remove from WSLPilot…",
+  "CmpRemoveTitle": "Remove {name} from WSLPilot?",
   "@CmpRemoveTitle": {
     "placeholders": {
       "name": {
@@ -613,7 +613,7 @@
       }
     }
   },
-  "CmpRemoveMessage": "WSLPilot forgets the project. Its files, containers and volumes are not touched.",
+  "CmpRemoveMessage": "WSLPilot stops managing this project. Its files, containers and volumes are not touched.",
   "BkRestore": "Restore",
   "BkPlans": "Plans",
   "BkOpenFolder": "Open folder…",
@@ -703,7 +703,6 @@
     }
   },
   "BkRestoreOverMessage": "The current state is backed up first, then replaced by this backup.",
-  "BkExtractFiles": "Extract project files…",
   "BkDeleteTitle": "Delete this backup?",
   "BkDeleteMessage": "The backup files are deleted from this location.",
   "BkNewPlan": "New plan…",
@@ -725,7 +724,7 @@
   "BkTargets": "What to back up",
   "BkDestination": "Destination",
   "BkRetention": "Keep",
-  "BkRetentionText": "last {last}, daily {daily}, weekly {weekly}, monthly {monthly}",
+  "BkRetentionText": "latest {last}, one a day for {daily} days, one a week for {weekly} weeks, one a month for {monthly} months",
   "@BkRetentionText": {
     "placeholders": {
       "last": {
@@ -742,7 +741,7 @@
       }
     }
   },
-  "BkConsistency": "Running sources",
+  "BkConsistency": "While running",
   "BkLive": "Backed up while running",
   "BkHistory": "History",
   "BkHistoryOK": "{items} backed up, {expired} expired",
@@ -807,13 +806,13 @@
   "BkPlan": "Backup plan",
   "BkKindHelp": "Incremental stores only what changed; archive keeps one file per backup; folder stays browsable in Explorer.",
   "BkCompression": "Compression",
-  "BkAt": "Time (HH:MM)",
+  "BkAt": "Time",
   "BkWeekday": "Day of the week",
-  "BkDay": "Day of the month (1–28)",
-  "BkKeepLast": "Most recent",
-  "BkKeepDaily": "Daily",
-  "BkKeepWeekly": "Weekly",
-  "BkKeepMonthly": "Monthly",
+  "BkDay": "Day of the month",
+  "BkKeepLast": "Latest backups",
+  "BkKeepDaily": "Days, one backup each",
+  "BkKeepWeekly": "Weeks, one backup each",
+  "BkKeepMonthly": "Months, one backup each",
   "BkRetries": "Retries after a failure",
   "BkLiveOption": "Back up without stopping them",
   "BkLiveHelp": "By default running distributions and containers stop for a consistent copy and start again afterwards.",
@@ -896,8 +895,6 @@
   },
   "CtrEditWarning": "A container cannot be changed in place: it is replaced by a new one with these settings. Volumes are kept; files written inside the container itself are lost.",
   "WSLUpdatePackages": "Update packages",
-  "CmpVolumes": "Volumes",
-  "CmpVolumesHelp": "native keeps data in a WSL Containers volume; bind uses a Windows folder instead.",
   "CmpVolumesWarning": "Existing data is not moved between a volume and a folder. Back the volume up first if it holds data.",
   "SetUpdates": "Updates",
   "SetAutoUpdate": "Check for updates automatically",
@@ -1295,7 +1292,6 @@
       }
     }
   },
-  "CmpProjects": "Projects",
   "CmpRunningOf": "{running} of {count} running",
   "@CmpRunningOf": {
     "placeholders": {
@@ -1309,16 +1305,14 @@
   },
   "CmpApply": "Apply changes",
   "CmpCombinedLogs": "Combined logs",
-  "CmpBackUp": "Back up…",
+  "CmpBackUp": "Back up project…",
   "CmpEdited": "Edited",
   "CmpValidate": "Validate",
   "CmpValidating": "Validating…",
   "CmpError": "Error",
   "CmpWarning": "Warning",
-  "CmpOK": "No problems found",
-  "CmpInfo": "Note",
-  "CmpNativeNo": "Not supported by the native backend",
-  "CmpNativeYes": "Supported by the native backend",
+  "CmpNativeNo": "This WSL has no native compose command yet, so the project runs on the builtin backend.",
+  "CmpNativeYes": "This WSL has a native compose command. The project stays on its backend until you migrate it.",
   "BkOpenBackup": "Open a backup…",
   "BkDropTitle": "Restore from a backup made anywhere",
   "BkDropHelp": "A WSLPilot repository or folder, a wsl --export archive or VHDX, or any Linux tar.",
@@ -1425,5 +1419,199 @@
   },
   "TrayCheckUpdates": "Check for updates",
   "TrayHint": "WSLPilot keeps running in the tray so scheduled backups continue. Choose Quit in the tray menu to close it, or change this in Settings.",
-  "DashOnDisk": "On disk (usage inside not measured)"
+  "DashOnDisk": "On disk (usage inside not measured)",
+  "CmpUpStart": "Start",
+  "CmpApplyHelp": "Creates or updates the containers to match the Compose file (compose up).",
+  "CmpUsage": "CPU {cpu} · memory {memory}",
+  "@CmpUsage": {
+    "placeholders": {
+      "cpu": {
+        "type": "String"
+      },
+      "memory": {
+        "type": "String"
+      }
+    }
+  },
+  "CmpContainer": "Container {name}",
+  "@CmpContainer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "CmpData": "Data",
+  "CmpDataHelp": "Where this project keeps its data. Backing up the project includes all of it except external volumes.",
+  "CmpBackUpTitle": "Back up {name}",
+  "@CmpBackUpTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "CmpBackUpIncludes": "The backup includes:",
+  "CmpBackUpFiles": "Compose files: {files}",
+  "@CmpBackUpFiles": {
+    "placeholders": {
+      "files": {
+        "type": "String"
+      }
+    }
+  },
+  "CmpBackUpExternal": "External volumes are not part of the project backup: {names}. Back them up on their own.",
+  "@CmpBackUpExternal": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "CmpBackUpTo": "Saved to {path}",
+  "@CmpBackUpTo": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "CmpBackUpLive": "Back up while running",
+  "CmpBackUpLiveHelp": "By default the running services stop during the backup and start again afterwards. A copy taken while running may be inconsistent and is labeled so.",
+  "CmpBackUpStart": "Back up",
+  "DataVolume": "Volume",
+  "DataFolder": "Folder",
+  "DataExternal": "External volume: not created by this project, not in its backup",
+  "DataUsedBy": "Used by {services}",
+  "@DataUsedBy": {
+    "placeholders": {
+      "services": {
+        "type": "String"
+      }
+    }
+  },
+  "DataUnused": "Not used by any service",
+  "DataOpenVolume": "Open in Volumes",
+  "DataStore": "Storage…",
+  "DataStoreTitle": "Where {key} keeps its data",
+  "@DataStoreTitle": {
+    "placeholders": {
+      "key": {
+        "type": "String"
+      }
+    }
+  },
+  "DataStoreVolume": "In a WSL Containers volume",
+  "DataStoreFolder": "In a Windows folder",
+  "DataNone": "This project keeps no data outside its containers.",
+  "DataReadOnly": "read-only",
+  "VolProject": "Compose {name}",
+  "@VolProject": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "VolProjectStopped": "no running container",
+  "VolProjectNotAdded": "project not added",
+  "VolOfProject": "This volume belongs to the Compose project {name}. Backing up the project includes it, with the project's files and folders.",
+  "@VolOfProject": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "BkRestoreProject": "Restore project…",
+  "BkRestoreProjectHelp": "Files and folders go into the folder you choose; folders that were inside the project folder keep their place there, so relative paths such as ./data still work. Volumes are restored as volumes.",
+  "BkFilesInto": "Files and folders into",
+  "BkFilesIntoHelp": "An empty or new folder. Leave it empty to restore only volumes. Folders from outside the project folder go to outside-folders.",
+  "BkRestoreVolumeNamed": "Restore volume {name}…",
+  "@BkRestoreVolumeNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "BkVolumeInto": "Into the volume",
+  "BkVolumeExists": "A volume named {name} exists. It is backed up to Safety first, then emptied and replaced.",
+  "@BkVolumeExists": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "BkVolumeNotConfirmed": "replacing it was not confirmed",
+  "BkRestoreFilesStep": "Writing files and folders",
+  "BkRestoreVolumeStep": "Restoring volume {name}",
+  "@BkRestoreVolumeStep": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "BkProjectFiles": "Compose files",
+  "BkProjectVolumeLine": "Compose volume {key}",
+  "@BkProjectVolumeLine": {
+    "placeholders": {
+      "key": {
+        "type": "String"
+      }
+    }
+  },
+  "BkProjectV1": "Made by WSLPilot 0.1.1 or earlier: the project's files only. Its volumes were backed up as separate items.",
+  "BkProjectExternal": "Not included (external volumes): {names}",
+  "@BkProjectExternal": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "BkInProject": "Also included in the backup of Compose {name}",
+  "@BkInProject": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "BkEveryHourly": "Every hour",
+  "BkEveryDaily": "Every day",
+  "BkEveryWeekly": "Every week",
+  "BkEveryMonthly": "Every month",
+  "BkEveryManual": "Only when run by hand",
+  "BkAtMinute": "Minute of the hour",
+  "BkHour": "Hour",
+  "BkMinute": "Minute",
+  "BkCompZstd": "Zstandard (smaller, fast)",
+  "BkCompGzip": "gzip (opens anywhere)",
+  "BkCompNone": "None",
+  "BkRetentionHelp": "After each run, older backups this plan made are deleted. A backup stays while any rule keeps it; 0 turns a rule off.",
+  "BkRetriesHelp": "The first retry waits 10 minutes, each next one twice as long, up to 2 hours.",
+  "BkEnabledHelp": "A paused plan keeps its settings and backups but does not run on its schedule.",
+  "SetLanguage": "Language",
+  "SetLanguageHelp": "The language WSLPilot shows. It changes at once.",
+  "SetLanguageSystem": "Same as Windows",
+  "CmpProject": "Project",
+  "BkRestoreProjectTitle": "Restore the project {name}",
+  "@BkRestoreProjectTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "BkRestoreVolumeCheck": "Restore the volume {name}",
+  "@BkRestoreVolumeCheck": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

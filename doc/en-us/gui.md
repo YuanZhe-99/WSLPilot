@@ -10,7 +10,7 @@ the MyGo apps Kyokai and EasyTier MyGo. Rules for writing views are in `architec
 | Part | Behavior |
 |---|---|
 | Frame | The system title bar is hidden (`gui.TitleBarOptions`); the window background is Mica. The sidebar is drawn on the Mica, the page on a raised rounded pane beside it. |
-| Pane header | Page icon, title and one line of context; it is the title bar: drag to move, double-click to maximize. Page actions sit on its right, then WSLPilot's own minimize, maximize (with snap layouts) and close buttons on Windows. |
+| Pane header | Page icon, title and one line of context (a sub-page puts its parent first as a link: "Compose › vocechat"); it is the title bar: drag to move, double-click to maximize. Page actions sit on its right, then WSLPilot's own minimize, maximize (with snap layouts) and close buttons on Windows. |
 | Sidebar | App icon and name, the pages with Lucide icons, and at the bottom Tasks (with a count of running jobs), the appearance toggle (system → light → dark), Settings and the version. |
 | Close | Keeps WSLPilot in the tray unless Settings › General says Quit; the first time, a notification says where it went (`closeHinted`). |
 | Tray | Open WSLPilot, Check for updates (opens Settings at About & updates and checks), Quit. |
@@ -24,7 +24,7 @@ and the control.
 
 | Group | Section | Rows |
 |---|---|---|
-| Preferences | General | Appearance, open at sign-in, closing the window (keep in tray or quit) |
+| Preferences | General | Appearance, language (same as Windows, English, 简体中文; changes at once), open at sign-in, closing the window (keep in tray or quit) |
 | This computer | Backups & agent | Background agent, default backup folder, volume helper image |
 | This computer | WSL Containers | Data location (move), restart the session, the `settings.yaml` form |
 | WSLPilot | About & updates | Version and source code, open source licenses, updates, the data folder |
@@ -55,9 +55,9 @@ The update loop and `autoInstallDue` are in `internal/gui/update.go`; the prefer
 | Dashboard | Stat cards for WSL, WSL Containers and Compose (a number, a status pill, a line, a link); disk usage bars on one scale (used, reclaimable, or on disk when the inside is not measured); activity (running jobs, recent results, next planned backup); quick actions. |
 | WSL | A table of distributions (default pill, state dot, version, size, location) and the chosen one's card: a grid of actions, sparse disk, the inline compact panel with its steps and "Back up first", Unregister. A distribution's settings open as their own page with a breadcrumb, a switch between `wsl.conf` and `.wslconfig`, grouped rows marked Changed, and a card of the changes to save. |
 | Containers | Containers, Images and Networks as segments; the container table (state, ports, CPU, memory, restart policy, Compose project) and the chosen container's logs in a dark console with search, Shell, Restart, Stop and more. |
-| Compose | Project cards; a project page with service cards, actions, volumes, and the `compose.yaml` editor with diagnostics on the offending lines and an issue list. |
-| Volumes | The volume table with the chosen volume's actions under it (Export TAR, Back up, Compact for vhd volumes, Delete) and the TAR import panel beside it (a new volume, or replacing a volume's contents after a safety backup; an entry-count check after import). Remove unused deletes volumes no container uses, backing each up first. |
-| Backups | Restore first: open a backup made anywhere, what can be restored, the locations, then the versions of the chosen source and a step card to restore one. Plans: the plan table and the chosen plan with Run now, Edit, Delete and its history. |
+| Compose | Project cards; a project page with service cards (image, usage, ports, and each mount as "source → target · Folder or Volume"), the Data card, and the `compose.yaml` editor with diagnostics on the offending lines and an issue list. The Data card lists where the project keeps its data with the Volumes page's names: each volume (size, services, Open in Volumes) and bind folder (size, services, Show in Explorer), external volumes, and Storage… to keep a named volume in a volume or a Windows folder. Back up project… first shows what the backup holds and whether the project stops. Remove containers… is `compose down`; Remove from WSLPilot… only forgets the project. |
+| Volumes | The volume table with the chosen volume's actions under it (Export TAR, Back up, Compact for vhd volumes, Delete) and the TAR import panel beside it (a new volume, or replacing a volume's contents after a safety backup; an entry-count check after import). Used by names the owning Compose project (a link to it) before the containers; such a volume is never "unused", even with the project down, and choosing it offers Back up project…. Remove unused deletes the other volumes no container uses, backing each up first. |
+| Backups | Restore first: open a backup made anywhere, what can be restored, the locations, then the versions of the chosen source and a step card to restore one; a project backup lists its files, folders and volumes and restores the whole project or one volume. Plans: the plan table and the chosen plan as label and value rows with Run now, Edit, Delete and its history; the plan editor names schedules and kinds in words, picks the time from lists, and marks a volume already in a chosen project's backup. |
 | Terminal | Tabs of shells in distributions, containers or PowerShell. |
 | Tasks | Every job of this run with progress and log. |
 
@@ -65,5 +65,5 @@ The update loop and `autoInstallDue` are in `internal/gui/update.go`; the prefer
 
 Layout numbers and colors are tokens in `internal/gui/style.go`; icons are Lucide SVGs in
 `internal/gui/icons.go`. Shared pieces: `card`, `pill`, `stateText`, `bar`, `callout`,
-`emptyState`, `iconButton`, `actionButton`, row lists (`rows.go`), and `paneHead` for every page
+`emptyState`, `iconButton`, `actionButton`, `labeledSelect` (a drop-down that stores a value and shows its label), `dataRow` (one data location, as on the Compose page and in backups), row lists (`rows.go`), and `paneHead` for every page
 header. On a selected table row, colored labels switch to the row's text color (`selTone`).

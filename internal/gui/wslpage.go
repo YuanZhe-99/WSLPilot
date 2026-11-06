@@ -222,7 +222,10 @@ func (a *App) wslDialogs(c *ui.Context) {
 }
 
 // dialogButtons draws Cancel and the action; act runs and closes.
+// Notes: the action is the label of the button that opened the dialog
+// less its "…", which only says a dialog follows.
 func dialogButtons(c *ui.Context, a *App, action string, enabled bool, act func()) {
+	action = strings.TrimSuffix(action, "…")
 	ui.Row(c).FillWidth().Gap(smallGap).Justify(ui.End).Children(func() {
 		ui.Button(c, L.Cancel()).OnClick(a.closeDialogs)
 		ui.PrimaryButton(c, action).Disabled(!enabled).OnClick(func() {

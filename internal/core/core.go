@@ -102,7 +102,10 @@ const SettingsDoc = "settings.json"
 
 // Prefs are the preferences in SettingsDoc.
 type Prefs struct {
-	Theme     string `json:"theme,omitempty"` // system, light, dark
+	Theme string `json:"theme,omitempty"` // system, light, dark
+	// Language is the interface language ("en", "zh-Hans"); "" follows
+	// Windows.
+	Language  string `json:"language,omitempty"`
 	BackupDir string `json:"backupDir,omitempty"`
 	// HelperImage is the image for volume transfers ("" = alpine:3.20).
 	HelperImage string `json:"helperImage,omitempty"`

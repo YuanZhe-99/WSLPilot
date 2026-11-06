@@ -248,6 +248,9 @@ func (a *App) versions(c *ui.Context, g backup.Group) {
 		if it.Note != "" {
 			callout(c, "note", toneWarn, iconInfo, noteText(it.Note), nil)
 		}
+		if it.Source.Kind == backup.SourceCompose {
+			a.projectContents(c, it)
+		}
 		step(2, L.BkStepRestoreAs(), "", toneAccent)
 		ui.Column(c).FillWidth().Gap(8).Padding(0, 0, 0, 36).Children(func() {
 			actions(c, func() {
@@ -265,8 +268,8 @@ func (a *App) versions(c *ui.Context, g backup.Group) {
 						p.rin, p.dlg = restoreInput{mode: "volume"}, "restore"
 					}
 				}
-				if it.Source.Kind == backup.SourceCompose && ui.PrimaryButton(c.Key("extract"), L.BkExtractFiles()).Clicked() {
-					p.rin, p.dlg = restoreInput{mode: "extract"}, "restore"
+				if it.Source.Kind == backup.SourceCompose {
+					a.projectRestoreActions(c, it)
 				}
 				if it.Source.Name != "" && (it.Source.Kind == backup.SourceDistro || it.Source.Kind == backup.SourceVolume) {
 					mode := "over-distro"
@@ -414,7 +417,7 @@ func (a *App) planDetail(c *ui.Context, pl scheduler.Plan) {
 					})
 				}
 			})
-			ui.Grid(c).FillWidth().Columns(2).GapX(28).GapY(4).Children(func() {
+			ui.Column(c.Key("plan-rows")).FillWidth().Gap(2).Children(func() {
 				planRow(c, L.BkTargets(), planTargets(pl))
 				planRow(c, L.BkDestination(), pl.Destination.Path)
 				planRow(c, L.BkKind(), kindLabel(pl.Destination.Kind))
@@ -422,12 +425,12 @@ func (a *App) planDetail(c *ui.Context, pl scheduler.Plan) {
 				r := pl.Retention
 				planRow(c, L.BkRetention(), L.BkRetentionText(r.KeepLast, r.KeepDaily, r.KeepWeekly, r.KeepMonthly))
 				planRow(c, L.BkRetries(), itoa(pl.Retry.Max))
+				cons := L.BkStopFirst()
+				if pl.Live {
+					cons = L.BkLive()
+				}
+				planRow(c, L.BkConsistency(), cons)
 			})
-			cons := L.BkStopFirst()
-			if pl.Live {
-				cons = L.BkLive()
-			}
-			small(c, cons)
 			small(c, L.BkRunsClosed())
 		})
 		ui.Box(c).Height(12)
@@ -457,10 +460,100 @@ func (a *App) planDetail(c *ui.Context, pl scheduler.Plan) {
 	})
 }
 
-// planRow is a label and value pair of the plan card.
+// planRow is one label and value of the plan card: the label in a fixed
+// column, the value beside it.
 func planRow(c *ui.Context, label, value string) {
-	ui.Row(c.Key("pr-" + label)).FillWidth().MinHeight(40).Gap(10).AlignItems(ui.Center).Children(func() {
-		ui.Text(c, label).Grow(1)
-		ui.Text(c, value).FontWeight(500).SingleLine().MaxWidth(320)
+	ui.Row(c.Key("pr-" + label)).FillWidth().MinHeight(32).Gap(16).AlignItems(ui.Center).Children(func() {
+		muted(c, label).Width(160).Shrink(0)
+		ui.Text(c, value).Grow(1).MinWidth(0).SingleLine().Tooltip(value).Selectable()
 	})
+}
+
+// projectManifest returns a project backup's manifest, reading it in the
+// background the first time. done is false while it is being read; a
+// version 1 backup is done with a nil manifest.
+func (a *App) projectManifest(it backup.Item) (m *backup.ProjectManifest, done bool) {
+	p := &a.bk
+	key := itemKey(it)
+	if p.manifestDone[key] {
+		return p.manifests[key], true
+	}
+	if p.manifests == nil {
+		p.manifests, p.manifestDone = map[string]*backup.ProjectManifest{}, map[string]bool{}
+	}
+	if _, reading := p.manifests[key]; !reading {
+		p.manifests[key] = nil
+		a.async(func(ctx context.Context) func() {
+			m, err := backup.ReadProjectManifest(ctx, it)
+			return func() {
+				if err != nil {
+					a.notify(friendlyError(err), true)
+				}
+				p.manifests[key], p.manifestDone[key] = m, true
+			}
+		})
+	}
+	return nil, false
+}
+
+// projectContents lists what a project backup holds, with the same names
+// and types as the Compose page's Data card.
+func (a *App) projectContents(c *ui.Context, it backup.Item) {
+	m, done := a.projectManifest(it)
+	ui.Column(c.Key("contents")).FillWidth().Gap(2).Padding(0, 0, 0, 36).Children(func() {
+		if !done {
+			ui.Spinner(c).Size(16, 16)
+			return
+		}
+		if m == nil {
+			small(c, L.BkProjectV1())
+			return
+		}
+		dataRow(c, "files", rowFiles, strings.Join(m.Files, ", "), L.BkProjectFiles(), nil)
+		for _, f := range m.Folders {
+			name := f.Source
+			if f.Relative != "" {
+				name = "./" + f.Relative
+			}
+			dataRow(c, "f-"+f.ID, rowFolder, name, f.Source, nil)
+		}
+		for _, v := range m.Volumes {
+			dataRow(c, "v-"+v.Name, rowVolume, v.Name, L.BkProjectVolumeLine(v.Key), nil)
+		}
+		if len(m.External) > 0 {
+			small(c, L.BkProjectExternal(strings.Join(m.External, ", ")))
+		}
+	})
+}
+
+// projectRestoreActions are the restore buttons of a project backup: the
+// whole project, or one of its volumes.
+func (a *App) projectRestoreActions(c *ui.Context, it backup.Item) {
+	p := &a.bk
+	m, done := a.projectManifest(it)
+	if !done {
+		return
+	}
+	choices := func(only string) []volChoice {
+		var vs []volChoice
+		if m != nil {
+			for _, v := range m.Volumes {
+				vs = append(vs, volChoice{from: v.Name, key: v.Key, into: v.Name, on: only == "" || only == v.Name})
+			}
+		}
+		return vs
+	}
+	if ui.PrimaryButton(c.Key("project"), L.BkRestoreProject()).Clicked() {
+		p.rin, p.dlg = restoreInput{mode: "project", vols: choices("")}, "restore"
+		a.loadVolumes()
+	}
+	if m == nil {
+		return
+	}
+	for _, v := range m.Volumes {
+		if ui.Button(c.Key("pv-"+v.Name), L.BkRestoreVolumeNamed(v.Name)).Clicked() {
+			p.rin, p.dlg = restoreInput{mode: "project", vols: choices(v.Name)}, "restore"
+			a.loadVolumes()
+		}
+	}
 }

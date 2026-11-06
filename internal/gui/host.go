@@ -60,6 +60,9 @@ type Host interface {
 	OpenAtLogin() bool
 	// SetTheme chooses "system", "light" or "dark".
 	SetTheme(mode string)
+	// SetLanguage shows the interface in tag ("en", "zh-Hans"), or in the
+	// Windows display language for "".
+	SetLanguage(tag string)
 	// Window minimizes, maximizes or restores, or closes the main window.
 	Window(op WindowOp)
 	// Maximized reports whether the main window is maximized.

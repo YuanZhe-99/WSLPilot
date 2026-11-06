@@ -6,7 +6,7 @@ tool github.com/egoist/mygo/cmd/mygo
 
 require (
 	github.com/compose-spec/compose-go/v2 v2.16.2
-	github.com/egoist/mygo v0.7.4
+	github.com/egoist/mygo v0.8.0
 	github.com/klauspost/compress v1.20.3
 	github.com/zeebo/blake3 v0.2.4
 	golang.org/x/crypto v0.57.0

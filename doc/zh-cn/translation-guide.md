@@ -23,6 +23,11 @@
 | retention policy | 保留策略 |
 | Tasks (page) | 任务 |
 | settings sheet | 设置面板 |
+| Data (project card) | 数据 |
+| Folder (Windows, bind) | 目录 |
+| External volume | 外部 Volume |
+| Storage (of a named volume) | 存放位置 |
+| Remove containers (compose down) | 移除容器 |
 | pane | 面板 |
 | repository (backup) | 仓库 |
 | chunk | 数据块 |

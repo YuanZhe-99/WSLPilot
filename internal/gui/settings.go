@@ -305,6 +305,7 @@ type settingsHit struct {
 func settingsHits() []settingsHit {
 	return []settingsHit{
 		{setGeneral, L.SetTheme(), L.SetThemeHelp()},
+		{setGeneral, L.SetLanguage(), L.SetLanguageHelp() + " English 简体中文 Language 语言"},
 		{setGeneral, L.SetOpenAtLogin(), L.SetOpenAtLoginHelp()},
 		{setGeneral, L.SetCloseWindow(), L.SetCloseWindowHelp()},
 		{setBackups, L.SetAgent(), L.SetAgentHelp()},
@@ -380,6 +381,12 @@ func (a *App) generalSettings(c *ui.Context, r *rows) {
 				s.themeIdx = max(slices.Index(modes, s.prefs.Theme), 0)
 				ui.Segmented(c.Key("theme-seg"), &s.themeIdx, L.SetThemeSystem(), L.SetThemeLight(), L.SetThemeDark()).Label(L.SetTheme()).OnChange(func() {
 					a.setTheme(modes[s.themeIdx])
+				})
+			})
+			r.row(c, "language", iconGlobe, L.SetLanguage(), L.SetLanguageHelp(), func() {
+				labeledSelect(c, "language-sel", &s.prefs.Language, []string{"", "en", "zh-Hans"}, languageLabel).Label(L.SetLanguage()).OnChange(func() {
+					a.host.SetLanguage(s.prefs.Language)
+					a.savePrefs()
 				})
 			})
 		})
@@ -571,4 +578,16 @@ func (a *App) aboutSettings(c *ui.Context, r *rows) {
 			})
 		})
 	})
+}
+
+// languageLabel names an interface language in itself, so a person who
+// cannot read the current one still finds theirs.
+func languageLabel(tag string) string {
+	switch tag {
+	case "en":
+		return "English"
+	case "zh-Hans":
+		return "简体中文"
+	}
+	return L.SetLanguageSystem()
 }

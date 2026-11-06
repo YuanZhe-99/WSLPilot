@@ -2,10 +2,10 @@ package core
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/backup"
 	"github.com/YuanZhe-99/WSLPilot/internal/compose"
@@ -40,40 +40,164 @@ func (k *Core) FindProject(name string) (*compose.Project, error) {
 	return nil, fmt.Errorf("no Compose project named %s", name)
 }
 
-// backupProject stores a project's files as one item and each of its
-// native named volumes as another, all with the same plan tag.
-// Returns: the files item; volume failures are joined into the error.
+// ProjectData is what a Compose project keeps its data in: the files,
+// the bind folders and the named volumes a backup of it holds, and what
+// each service mounts (doc/en-us/backups.md, "Compose project backups").
+type ProjectData struct {
+	WorkingDir string
+	Files      map[string]string // name in the backup → Windows path
+	Folders    []backup.ProjectFolder
+	Volumes    []backup.ProjectVolume
+	// External volumes are used but not created by the project; a project
+	// backup leaves them out.
+	External []string
+	Services map[string]ServiceData
+}
+
+// ServiceData is what one service publishes and mounts.
+type ServiceData struct {
+	Ports  []string // "127.0.0.1:59884 → 3000"
+	Mounts []Mount
+}
+
+// Mount is one mount of a service.
+type Mount struct {
+	Kind     string // MountFolder, MountVolume or "tmpfs"
+	Source   string // Windows path or volume name
+	Display  string // "./vc-data" inside the project folder, else Source
+	Target   string
+	ReadOnly bool
+}
+
+// Mount kinds.
+const (
+	MountFolder = "folder"
+	MountVolume = "volume"
+)
+
+// ProjectData reads a project's Compose files and lists its data.
+func (k *Core) ProjectData(ctx context.Context, p *compose.Project) (ProjectData, error) {
+	d := ProjectData{WorkingDir: projectDir(p), Files: map[string]string{}, Services: map[string]ServiceData{}}
+	for _, f := range append(append([]string{}, p.Files...), p.EnvFiles...) {
+		d.Files[filepath.Base(f)] = f
+	}
+	if env := filepath.Join(d.WorkingDir, ".env"); len(p.EnvFiles) == 0 && fileExists(env) {
+		d.Files[".env"] = env
+	}
+	loaded, err := compose.Load(ctx, p)
+	if err != nil {
+		return d, err
+	}
+	plan, _ := compose.Translate(loaded, p)
+	folders := map[string]int{} // lower-case path → index
+	ids := map[string]bool{}
+	vols := map[string]int{}
+	for _, v := range plan.Volumes {
+		switch {
+		case v.External:
+			d.External = append(d.External, v.Name)
+		case v.Bind == "":
+			vols[v.Name] = len(d.Volumes)
+			d.Volumes = append(d.Volumes, backup.ProjectVolume{Key: v.Key, Name: v.Name})
+		}
+	}
+	for _, s := range plan.Services {
+		sd := ServiceData{}
+		if len(s.Containers) > 0 {
+			spec := s.Containers[0].Spec
+			for _, pb := range spec.Ports {
+				host := pb.HostPort
+				if pb.HostIP != "" {
+					host = pb.HostIP + ":" + host
+				}
+				port := host + " → " + pb.ContainerPort
+				if pb.Protocol == "udp" {
+					port += "/udp"
+				}
+				sd.Ports = append(sd.Ports, port)
+			}
+			for _, m := range spec.Mounts {
+				mt := Mount{Kind: m.Type, Source: m.Source, Display: m.Source, Target: m.Target, ReadOnly: m.ReadOnly}
+				switch m.Type {
+				case "bind":
+					mt.Kind = MountFolder
+					rel := relativeTo(d.WorkingDir, m.Source)
+					if rel != "" {
+						mt.Display = "./" + rel
+					}
+					key := strings.ToLower(filepath.Clean(m.Source))
+					i, ok := folders[key]
+					if !ok {
+						st, serr := os.Stat(m.Source)
+						i = len(d.Folders)
+						folders[key] = i
+						d.Folders = append(d.Folders, backup.ProjectFolder{ID: backup.FolderID(m.Source, ids), Source: m.Source,
+							Relative: rel, File: serr == nil && !st.IsDir()})
+					}
+					d.Folders[i].Services = appendOnce(d.Folders[i].Services, s.Name)
+				case "volume":
+					mt.Kind = MountVolume
+					if i, ok := vols[m.Source]; ok {
+						d.Volumes[i].Services = appendOnce(d.Volumes[i].Services, s.Name)
+					}
+				}
+				sd.Mounts = append(sd.Mounts, mt)
+			}
+		}
+		d.Services[s.Name] = sd
+	}
+	return d, nil
+}
+
+// relativeTo returns p relative to dir with slashes, or "" when p is not
+// inside dir.
+func relativeTo(dir, p string) string {
+	if dir == "" {
+		return ""
+	}
+	rel, err := filepath.Rel(dir, p)
+	if err != nil || !filepath.IsLocal(rel) {
+		return ""
+	}
+	return filepath.ToSlash(rel)
+}
+
+func appendOnce(s []string, v string) []string {
+	for _, x := range s {
+		if x == v {
+			return s
+		}
+	}
+	return append(s, v)
+}
+
+// backupProject stores a project as one item: its files, bind folders and
+// named volumes (layout version 2). Running containers are stopped first
+// unless the backup is live, and only those are started again.
 func (k *Core) backupProject(ctx context.Context, name string, w backup.Writer, o backup.Options) (backup.Item, error) {
 	p, err := k.FindProject(name)
 	if err != nil {
 		return backup.Item{}, err
 	}
-	files := map[string]string{}
-	for _, f := range append(append([]string{}, p.Files...), p.EnvFiles...) {
-		files[filepath.Base(f)] = f
-	}
-	if env := filepath.Join(projectDir(p), ".env"); len(p.EnvFiles) == 0 && fileExists(env) {
-		files[".env"] = env
-	}
-	it, err := k.Backup.BackupFiles(ctx, backup.Source{Kind: backup.SourceCompose, Name: p.Name}, files, w, o)
+	d, err := k.ProjectData(ctx, p)
 	if err != nil {
-		return it, err
+		return backup.Item{}, err
 	}
-	loaded, err := compose.Load(ctx, p)
-	if err != nil {
-		return it, err
-	}
-	plan, _ := compose.Translate(loaded, p)
-	var errs []error
-	for _, v := range plan.Volumes {
-		if v.Bind != "" || v.External {
-			continue
+	spec := backup.ProjectSpec{Name: p.Name, WorkingDir: d.WorkingDir, Files: d.Files, Folders: d.Folders, Volumes: d.Volumes, External: d.External}
+	if b, berr := k.Compose.For(p); berr == nil {
+		var running []string
+		if ps, perr := b.Ps(ctx, p); perr == nil {
+			for _, c := range ps {
+				if c.State == "running" {
+					running = appendOnce(running, c.Service)
+				}
+			}
 		}
-		if _, err := k.Backup.BackupVolume(ctx, v.Name, w, o); err != nil {
-			errs = append(errs, fmt.Errorf("volume %s: %w", v.Name, err))
-		}
+		spec.Running = len(running) > 0
+		spec.Stop = func(ctx context.Context) error { return b.Stop(ctx, p, nil, nil) }
+		spec.Start = func(ctx context.Context) { b.Start(ctx, p, running, nil) }
 	}
-	return it, errors.Join(errs...)
+	return k.Backup.BackupProject(ctx, spec, w, o)
 }
 
 // autostart brings up every project marked autostart, with its own backend.

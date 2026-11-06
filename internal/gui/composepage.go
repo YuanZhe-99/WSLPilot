@@ -5,7 +5,6 @@ import (
 	"maps"
 	"path/filepath"
 	"regexp"
-	"sort"
 	"strings"
 
 	"github.com/egoist/mygo/ui"
@@ -13,6 +12,7 @@ import (
 
 	"github.com/YuanZhe-99/WSLPilot/internal/compose"
 	"github.com/YuanZhe-99/WSLPilot/internal/configdoc"
+	"github.com/YuanZhe-99/WSLPilot/internal/core"
 	"github.com/YuanZhe-99/WSLPilot/internal/jobs"
 	L "github.com/YuanZhe-99/WSLPilot/locales"
 )
@@ -24,12 +24,13 @@ type composePage struct {
 	projects        []*compose.Project
 	ps              map[string][]compose.ContainerStatus
 	reports         map[string]*compose.Report
-	volKeys         map[string][]string // project ID → named volume keys
-	volMode         map[string]*string  // "id NUL key" → native | bind
-	volPath         map[string]*string
-	pl, svc         ui.ListState
-	sel             int // the open project (-1: the list)
-	showLogs        bool
+	// data is what each project mounts and backs up (nil while loading);
+	// fsize the measured size of each bind folder (-1 while measuring).
+	data     map[string]*core.ProjectData
+	fsize    map[string]int64
+	pl, svc  ui.ListState
+	sel      int // the open project (-1: the list)
+	showLogs bool
 
 	fileFor  string
 	file     *editor.State
@@ -49,6 +50,9 @@ type composePage struct {
 type composeInput struct {
 	file, name    string
 	removeVolumes bool
+	live          bool   // backup: leave running services running
+	key, mode     string // storage: the named volume and native | bind
+	path          string
 }
 
 var composeNameRe = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]*$`)
@@ -79,15 +83,6 @@ func (a *App) validate(pr *compose.Project) {
 		if err == nil {
 			r, err = b.Validate(ctx, pr)
 		}
-		var keys []string
-		if loaded, lerr := compose.Load(ctx, pr); lerr == nil {
-			for k, v := range loaded.Volumes {
-				if !bool(v.External) {
-					keys = append(keys, k)
-				}
-			}
-			sort.Strings(keys)
-		}
 		return func() {
 			if a.cmp.reports == nil {
 				a.cmp.reports = map[string]*compose.Report{}
@@ -96,10 +91,6 @@ func (a *App) validate(pr *compose.Project) {
 				r = compose.Report{Errors: []compose.Issue{{Message: friendlyError(err)}}}
 			}
 			a.cmp.reports[pr.ID] = &r
-			if a.cmp.volKeys == nil {
-				a.cmp.volKeys = map[string][]string{}
-			}
-			a.cmp.volKeys[pr.ID] = keys
 		}
 	})
 }
@@ -203,6 +194,15 @@ func (a *App) composeDialogs(c *ui.Context) {
 						}
 					})
 				})
+			case "backup":
+				pr := p.projects[p.sel]
+				running := false
+				for _, s := range p.ps[pr.ID] {
+					running = running || s.State == "running"
+				}
+				a.backupDialog(c, pr, running)
+			case "store":
+				a.storeDialog(c, p.projects[p.sel])
 			case "down":
 				pr := p.projects[p.sel]
 				ui.Text(c, L.CmpDownTitle(pr.Name)).FontSize(16).Bold()
@@ -236,74 +236,6 @@ func defaultProjectName(file string) string {
 		}
 	}
 	return strings.Trim(b.String(), "-_")
-}
-
-// projectVolumes chooses, per named volume, a WSLc volume or a Windows
-// folder (bind mount).
-func (a *App) projectVolumes(c *ui.Context, pr *compose.Project) {
-	p := &a.cmp
-	keys := p.volKeys[pr.ID]
-	if len(keys) == 0 {
-		return
-	}
-	if p.volMode == nil {
-		p.volMode, p.volPath = map[string]*string{}, map[string]*string{}
-	}
-	card(c, L.CmpVolumes(), func() {
-		muted(c, L.CmpVolumesHelp())
-		changed := false
-		for _, key := range keys {
-			id := pr.ID + "\x00" + key
-			if p.volMode[id] == nil {
-				ch := pr.Volumes[key]
-				mode, path := ch.Mode, ch.Path
-				if mode == "" {
-					mode = "native"
-				}
-				p.volMode[id], p.volPath[id] = &mode, &path
-			}
-			mode, path := p.volMode[id], p.volPath[id]
-			cur := pr.Volumes[key]
-			if (cur.Mode == "" && *mode != "native") || (cur.Mode != "" && cur.Mode != *mode) || cur.Path != *path {
-				changed = true
-			}
-			ui.Row(c.Key(id)).FillWidth().Gap(smallGap).AlignItems(ui.Center).Children(func() {
-				ui.Text(c, key).Width(140)
-				ui.Select(c, mode, []string{"native", "bind"}).Label(key)
-				if *mode == "bind" {
-					ui.TextInput(c, path).Placeholder(`C:\data\` + key).Label(key).Grow(1)
-				}
-			})
-		}
-		if changed {
-			ui.Text(c, L.CmpVolumesWarning()).TextColor(c.Theme().Warning)
-			ui.PrimaryButton(c, L.Save()).OnClick(func() {
-				if pr.Volumes == nil {
-					pr.Volumes = map[string]compose.VolumeChoice{}
-				}
-				for _, key := range keys {
-					id := pr.ID + "\x00" + key
-					if *p.volMode[id] == "native" {
-						delete(pr.Volumes, key)
-					} else {
-						pr.Volumes[key] = compose.VolumeChoice{Mode: "bind", Path: strings.TrimSpace(*p.volPath[id])}
-					}
-				}
-				proj := snapshotProject(pr)
-				a.async(func(ctx context.Context) func() {
-					err := a.k.Projects.Save(proj)
-					return func() {
-						if err != nil {
-							a.notify(friendlyError(err), true)
-							return
-						}
-						delete(a.cmp.reports, proj.ID)
-						a.notify(L.CfgSaved(), false)
-					}
-				})
-			})
-		}
-	})
 }
 
 // snapshotProject copies a project for saving on a goroutine while the

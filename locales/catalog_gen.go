@@ -3192,31 +3192,31 @@ func (msgs Messages) CmpUp() string {
 	return Catalog.Format(msgs.locale, "CmpUp", nil)
 }
 
-// CmpDown says "Down…"
+// CmpDown says "Remove containers…"
 // in the language the app shows.
 func CmpDown() string { return In(i18n.Locale()).CmpDown() }
 
-// CmpDown says "Down…"
+// CmpDown says "Remove containers…"
 // in the language of msgs.
 func (msgs Messages) CmpDown() string {
 	return Catalog.Format(msgs.locale, "CmpDown", nil)
 }
 
-// CmpDownTitle says "Take {name} down?"
+// CmpDownTitle says "Remove the containers of {name}?"
 // in the language the app shows.
 func CmpDownTitle(name string) string { return In(i18n.Locale()).CmpDownTitle(name) }
 
-// CmpDownTitle says "Take {name} down?"
+// CmpDownTitle says "Remove the containers of {name}?"
 // in the language of msgs.
 func (msgs Messages) CmpDownTitle(name string) string {
 	return Catalog.Format(msgs.locale, "CmpDownTitle", map[string]any{"name": name})
 }
 
-// CmpDownMessage says "The project's containers and networks are removed. Volumes are kept unless you choose otherwise."
+// CmpDownMessage says "The project's containers and networks are removed (compose down). Its files, folders and volumes are kept unless you …"
 // in the language the app shows.
 func CmpDownMessage() string { return In(i18n.Locale()).CmpDownMessage() }
 
-// CmpDownMessage says "The project's containers and networks are removed. Volumes are kept unless you choose otherwise."
+// CmpDownMessage says "The project's containers and networks are removed (compose down). Its files, folders and volumes are kept unless you …"
 // in the language of msgs.
 func (msgs Messages) CmpDownMessage() string {
 	return Catalog.Format(msgs.locale, "CmpDownMessage", nil)
@@ -3262,11 +3262,11 @@ func (msgs Messages) CmpAutostartHelp() string {
 	return Catalog.Format(msgs.locale, "CmpAutostartHelp", nil)
 }
 
-// CmpValid says "The project is valid for this backend."
+// CmpValid says "No problems found: the project can run on this backend."
 // in the language the app shows.
 func CmpValid() string { return In(i18n.Locale()).CmpValid() }
 
-// CmpValid says "The project is valid for this backend."
+// CmpValid says "No problems found: the project can run on this backend."
 // in the language of msgs.
 func (msgs Messages) CmpValid() string {
 	return Catalog.Format(msgs.locale, "CmpValid", nil)
@@ -3322,31 +3322,31 @@ func (msgs Messages) CmpNotUp() string {
 	return Catalog.Format(msgs.locale, "CmpNotUp", nil)
 }
 
-// CmpRemove says "Forget project…"
+// CmpRemove says "Remove from WSLPilot…"
 // in the language the app shows.
 func CmpRemove() string { return In(i18n.Locale()).CmpRemove() }
 
-// CmpRemove says "Forget project…"
+// CmpRemove says "Remove from WSLPilot…"
 // in the language of msgs.
 func (msgs Messages) CmpRemove() string {
 	return Catalog.Format(msgs.locale, "CmpRemove", nil)
 }
 
-// CmpRemoveTitle says "Forget {name}?"
+// CmpRemoveTitle says "Remove {name} from WSLPilot?"
 // in the language the app shows.
 func CmpRemoveTitle(name string) string { return In(i18n.Locale()).CmpRemoveTitle(name) }
 
-// CmpRemoveTitle says "Forget {name}?"
+// CmpRemoveTitle says "Remove {name} from WSLPilot?"
 // in the language of msgs.
 func (msgs Messages) CmpRemoveTitle(name string) string {
 	return Catalog.Format(msgs.locale, "CmpRemoveTitle", map[string]any{"name": name})
 }
 
-// CmpRemoveMessage says "WSLPilot forgets the project. Its files, containers and volumes are not touched."
+// CmpRemoveMessage says "WSLPilot stops managing this project. Its files, containers and volumes are not touched."
 // in the language the app shows.
 func CmpRemoveMessage() string { return In(i18n.Locale()).CmpRemoveMessage() }
 
-// CmpRemoveMessage says "WSLPilot forgets the project. Its files, containers and volumes are not touched."
+// CmpRemoveMessage says "WSLPilot stops managing this project. Its files, containers and volumes are not touched."
 // in the language of msgs.
 func (msgs Messages) CmpRemoveMessage() string {
 	return Catalog.Format(msgs.locale, "CmpRemoveMessage", nil)
@@ -3822,16 +3822,6 @@ func (msgs Messages) BkRestoreOverMessage() string {
 	return Catalog.Format(msgs.locale, "BkRestoreOverMessage", nil)
 }
 
-// BkExtractFiles says "Extract project files…"
-// in the language the app shows.
-func BkExtractFiles() string { return In(i18n.Locale()).BkExtractFiles() }
-
-// BkExtractFiles says "Extract project files…"
-// in the language of msgs.
-func (msgs Messages) BkExtractFiles() string {
-	return Catalog.Format(msgs.locale, "BkExtractFiles", nil)
-}
-
 // BkDeleteTitle says "Delete this backup?"
 // in the language the app shows.
 func BkDeleteTitle() string { return In(i18n.Locale()).BkDeleteTitle() }
@@ -3972,23 +3962,23 @@ func (msgs Messages) BkRetention() string {
 	return Catalog.Format(msgs.locale, "BkRetention", nil)
 }
 
-// BkRetentionText says "last {last}, daily {daily}, weekly {weekly}, monthly {monthly}"
+// BkRetentionText says "latest {last}, one a day for {daily} days, one a week for {weekly} weeks, one a month for {monthly} months"
 // in the language the app shows.
 func BkRetentionText(last int, daily int, weekly int, monthly int) string {
 	return In(i18n.Locale()).BkRetentionText(last, daily, weekly, monthly)
 }
 
-// BkRetentionText says "last {last}, daily {daily}, weekly {weekly}, monthly {monthly}"
+// BkRetentionText says "latest {last}, one a day for {daily} days, one a week for {weekly} weeks, one a month for {monthly} months"
 // in the language of msgs.
 func (msgs Messages) BkRetentionText(last int, daily int, weekly int, monthly int) string {
 	return Catalog.Format(msgs.locale, "BkRetentionText", map[string]any{"last": last, "daily": daily, "weekly": weekly, "monthly": monthly})
 }
 
-// BkConsistency says "Running sources"
+// BkConsistency says "While running"
 // in the language the app shows.
 func BkConsistency() string { return In(i18n.Locale()).BkConsistency() }
 
-// BkConsistency says "Running sources"
+// BkConsistency says "While running"
 // in the language of msgs.
 func (msgs Messages) BkConsistency() string {
 	return Catalog.Format(msgs.locale, "BkConsistency", nil)
@@ -4124,11 +4114,11 @@ func (msgs Messages) BkCompression() string {
 	return Catalog.Format(msgs.locale, "BkCompression", nil)
 }
 
-// BkAt says "Time (HH:MM)"
+// BkAt says "Time"
 // in the language the app shows.
 func BkAt() string { return In(i18n.Locale()).BkAt() }
 
-// BkAt says "Time (HH:MM)"
+// BkAt says "Time"
 // in the language of msgs.
 func (msgs Messages) BkAt() string {
 	return Catalog.Format(msgs.locale, "BkAt", nil)
@@ -4144,51 +4134,51 @@ func (msgs Messages) BkWeekday() string {
 	return Catalog.Format(msgs.locale, "BkWeekday", nil)
 }
 
-// BkDay says "Day of the month (1–28)"
+// BkDay says "Day of the month"
 // in the language the app shows.
 func BkDay() string { return In(i18n.Locale()).BkDay() }
 
-// BkDay says "Day of the month (1–28)"
+// BkDay says "Day of the month"
 // in the language of msgs.
 func (msgs Messages) BkDay() string {
 	return Catalog.Format(msgs.locale, "BkDay", nil)
 }
 
-// BkKeepLast says "Most recent"
+// BkKeepLast says "Latest backups"
 // in the language the app shows.
 func BkKeepLast() string { return In(i18n.Locale()).BkKeepLast() }
 
-// BkKeepLast says "Most recent"
+// BkKeepLast says "Latest backups"
 // in the language of msgs.
 func (msgs Messages) BkKeepLast() string {
 	return Catalog.Format(msgs.locale, "BkKeepLast", nil)
 }
 
-// BkKeepDaily says "Daily"
+// BkKeepDaily says "Days, one backup each"
 // in the language the app shows.
 func BkKeepDaily() string { return In(i18n.Locale()).BkKeepDaily() }
 
-// BkKeepDaily says "Daily"
+// BkKeepDaily says "Days, one backup each"
 // in the language of msgs.
 func (msgs Messages) BkKeepDaily() string {
 	return Catalog.Format(msgs.locale, "BkKeepDaily", nil)
 }
 
-// BkKeepWeekly says "Weekly"
+// BkKeepWeekly says "Weeks, one backup each"
 // in the language the app shows.
 func BkKeepWeekly() string { return In(i18n.Locale()).BkKeepWeekly() }
 
-// BkKeepWeekly says "Weekly"
+// BkKeepWeekly says "Weeks, one backup each"
 // in the language of msgs.
 func (msgs Messages) BkKeepWeekly() string {
 	return Catalog.Format(msgs.locale, "BkKeepWeekly", nil)
 }
 
-// BkKeepMonthly says "Monthly"
+// BkKeepMonthly says "Months, one backup each"
 // in the language the app shows.
 func BkKeepMonthly() string { return In(i18n.Locale()).BkKeepMonthly() }
 
-// BkKeepMonthly says "Monthly"
+// BkKeepMonthly says "Months, one backup each"
 // in the language of msgs.
 func (msgs Messages) BkKeepMonthly() string {
 	return Catalog.Format(msgs.locale, "BkKeepMonthly", nil)
@@ -4644,26 +4634,6 @@ func WSLUpdatePackages() string { return In(i18n.Locale()).WSLUpdatePackages() }
 // in the language of msgs.
 func (msgs Messages) WSLUpdatePackages() string {
 	return Catalog.Format(msgs.locale, "WSLUpdatePackages", nil)
-}
-
-// CmpVolumes says "Volumes"
-// in the language the app shows.
-func CmpVolumes() string { return In(i18n.Locale()).CmpVolumes() }
-
-// CmpVolumes says "Volumes"
-// in the language of msgs.
-func (msgs Messages) CmpVolumes() string {
-	return Catalog.Format(msgs.locale, "CmpVolumes", nil)
-}
-
-// CmpVolumesHelp says "native keeps data in a WSL Containers volume; bind uses a Windows folder instead."
-// in the language the app shows.
-func CmpVolumesHelp() string { return In(i18n.Locale()).CmpVolumesHelp() }
-
-// CmpVolumesHelp says "native keeps data in a WSL Containers volume; bind uses a Windows folder instead."
-// in the language of msgs.
-func (msgs Messages) CmpVolumesHelp() string {
-	return Catalog.Format(msgs.locale, "CmpVolumesHelp", nil)
 }
 
 // CmpVolumesWarning says "Existing data is not moved between a volume and a folder. Back the volume up first if it holds data."
@@ -6308,16 +6278,6 @@ func (msgs Messages) CmpBackendIs(backend string) string {
 	return Catalog.Format(msgs.locale, "CmpBackendIs", map[string]any{"backend": backend})
 }
 
-// CmpProjects says "Projects"
-// in the language the app shows.
-func CmpProjects() string { return In(i18n.Locale()).CmpProjects() }
-
-// CmpProjects says "Projects"
-// in the language of msgs.
-func (msgs Messages) CmpProjects() string {
-	return Catalog.Format(msgs.locale, "CmpProjects", nil)
-}
-
 // CmpRunningOf says "{running} of {count} running"
 // in the language the app shows.
 func CmpRunningOf(running int, count int) string {
@@ -6350,11 +6310,11 @@ func (msgs Messages) CmpCombinedLogs() string {
 	return Catalog.Format(msgs.locale, "CmpCombinedLogs", nil)
 }
 
-// CmpBackUp says "Back up…"
+// CmpBackUp says "Back up project…"
 // in the language the app shows.
 func CmpBackUp() string { return In(i18n.Locale()).CmpBackUp() }
 
-// CmpBackUp says "Back up…"
+// CmpBackUp says "Back up project…"
 // in the language of msgs.
 func (msgs Messages) CmpBackUp() string {
 	return Catalog.Format(msgs.locale, "CmpBackUp", nil)
@@ -6410,41 +6370,21 @@ func (msgs Messages) CmpWarning() string {
 	return Catalog.Format(msgs.locale, "CmpWarning", nil)
 }
 
-// CmpOK says "No problems found"
-// in the language the app shows.
-func CmpOK() string { return In(i18n.Locale()).CmpOK() }
-
-// CmpOK says "No problems found"
-// in the language of msgs.
-func (msgs Messages) CmpOK() string {
-	return Catalog.Format(msgs.locale, "CmpOK", nil)
-}
-
-// CmpInfo says "Note"
-// in the language the app shows.
-func CmpInfo() string { return In(i18n.Locale()).CmpInfo() }
-
-// CmpInfo says "Note"
-// in the language of msgs.
-func (msgs Messages) CmpInfo() string {
-	return Catalog.Format(msgs.locale, "CmpInfo", nil)
-}
-
-// CmpNativeNo says "Not supported by the native backend"
+// CmpNativeNo says "This WSL has no native compose command yet, so the project runs on the builtin backend."
 // in the language the app shows.
 func CmpNativeNo() string { return In(i18n.Locale()).CmpNativeNo() }
 
-// CmpNativeNo says "Not supported by the native backend"
+// CmpNativeNo says "This WSL has no native compose command yet, so the project runs on the builtin backend."
 // in the language of msgs.
 func (msgs Messages) CmpNativeNo() string {
 	return Catalog.Format(msgs.locale, "CmpNativeNo", nil)
 }
 
-// CmpNativeYes says "Supported by the native backend"
+// CmpNativeYes says "This WSL has a native compose command. The project stays on its backend until you migrate it."
 // in the language the app shows.
 func CmpNativeYes() string { return In(i18n.Locale()).CmpNativeYes() }
 
-// CmpNativeYes says "Supported by the native backend"
+// CmpNativeYes says "This WSL has a native compose command. The project stays on its backend until you migrate it."
 // in the language of msgs.
 func (msgs Messages) CmpNativeYes() string {
 	return Catalog.Format(msgs.locale, "CmpNativeYes", nil)
@@ -6874,4 +6814,654 @@ func DashOnDisk() string { return In(i18n.Locale()).DashOnDisk() }
 // in the language of msgs.
 func (msgs Messages) DashOnDisk() string {
 	return Catalog.Format(msgs.locale, "DashOnDisk", nil)
+}
+
+// CmpUpStart says "Start"
+// in the language the app shows.
+func CmpUpStart() string { return In(i18n.Locale()).CmpUpStart() }
+
+// CmpUpStart says "Start"
+// in the language of msgs.
+func (msgs Messages) CmpUpStart() string {
+	return Catalog.Format(msgs.locale, "CmpUpStart", nil)
+}
+
+// CmpApplyHelp says "Creates or updates the containers to match the Compose file (compose up)."
+// in the language the app shows.
+func CmpApplyHelp() string { return In(i18n.Locale()).CmpApplyHelp() }
+
+// CmpApplyHelp says "Creates or updates the containers to match the Compose file (compose up)."
+// in the language of msgs.
+func (msgs Messages) CmpApplyHelp() string {
+	return Catalog.Format(msgs.locale, "CmpApplyHelp", nil)
+}
+
+// CmpUsage says "CPU {cpu} · memory {memory}"
+// in the language the app shows.
+func CmpUsage(cpu string, memory string) string { return In(i18n.Locale()).CmpUsage(cpu, memory) }
+
+// CmpUsage says "CPU {cpu} · memory {memory}"
+// in the language of msgs.
+func (msgs Messages) CmpUsage(cpu string, memory string) string {
+	return Catalog.Format(msgs.locale, "CmpUsage", map[string]any{"cpu": cpu, "memory": memory})
+}
+
+// CmpContainer says "Container {name}"
+// in the language the app shows.
+func CmpContainer(name string) string { return In(i18n.Locale()).CmpContainer(name) }
+
+// CmpContainer says "Container {name}"
+// in the language of msgs.
+func (msgs Messages) CmpContainer(name string) string {
+	return Catalog.Format(msgs.locale, "CmpContainer", map[string]any{"name": name})
+}
+
+// CmpData says "Data"
+// in the language the app shows.
+func CmpData() string { return In(i18n.Locale()).CmpData() }
+
+// CmpData says "Data"
+// in the language of msgs.
+func (msgs Messages) CmpData() string {
+	return Catalog.Format(msgs.locale, "CmpData", nil)
+}
+
+// CmpDataHelp says "Where this project keeps its data. Backing up the project includes all of it except external volumes."
+// in the language the app shows.
+func CmpDataHelp() string { return In(i18n.Locale()).CmpDataHelp() }
+
+// CmpDataHelp says "Where this project keeps its data. Backing up the project includes all of it except external volumes."
+// in the language of msgs.
+func (msgs Messages) CmpDataHelp() string {
+	return Catalog.Format(msgs.locale, "CmpDataHelp", nil)
+}
+
+// CmpBackUpTitle says "Back up {name}"
+// in the language the app shows.
+func CmpBackUpTitle(name string) string { return In(i18n.Locale()).CmpBackUpTitle(name) }
+
+// CmpBackUpTitle says "Back up {name}"
+// in the language of msgs.
+func (msgs Messages) CmpBackUpTitle(name string) string {
+	return Catalog.Format(msgs.locale, "CmpBackUpTitle", map[string]any{"name": name})
+}
+
+// CmpBackUpIncludes says "The backup includes:"
+// in the language the app shows.
+func CmpBackUpIncludes() string { return In(i18n.Locale()).CmpBackUpIncludes() }
+
+// CmpBackUpIncludes says "The backup includes:"
+// in the language of msgs.
+func (msgs Messages) CmpBackUpIncludes() string {
+	return Catalog.Format(msgs.locale, "CmpBackUpIncludes", nil)
+}
+
+// CmpBackUpFiles says "Compose files: {files}"
+// in the language the app shows.
+func CmpBackUpFiles(files string) string { return In(i18n.Locale()).CmpBackUpFiles(files) }
+
+// CmpBackUpFiles says "Compose files: {files}"
+// in the language of msgs.
+func (msgs Messages) CmpBackUpFiles(files string) string {
+	return Catalog.Format(msgs.locale, "CmpBackUpFiles", map[string]any{"files": files})
+}
+
+// CmpBackUpExternal says "External volumes are not part of the project backup: {names}. Back them up on their own."
+// in the language the app shows.
+func CmpBackUpExternal(names string) string { return In(i18n.Locale()).CmpBackUpExternal(names) }
+
+// CmpBackUpExternal says "External volumes are not part of the project backup: {names}. Back them up on their own."
+// in the language of msgs.
+func (msgs Messages) CmpBackUpExternal(names string) string {
+	return Catalog.Format(msgs.locale, "CmpBackUpExternal", map[string]any{"names": names})
+}
+
+// CmpBackUpTo says "Saved to {path}"
+// in the language the app shows.
+func CmpBackUpTo(path string) string { return In(i18n.Locale()).CmpBackUpTo(path) }
+
+// CmpBackUpTo says "Saved to {path}"
+// in the language of msgs.
+func (msgs Messages) CmpBackUpTo(path string) string {
+	return Catalog.Format(msgs.locale, "CmpBackUpTo", map[string]any{"path": path})
+}
+
+// CmpBackUpLive says "Back up while running"
+// in the language the app shows.
+func CmpBackUpLive() string { return In(i18n.Locale()).CmpBackUpLive() }
+
+// CmpBackUpLive says "Back up while running"
+// in the language of msgs.
+func (msgs Messages) CmpBackUpLive() string {
+	return Catalog.Format(msgs.locale, "CmpBackUpLive", nil)
+}
+
+// CmpBackUpLiveHelp says "By default the running services stop during the backup and start again afterwards. A copy taken while running may be …"
+// in the language the app shows.
+func CmpBackUpLiveHelp() string { return In(i18n.Locale()).CmpBackUpLiveHelp() }
+
+// CmpBackUpLiveHelp says "By default the running services stop during the backup and start again afterwards. A copy taken while running may be …"
+// in the language of msgs.
+func (msgs Messages) CmpBackUpLiveHelp() string {
+	return Catalog.Format(msgs.locale, "CmpBackUpLiveHelp", nil)
+}
+
+// CmpBackUpStart says "Back up"
+// in the language the app shows.
+func CmpBackUpStart() string { return In(i18n.Locale()).CmpBackUpStart() }
+
+// CmpBackUpStart says "Back up"
+// in the language of msgs.
+func (msgs Messages) CmpBackUpStart() string {
+	return Catalog.Format(msgs.locale, "CmpBackUpStart", nil)
+}
+
+// DataVolume says "Volume"
+// in the language the app shows.
+func DataVolume() string { return In(i18n.Locale()).DataVolume() }
+
+// DataVolume says "Volume"
+// in the language of msgs.
+func (msgs Messages) DataVolume() string {
+	return Catalog.Format(msgs.locale, "DataVolume", nil)
+}
+
+// DataFolder says "Folder"
+// in the language the app shows.
+func DataFolder() string { return In(i18n.Locale()).DataFolder() }
+
+// DataFolder says "Folder"
+// in the language of msgs.
+func (msgs Messages) DataFolder() string {
+	return Catalog.Format(msgs.locale, "DataFolder", nil)
+}
+
+// DataExternal says "External volume: not created by this project, not in its backup"
+// in the language the app shows.
+func DataExternal() string { return In(i18n.Locale()).DataExternal() }
+
+// DataExternal says "External volume: not created by this project, not in its backup"
+// in the language of msgs.
+func (msgs Messages) DataExternal() string {
+	return Catalog.Format(msgs.locale, "DataExternal", nil)
+}
+
+// DataUsedBy says "Used by {services}"
+// in the language the app shows.
+func DataUsedBy(services string) string { return In(i18n.Locale()).DataUsedBy(services) }
+
+// DataUsedBy says "Used by {services}"
+// in the language of msgs.
+func (msgs Messages) DataUsedBy(services string) string {
+	return Catalog.Format(msgs.locale, "DataUsedBy", map[string]any{"services": services})
+}
+
+// DataUnused says "Not used by any service"
+// in the language the app shows.
+func DataUnused() string { return In(i18n.Locale()).DataUnused() }
+
+// DataUnused says "Not used by any service"
+// in the language of msgs.
+func (msgs Messages) DataUnused() string {
+	return Catalog.Format(msgs.locale, "DataUnused", nil)
+}
+
+// DataOpenVolume says "Open in Volumes"
+// in the language the app shows.
+func DataOpenVolume() string { return In(i18n.Locale()).DataOpenVolume() }
+
+// DataOpenVolume says "Open in Volumes"
+// in the language of msgs.
+func (msgs Messages) DataOpenVolume() string {
+	return Catalog.Format(msgs.locale, "DataOpenVolume", nil)
+}
+
+// DataStore says "Storage…"
+// in the language the app shows.
+func DataStore() string { return In(i18n.Locale()).DataStore() }
+
+// DataStore says "Storage…"
+// in the language of msgs.
+func (msgs Messages) DataStore() string {
+	return Catalog.Format(msgs.locale, "DataStore", nil)
+}
+
+// DataStoreTitle says "Where {key} keeps its data"
+// in the language the app shows.
+func DataStoreTitle(key string) string { return In(i18n.Locale()).DataStoreTitle(key) }
+
+// DataStoreTitle says "Where {key} keeps its data"
+// in the language of msgs.
+func (msgs Messages) DataStoreTitle(key string) string {
+	return Catalog.Format(msgs.locale, "DataStoreTitle", map[string]any{"key": key})
+}
+
+// DataStoreVolume says "In a WSL Containers volume"
+// in the language the app shows.
+func DataStoreVolume() string { return In(i18n.Locale()).DataStoreVolume() }
+
+// DataStoreVolume says "In a WSL Containers volume"
+// in the language of msgs.
+func (msgs Messages) DataStoreVolume() string {
+	return Catalog.Format(msgs.locale, "DataStoreVolume", nil)
+}
+
+// DataStoreFolder says "In a Windows folder"
+// in the language the app shows.
+func DataStoreFolder() string { return In(i18n.Locale()).DataStoreFolder() }
+
+// DataStoreFolder says "In a Windows folder"
+// in the language of msgs.
+func (msgs Messages) DataStoreFolder() string {
+	return Catalog.Format(msgs.locale, "DataStoreFolder", nil)
+}
+
+// DataNone says "This project keeps no data outside its containers."
+// in the language the app shows.
+func DataNone() string { return In(i18n.Locale()).DataNone() }
+
+// DataNone says "This project keeps no data outside its containers."
+// in the language of msgs.
+func (msgs Messages) DataNone() string {
+	return Catalog.Format(msgs.locale, "DataNone", nil)
+}
+
+// DataReadOnly says "read-only"
+// in the language the app shows.
+func DataReadOnly() string { return In(i18n.Locale()).DataReadOnly() }
+
+// DataReadOnly says "read-only"
+// in the language of msgs.
+func (msgs Messages) DataReadOnly() string {
+	return Catalog.Format(msgs.locale, "DataReadOnly", nil)
+}
+
+// VolProject says "Compose {name}"
+// in the language the app shows.
+func VolProject(name string) string { return In(i18n.Locale()).VolProject(name) }
+
+// VolProject says "Compose {name}"
+// in the language of msgs.
+func (msgs Messages) VolProject(name string) string {
+	return Catalog.Format(msgs.locale, "VolProject", map[string]any{"name": name})
+}
+
+// VolProjectStopped says "no running container"
+// in the language the app shows.
+func VolProjectStopped() string { return In(i18n.Locale()).VolProjectStopped() }
+
+// VolProjectStopped says "no running container"
+// in the language of msgs.
+func (msgs Messages) VolProjectStopped() string {
+	return Catalog.Format(msgs.locale, "VolProjectStopped", nil)
+}
+
+// VolProjectNotAdded says "project not added"
+// in the language the app shows.
+func VolProjectNotAdded() string { return In(i18n.Locale()).VolProjectNotAdded() }
+
+// VolProjectNotAdded says "project not added"
+// in the language of msgs.
+func (msgs Messages) VolProjectNotAdded() string {
+	return Catalog.Format(msgs.locale, "VolProjectNotAdded", nil)
+}
+
+// VolOfProject says "This volume belongs to the Compose project {name}. Backing up the project includes it, with the project's files and f…"
+// in the language the app shows.
+func VolOfProject(name string) string { return In(i18n.Locale()).VolOfProject(name) }
+
+// VolOfProject says "This volume belongs to the Compose project {name}. Backing up the project includes it, with the project's files and f…"
+// in the language of msgs.
+func (msgs Messages) VolOfProject(name string) string {
+	return Catalog.Format(msgs.locale, "VolOfProject", map[string]any{"name": name})
+}
+
+// BkRestoreProject says "Restore project…"
+// in the language the app shows.
+func BkRestoreProject() string { return In(i18n.Locale()).BkRestoreProject() }
+
+// BkRestoreProject says "Restore project…"
+// in the language of msgs.
+func (msgs Messages) BkRestoreProject() string {
+	return Catalog.Format(msgs.locale, "BkRestoreProject", nil)
+}
+
+// BkRestoreProjectHelp says "Files and folders go into the folder you choose; folders that were inside the project folder keep their place there, …"
+// in the language the app shows.
+func BkRestoreProjectHelp() string { return In(i18n.Locale()).BkRestoreProjectHelp() }
+
+// BkRestoreProjectHelp says "Files and folders go into the folder you choose; folders that were inside the project folder keep their place there, …"
+// in the language of msgs.
+func (msgs Messages) BkRestoreProjectHelp() string {
+	return Catalog.Format(msgs.locale, "BkRestoreProjectHelp", nil)
+}
+
+// BkFilesInto says "Files and folders into"
+// in the language the app shows.
+func BkFilesInto() string { return In(i18n.Locale()).BkFilesInto() }
+
+// BkFilesInto says "Files and folders into"
+// in the language of msgs.
+func (msgs Messages) BkFilesInto() string {
+	return Catalog.Format(msgs.locale, "BkFilesInto", nil)
+}
+
+// BkFilesIntoHelp says "An empty or new folder. Leave it empty to restore only volumes. Folders from outside the project folder go to outside…"
+// in the language the app shows.
+func BkFilesIntoHelp() string { return In(i18n.Locale()).BkFilesIntoHelp() }
+
+// BkFilesIntoHelp says "An empty or new folder. Leave it empty to restore only volumes. Folders from outside the project folder go to outside…"
+// in the language of msgs.
+func (msgs Messages) BkFilesIntoHelp() string {
+	return Catalog.Format(msgs.locale, "BkFilesIntoHelp", nil)
+}
+
+// BkRestoreVolumeNamed says "Restore volume {name}…"
+// in the language the app shows.
+func BkRestoreVolumeNamed(name string) string { return In(i18n.Locale()).BkRestoreVolumeNamed(name) }
+
+// BkRestoreVolumeNamed says "Restore volume {name}…"
+// in the language of msgs.
+func (msgs Messages) BkRestoreVolumeNamed(name string) string {
+	return Catalog.Format(msgs.locale, "BkRestoreVolumeNamed", map[string]any{"name": name})
+}
+
+// BkVolumeInto says "Into the volume"
+// in the language the app shows.
+func BkVolumeInto() string { return In(i18n.Locale()).BkVolumeInto() }
+
+// BkVolumeInto says "Into the volume"
+// in the language of msgs.
+func (msgs Messages) BkVolumeInto() string {
+	return Catalog.Format(msgs.locale, "BkVolumeInto", nil)
+}
+
+// BkVolumeExists says "A volume named {name} exists. It is backed up to Safety first, then emptied and replaced."
+// in the language the app shows.
+func BkVolumeExists(name string) string { return In(i18n.Locale()).BkVolumeExists(name) }
+
+// BkVolumeExists says "A volume named {name} exists. It is backed up to Safety first, then emptied and replaced."
+// in the language of msgs.
+func (msgs Messages) BkVolumeExists(name string) string {
+	return Catalog.Format(msgs.locale, "BkVolumeExists", map[string]any{"name": name})
+}
+
+// BkVolumeNotConfirmed says "replacing it was not confirmed"
+// in the language the app shows.
+func BkVolumeNotConfirmed() string { return In(i18n.Locale()).BkVolumeNotConfirmed() }
+
+// BkVolumeNotConfirmed says "replacing it was not confirmed"
+// in the language of msgs.
+func (msgs Messages) BkVolumeNotConfirmed() string {
+	return Catalog.Format(msgs.locale, "BkVolumeNotConfirmed", nil)
+}
+
+// BkRestoreFilesStep says "Writing files and folders"
+// in the language the app shows.
+func BkRestoreFilesStep() string { return In(i18n.Locale()).BkRestoreFilesStep() }
+
+// BkRestoreFilesStep says "Writing files and folders"
+// in the language of msgs.
+func (msgs Messages) BkRestoreFilesStep() string {
+	return Catalog.Format(msgs.locale, "BkRestoreFilesStep", nil)
+}
+
+// BkRestoreVolumeStep says "Restoring volume {name}"
+// in the language the app shows.
+func BkRestoreVolumeStep(name string) string { return In(i18n.Locale()).BkRestoreVolumeStep(name) }
+
+// BkRestoreVolumeStep says "Restoring volume {name}"
+// in the language of msgs.
+func (msgs Messages) BkRestoreVolumeStep(name string) string {
+	return Catalog.Format(msgs.locale, "BkRestoreVolumeStep", map[string]any{"name": name})
+}
+
+// BkProjectFiles says "Compose files"
+// in the language the app shows.
+func BkProjectFiles() string { return In(i18n.Locale()).BkProjectFiles() }
+
+// BkProjectFiles says "Compose files"
+// in the language of msgs.
+func (msgs Messages) BkProjectFiles() string {
+	return Catalog.Format(msgs.locale, "BkProjectFiles", nil)
+}
+
+// BkProjectVolumeLine says "Compose volume {key}"
+// in the language the app shows.
+func BkProjectVolumeLine(key string) string { return In(i18n.Locale()).BkProjectVolumeLine(key) }
+
+// BkProjectVolumeLine says "Compose volume {key}"
+// in the language of msgs.
+func (msgs Messages) BkProjectVolumeLine(key string) string {
+	return Catalog.Format(msgs.locale, "BkProjectVolumeLine", map[string]any{"key": key})
+}
+
+// BkProjectV1 says "Made by WSLPilot 0.1.1 or earlier: the project's files only. Its volumes were backed up as separate items."
+// in the language the app shows.
+func BkProjectV1() string { return In(i18n.Locale()).BkProjectV1() }
+
+// BkProjectV1 says "Made by WSLPilot 0.1.1 or earlier: the project's files only. Its volumes were backed up as separate items."
+// in the language of msgs.
+func (msgs Messages) BkProjectV1() string {
+	return Catalog.Format(msgs.locale, "BkProjectV1", nil)
+}
+
+// BkProjectExternal says "Not included (external volumes): {names}"
+// in the language the app shows.
+func BkProjectExternal(names string) string { return In(i18n.Locale()).BkProjectExternal(names) }
+
+// BkProjectExternal says "Not included (external volumes): {names}"
+// in the language of msgs.
+func (msgs Messages) BkProjectExternal(names string) string {
+	return Catalog.Format(msgs.locale, "BkProjectExternal", map[string]any{"names": names})
+}
+
+// BkInProject says "Also included in the backup of Compose {name}"
+// in the language the app shows.
+func BkInProject(name string) string { return In(i18n.Locale()).BkInProject(name) }
+
+// BkInProject says "Also included in the backup of Compose {name}"
+// in the language of msgs.
+func (msgs Messages) BkInProject(name string) string {
+	return Catalog.Format(msgs.locale, "BkInProject", map[string]any{"name": name})
+}
+
+// BkEveryHourly says "Every hour"
+// in the language the app shows.
+func BkEveryHourly() string { return In(i18n.Locale()).BkEveryHourly() }
+
+// BkEveryHourly says "Every hour"
+// in the language of msgs.
+func (msgs Messages) BkEveryHourly() string {
+	return Catalog.Format(msgs.locale, "BkEveryHourly", nil)
+}
+
+// BkEveryDaily says "Every day"
+// in the language the app shows.
+func BkEveryDaily() string { return In(i18n.Locale()).BkEveryDaily() }
+
+// BkEveryDaily says "Every day"
+// in the language of msgs.
+func (msgs Messages) BkEveryDaily() string {
+	return Catalog.Format(msgs.locale, "BkEveryDaily", nil)
+}
+
+// BkEveryWeekly says "Every week"
+// in the language the app shows.
+func BkEveryWeekly() string { return In(i18n.Locale()).BkEveryWeekly() }
+
+// BkEveryWeekly says "Every week"
+// in the language of msgs.
+func (msgs Messages) BkEveryWeekly() string {
+	return Catalog.Format(msgs.locale, "BkEveryWeekly", nil)
+}
+
+// BkEveryMonthly says "Every month"
+// in the language the app shows.
+func BkEveryMonthly() string { return In(i18n.Locale()).BkEveryMonthly() }
+
+// BkEveryMonthly says "Every month"
+// in the language of msgs.
+func (msgs Messages) BkEveryMonthly() string {
+	return Catalog.Format(msgs.locale, "BkEveryMonthly", nil)
+}
+
+// BkEveryManual says "Only when run by hand"
+// in the language the app shows.
+func BkEveryManual() string { return In(i18n.Locale()).BkEveryManual() }
+
+// BkEveryManual says "Only when run by hand"
+// in the language of msgs.
+func (msgs Messages) BkEveryManual() string {
+	return Catalog.Format(msgs.locale, "BkEveryManual", nil)
+}
+
+// BkAtMinute says "Minute of the hour"
+// in the language the app shows.
+func BkAtMinute() string { return In(i18n.Locale()).BkAtMinute() }
+
+// BkAtMinute says "Minute of the hour"
+// in the language of msgs.
+func (msgs Messages) BkAtMinute() string {
+	return Catalog.Format(msgs.locale, "BkAtMinute", nil)
+}
+
+// BkHour says "Hour"
+// in the language the app shows.
+func BkHour() string { return In(i18n.Locale()).BkHour() }
+
+// BkHour says "Hour"
+// in the language of msgs.
+func (msgs Messages) BkHour() string {
+	return Catalog.Format(msgs.locale, "BkHour", nil)
+}
+
+// BkMinute says "Minute"
+// in the language the app shows.
+func BkMinute() string { return In(i18n.Locale()).BkMinute() }
+
+// BkMinute says "Minute"
+// in the language of msgs.
+func (msgs Messages) BkMinute() string {
+	return Catalog.Format(msgs.locale, "BkMinute", nil)
+}
+
+// BkCompZstd says "Zstandard (smaller, fast)"
+// in the language the app shows.
+func BkCompZstd() string { return In(i18n.Locale()).BkCompZstd() }
+
+// BkCompZstd says "Zstandard (smaller, fast)"
+// in the language of msgs.
+func (msgs Messages) BkCompZstd() string {
+	return Catalog.Format(msgs.locale, "BkCompZstd", nil)
+}
+
+// BkCompGzip says "gzip (opens anywhere)"
+// in the language the app shows.
+func BkCompGzip() string { return In(i18n.Locale()).BkCompGzip() }
+
+// BkCompGzip says "gzip (opens anywhere)"
+// in the language of msgs.
+func (msgs Messages) BkCompGzip() string {
+	return Catalog.Format(msgs.locale, "BkCompGzip", nil)
+}
+
+// BkCompNone says "None"
+// in the language the app shows.
+func BkCompNone() string { return In(i18n.Locale()).BkCompNone() }
+
+// BkCompNone says "None"
+// in the language of msgs.
+func (msgs Messages) BkCompNone() string {
+	return Catalog.Format(msgs.locale, "BkCompNone", nil)
+}
+
+// BkRetentionHelp says "After each run, older backups this plan made are deleted. A backup stays while any rule keeps it; 0 turns a rule off."
+// in the language the app shows.
+func BkRetentionHelp() string { return In(i18n.Locale()).BkRetentionHelp() }
+
+// BkRetentionHelp says "After each run, older backups this plan made are deleted. A backup stays while any rule keeps it; 0 turns a rule off."
+// in the language of msgs.
+func (msgs Messages) BkRetentionHelp() string {
+	return Catalog.Format(msgs.locale, "BkRetentionHelp", nil)
+}
+
+// BkRetriesHelp says "The first retry waits 10 minutes, each next one twice as long, up to 2 hours."
+// in the language the app shows.
+func BkRetriesHelp() string { return In(i18n.Locale()).BkRetriesHelp() }
+
+// BkRetriesHelp says "The first retry waits 10 minutes, each next one twice as long, up to 2 hours."
+// in the language of msgs.
+func (msgs Messages) BkRetriesHelp() string {
+	return Catalog.Format(msgs.locale, "BkRetriesHelp", nil)
+}
+
+// BkEnabledHelp says "A paused plan keeps its settings and backups but does not run on its schedule."
+// in the language the app shows.
+func BkEnabledHelp() string { return In(i18n.Locale()).BkEnabledHelp() }
+
+// BkEnabledHelp says "A paused plan keeps its settings and backups but does not run on its schedule."
+// in the language of msgs.
+func (msgs Messages) BkEnabledHelp() string {
+	return Catalog.Format(msgs.locale, "BkEnabledHelp", nil)
+}
+
+// SetLanguage says "Language"
+// in the language the app shows.
+func SetLanguage() string { return In(i18n.Locale()).SetLanguage() }
+
+// SetLanguage says "Language"
+// in the language of msgs.
+func (msgs Messages) SetLanguage() string {
+	return Catalog.Format(msgs.locale, "SetLanguage", nil)
+}
+
+// SetLanguageHelp says "The language WSLPilot shows. It changes at once."
+// in the language the app shows.
+func SetLanguageHelp() string { return In(i18n.Locale()).SetLanguageHelp() }
+
+// SetLanguageHelp says "The language WSLPilot shows. It changes at once."
+// in the language of msgs.
+func (msgs Messages) SetLanguageHelp() string {
+	return Catalog.Format(msgs.locale, "SetLanguageHelp", nil)
+}
+
+// SetLanguageSystem says "Same as Windows"
+// in the language the app shows.
+func SetLanguageSystem() string { return In(i18n.Locale()).SetLanguageSystem() }
+
+// SetLanguageSystem says "Same as Windows"
+// in the language of msgs.
+func (msgs Messages) SetLanguageSystem() string {
+	return Catalog.Format(msgs.locale, "SetLanguageSystem", nil)
+}
+
+// CmpProject says "Project"
+// in the language the app shows.
+func CmpProject() string { return In(i18n.Locale()).CmpProject() }
+
+// CmpProject says "Project"
+// in the language of msgs.
+func (msgs Messages) CmpProject() string {
+	return Catalog.Format(msgs.locale, "CmpProject", nil)
+}
+
+// BkRestoreProjectTitle says "Restore the project {name}"
+// in the language the app shows.
+func BkRestoreProjectTitle(name string) string { return In(i18n.Locale()).BkRestoreProjectTitle(name) }
+
+// BkRestoreProjectTitle says "Restore the project {name}"
+// in the language of msgs.
+func (msgs Messages) BkRestoreProjectTitle(name string) string {
+	return Catalog.Format(msgs.locale, "BkRestoreProjectTitle", map[string]any{"name": name})
+}
+
+// BkRestoreVolumeCheck says "Restore the volume {name}"
+// in the language the app shows.
+func BkRestoreVolumeCheck(name string) string { return In(i18n.Locale()).BkRestoreVolumeCheck(name) }
+
+// BkRestoreVolumeCheck says "Restore the volume {name}"
+// in the language of msgs.
+func (msgs Messages) BkRestoreVolumeCheck(name string) string {
+	return Catalog.Format(msgs.locale, "BkRestoreVolumeCheck", map[string]any{"name": name})
 }

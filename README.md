@@ -15,7 +15,7 @@ Desktop, and it keeps no state of its own about your distributions or containers
 using the command line alongside it.
 
 It runs on Windows 11 x64 and ARM64. Container features need WSL 3.0 or later, which includes
-WSL Containers. The current version is 0.1.1, tested with WSL 3.0.3.
+WSL Containers. The current version is 0.1.2, tested with WSL 3.0.3.
 
 ## What it does
 
@@ -48,7 +48,7 @@ itself.
 
 ## Install
 
-Download `wslpilot-setup-0.1.1-amd64.exe` (Intel and AMD) or `wslpilot-setup-0.1.1-arm64.exe`
+Download `wslpilot-setup-0.1.2-amd64.exe` (Intel and AMD) or `wslpilot-setup-0.1.2-arm64.exe`
 (ARM) from the [latest release](https://github.com/YuanZhe-99/WSLPilot/releases/latest) and run
 it. It installs for your account only and keeps itself up to date. Portable `.zip` builds are
 there too, but they don't update themselves.
@@ -97,7 +97,7 @@ WSLPilot 是一个在 Windows 11 上管理 WSL 与 WSL 容器的桌面应用，�
 它是 WSL 自带的 `wsl.exe` 与 `wslc.exe` 的图形界面：不需要 Docker Desktop，也不另外保存发行版或容器的状态，
 所以你可以照常同时使用命令行。
 
-支持 Windows 11 x64 与 ARM64。容器功能需要 WSL 3.0 及以上（自带 WSL 容器）。当前版本 0.1.1，在 WSL 3.0.3 上测试。
+支持 Windows 11 x64 与 ARM64。容器功能需要 WSL 3.0 及以上（自带 WSL 容器）。当前版本 0.1.2，在 WSL 3.0.3 上测试。
 
 **能做什么**
 
@@ -113,7 +113,7 @@ WSLPilot 是一个在 Windows 11 上管理 WSL 与 WSL 容器的桌面应用，�
 - 另有托盘图标、浅色与深色主题、中英文界面和自动更新。
 
 **安装**：从 [最新 Release](https://github.com/YuanZhe-99/WSLPilot/releases/latest) 下载
-`wslpilot-setup-0.1.1-amd64.exe`（Intel、AMD）或 `wslpilot-setup-0.1.1-arm64.exe`（ARM）运行即可。
+`wslpilot-setup-0.1.2-amd64.exe`（Intel、AMD）或 `wslpilot-setup-0.1.2-arm64.exe`（ARM）运行即可。
 它只为当前账户安装，并会自动更新。也提供便携版 `.zip`，但不会自动更新。安装包尚未进行代码签名，首次运行时 Windows 可能显示
 SmartScreen 警告，选择“更多信息 → 仍要运行”即可。
 

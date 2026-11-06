@@ -11,7 +11,7 @@ The machine-readable list is `internal/upstream/tested.json`; keep it and this t
 |---|---|---|
 | WSL | 3.0.3.0 (kernel 6.18.54.1-1) | Windows 11 ARM64, build 26300 |
 | WSLc | 3.0.3.0 (session manager 3.0.3) | Windows 11 ARM64, build 26300 |
-| MyGo | v0.7.4 | Windows 11 ARM64, build 26300 |
+| MyGo | v0.8.0 | Windows 11 ARM64, build 26300 |
 
 ## wsl.exe
 
@@ -90,3 +90,6 @@ date). `internal/configdoc/schema.go` copies the subset the forms show.
 | `mygo.Updater.Check` returns the newer signed release or nil; `Update.Install(ctx, progress)` downloads, verifies and installs it; `Updater.Enabled` is false for a copy that cannot write where it runs; `App.Relaunch` restarts into it (v0.7.4). | The in-app update flow (`gui.md`) is built on these; the update window plugin is not used. |
 | `Power.IdleTime` reports how long the user has been idle (v0.7.4). | Used for "install when the computer is idle". |
 | `TitleBarHidden` with `HideWindowButtons` leaves the window frame to the app; `.DragWindow()` and `.MaximizeButton()` mark the drag area and the snap-layout button (v0.7.4). | The pane header is the title bar; WSLPilot draws its own window buttons on Windows. |
+| `App.SetLocale(tag)` switches the interface language at once and keeps it for the next launches; `""` follows the system (v0.8.0). | The Language setting calls it. |
+| `ui.Select` shows and stores the option strings themselves; `ui.SelectBase` lets each option show a label of its own (v0.8.0). | `labeledSelect` stores values such as `daily` and shows "Every day". |
+| Since v0.8.0 an inactive window shows its accent in gray, and every key reaches `HandleInput`. | WSLPilot uses neither `HandleInput` nor `ObserveInput`; no change needed. |

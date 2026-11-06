@@ -296,22 +296,22 @@ CmpBackend	Backend	Backend
 CmpBackendFixed	Fixed for this project	本项目固定
 CmpRunning	{running:int}/{total:int} running	{running:int}/{total:int} 运行中
 CmpUp	Up	启动（up）
-CmpDown	Down…	停止并删除（down）…
-CmpDownTitle	Take {name} down?	对 {name} 执行 down？
-CmpDownMessage	The project's containers and networks are removed. Volumes are kept unless you choose otherwise.	项目的容器与网络会被删除。除非你另行选择，Volume 会保留。
+CmpDown	Remove containers…	移除容器…
+CmpDownTitle	Remove the containers of {name}?	移除 {name} 的容器？
+CmpDownMessage	The project's containers and networks are removed (compose down). Its files, folders and volumes are kept unless you choose otherwise.	项目的容器与网络会被删除（compose down）。除非你另行选择，项目的文件、目录与 Volume 都会保留。
 CmpRemoveVolumes	Also remove the project's volumes	同时删除项目的 Volume
 CmpRemoveVolumesWarning	The data in the volumes is deleted.	Volume 中的数据会被删除。
 CmpAutostart	Start at sign-in	登录时启动
 CmpAutostartHelp	The WSLPilot agent brings the project up when you sign in.	登录时由 WSLPilot agent 启动该项目。
-CmpValid	The project is valid for this backend.	该项目适用于此 Backend。
+CmpValid	No problems found: the project can run on this backend.	未发现问题：项目可以在此后端上运行。
 CmpServices	Services	服务
 CmpService	Service	服务
 CmpHealth	Health	健康状态
 CmpFile	Compose file	Compose 文件
 CmpNotUp	The project is not up.	项目未启动。
-CmpRemove	Forget project…	移除项目…
-CmpRemoveTitle	Forget {name}?	移除 {name}？
-CmpRemoveMessage	WSLPilot forgets the project. Its files, containers and volumes are not touched.	WSLPilot 会忘记该项目。其文件、容器与 Volume 不受影响。
+CmpRemove	Remove from WSLPilot…	从 WSLPilot 中移除…
+CmpRemoveTitle	Remove {name} from WSLPilot?	从 WSLPilot 中移除 {name}？
+CmpRemoveMessage	WSLPilot stops managing this project. Its files, containers and volumes are not touched.	WSLPilot 不再管理该项目。其文件、容器与 Volume 不受影响。
 BkRestore	Restore	恢复
 BkPlans	Plans	计划
 BkOpenFolder	Open folder…	打开目录…
@@ -359,7 +359,6 @@ BkOnlyPath	Only this path (optional)	仅此路径（可选）
 BkIntoFolder	Into folder	恢复到目录
 BkRestoreOver	Restore over {name}…	覆盖恢复 {name}…
 BkRestoreOverMessage	The current state is backed up first, then replaced by this backup.	会先备份当前状态，然后用此备份替换。
-BkExtractFiles	Extract project files…	提取项目文件…
 BkDeleteTitle	Delete this backup?	删除此备份？
 BkDeleteMessage	The backup files are deleted from this location.	备份文件会从此位置删除。
 BkNewPlan	New plan…	新建计划…
@@ -374,8 +373,8 @@ BkRunNow	Run now	立即运行
 BkTargets	What to back up	备份内容
 BkDestination	Destination	目标
 BkRetention	Keep	保留
-BkRetentionText	last {last:int}, daily {daily:int}, weekly {weekly:int}, monthly {monthly:int}	最近 {last:int} 个，每日 {daily:int} 个，每周 {weekly:int} 个，每月 {monthly:int} 个
-BkConsistency	Running sources	运行中的来源
+BkRetentionText	latest {last:int}, one a day for {daily:int} days, one a week for {weekly:int} weeks, one a month for {monthly:int} months	最近 {last:int} 个；每天 1 个保留 {daily:int} 天；每周 1 个保留 {weekly:int} 周；每月 1 个保留 {monthly:int} 个月
+BkConsistency	While running	运行中的对象
 BkLive	Backed up while running	运行中备份
 BkHistory	History	历史
 BkHistoryOK	{items:int} backed up, {expired:int} expired	备份 {items:int} 项，过期 {expired:int} 项
@@ -389,13 +388,13 @@ BkDeletePlanMessage	The plan stops. The backups it made are kept.	计划会停�
 BkPlan	Backup plan	备份计划
 BkKindHelp	Incremental stores only what changed; archive keeps one file per backup; folder stays browsable in Explorer.	增量只保存变化的部分；归档每次备份一个文件；目录可在资源管理器中浏览。
 BkCompression	Compression	压缩
-BkAt	Time (HH:MM)	时间（HH:MM）
+BkAt	Time	时间
 BkWeekday	Day of the week	星期
-BkDay	Day of the month (1–28)	每月日期（1–28）
-BkKeepLast	Most recent	最近
-BkKeepDaily	Daily	每日
-BkKeepWeekly	Weekly	每周
-BkKeepMonthly	Monthly	每月
+BkDay	Day of the month	每月日期
+BkKeepLast	Latest backups	最近的备份数
+BkKeepDaily	Days, one backup each	按天保留的天数（每天 1 个）
+BkKeepWeekly	Weeks, one backup each	按周保留的周数（每周 1 个）
+BkKeepMonthly	Months, one backup each	按月保留的月数（每月 1 个）
 BkRetries	Retries after a failure	失败后重试次数
 BkLiveOption	Back up without stopping them	不停止直接备份
 BkLiveHelp	By default running distributions and containers stop for a consistent copy and start again afterwards.	默认情况下，运行中的发行版与容器会先停止以获得一致的副本，结束后再启动。
@@ -441,8 +440,6 @@ CtrEdit	Edit configuration…	编辑配置…
 CtrEditTitle	Edit {name}	编辑 {name}
 CtrEditWarning	A container cannot be changed in place: it is replaced by a new one with these settings. Volumes are kept; files written inside the container itself are lost.	容器无法原地修改：会用这些设置创建新容器来替换它。Volume 会保留；写在容器自身内部的文件会丢失。
 WSLUpdatePackages	Update packages	更新软件包
-CmpVolumes	Volumes	Volume
-CmpVolumesHelp	native keeps data in a WSL Containers volume; bind uses a Windows folder instead.	native 把数据保存在 WSL 容器的 Volume 中；bind 改用一个 Windows 目录。
 CmpVolumesWarning	Existing data is not moved between a volume and a folder. Back the volume up first if it holds data.	已有数据不会在 Volume 与目录之间移动。如果 Volume 中有数据，请先备份。
 SetUpdates	Updates	更新
 SetAutoUpdate	Check for updates automatically	自动检查更新
@@ -606,20 +603,17 @@ ImgPick	Select an image to see what you can do with it.	选择一个镜像以查
 NetBuiltin	Built-in	内置
 CmpNone	No Compose projects	没有 Compose 项目
 CmpBackendIs	Backend: {backend}	后端：{backend}
-CmpProjects	Projects	项目
-CmpRunningOf	{running:int} of {count:int} running	{count:int} 个中 {running:int} 个运行中
+CmpRunningOf	{running:int} of {count:int} running	运行中 {running:int}/{count:int}
 CmpApply	Apply changes	应用更改
 CmpCombinedLogs	Combined logs	合并日志
-CmpBackUp	Back up…	备份…
+CmpBackUp	Back up project…	备份项目…
 CmpEdited	Edited	已编辑
 CmpValidate	Validate	验证
 CmpValidating	Validating…	正在验证…
 CmpError	Error	错误
 CmpWarning	Warning	警告
-CmpOK	No problems found	未发现问题
-CmpInfo	Note	提示
-CmpNativeNo	Not supported by the native backend	原生后端不支持
-CmpNativeYes	Supported by the native backend	原生后端支持
+CmpNativeNo	This WSL has no native compose command yet, so the project runs on the builtin backend.	此 WSL 还没有原生 compose 命令，因此项目使用 builtin 后端运行。
+CmpNativeYes	This WSL has a native compose command. The project stays on its backend until you migrate it.	此 WSL 已有原生 compose 命令。在你迁移之前，项目会继续使用当前后端。
 BkOpenBackup	Open a backup…	打开备份…
 BkDropTitle	Restore from a backup made anywhere	从任意位置的备份还原
 BkDropHelp	A WSLPilot repository or folder, a wsl --export archive or VHDX, or any Linux tar.	WSLPilot 仓库或文件夹、wsl --export 归档或 VHDX，或任意 Linux tar。
@@ -662,3 +656,68 @@ VolImportGo	Import	导入
 TrayCheckUpdates	Check for updates	检查更新
 TrayHint	WSLPilot keeps running in the tray so scheduled backups continue. Choose Quit in the tray menu to close it, or change this in Settings.	WSLPilot 会继续在托盘中运行，以便计划备份照常进行。要退出，请在托盘菜单中选择“退出”，或在设置中更改。
 DashOnDisk	On disk (usage inside not measured)	磁盘占用（未测量内部用量）
+CmpUpStart	Start	启动
+CmpApplyHelp	Creates or updates the containers to match the Compose file (compose up).	按 Compose 文件创建或更新容器（compose up）。
+CmpUsage	CPU {cpu} · memory {memory}	CPU {cpu} · 内存 {memory}
+CmpContainer	Container {name}	容器 {name}
+CmpData	Data	数据
+CmpDataHelp	Where this project keeps its data. Backing up the project includes all of it except external volumes.	项目保存数据的位置。备份项目时会包含这里的全部内容（外部 Volume 除外）。
+CmpBackUpTitle	Back up {name}	备份 {name}
+CmpBackUpIncludes	The backup includes:	此备份包含：
+CmpBackUpFiles	Compose files: {files}	Compose 文件：{files}
+CmpBackUpExternal	External volumes are not part of the project backup: {names}. Back them up on their own.	外部 Volume 不包含在项目备份中：{names}。请单独备份它们。
+CmpBackUpTo	Saved to {path}	保存到 {path}
+CmpBackUpLive	Back up while running	运行中直接备份
+CmpBackUpLiveHelp	By default the running services stop during the backup and start again afterwards. A copy taken while running may be inconsistent and is labeled so.	默认情况下，备份期间会停止运行中的服务，结束后再启动。运行中备份的副本可能不一致，并会如此标注。
+CmpBackUpStart	Back up	备份
+DataVolume	Volume	Volume
+DataFolder	Folder	目录
+DataExternal	External volume: not created by this project, not in its backup	外部 Volume：不是此项目创建的，不在项目备份中
+DataUsedBy	Used by {services}	使用者：{services}
+DataUnused	Not used by any service	没有服务使用
+DataOpenVolume	Open in Volumes	在 Volume 页面中打开
+DataStore	Storage…	存放位置…
+DataStoreTitle	Where {key} keeps its data	{key} 的数据存放位置
+DataStoreVolume	In a WSL Containers volume	WSL 容器的 Volume
+DataStoreFolder	In a Windows folder	一个 Windows 目录
+DataNone	This project keeps no data outside its containers.	此项目没有在容器之外保存数据。
+DataReadOnly	read-only	只读
+VolProject	Compose {name}	Compose {name}
+VolProjectStopped	no running container	没有运行中的容器
+VolProjectNotAdded	project not added	项目未添加
+VolOfProject	This volume belongs to the Compose project {name}. Backing up the project includes it, with the project's files and folders.	此 Volume 属于 Compose 项目 {name}。备份该项目会一并包含它以及项目的文件和目录。
+BkRestoreProject	Restore project…	还原项目…
+BkRestoreProjectHelp	Files and folders go into the folder you choose; folders that were inside the project folder keep their place there, so relative paths such as ./data still work. Volumes are restored as volumes.	文件和目录会写入你选择的目录；原本位于项目目录内的目录保持相对位置，因此 ./data 这样的相对路径依然可用。Volume 会还原为 Volume。
+BkFilesInto	Files and folders into	文件和目录还原到
+BkFilesIntoHelp	An empty or new folder. Leave it empty to restore only volumes. Folders from outside the project folder go to outside-folders.	一个空目录或新目录。留空则只还原 Volume。项目目录之外的目录会放到 outside-folders 中。
+BkRestoreVolumeNamed	Restore volume {name}…	还原 Volume {name}…
+BkVolumeInto	Into the volume	还原到 Volume
+BkVolumeExists	A volume named {name} exists. It is backed up to Safety first, then emptied and replaced.	已存在名为 {name} 的 Volume。它会先备份到 Safety，然后清空并替换。
+BkVolumeNotConfirmed	replacing it was not confirmed	未确认替换
+BkRestoreFilesStep	Writing files and folders	正在写入文件和目录
+BkRestoreVolumeStep	Restoring volume {name}	正在还原 Volume {name}
+BkProjectFiles	Compose files	Compose 文件
+BkProjectVolumeLine	Compose volume {key}	Compose Volume {key}
+BkProjectV1	Made by WSLPilot 0.1.1 or earlier: the project's files only. Its volumes were backed up as separate items.	由 WSLPilot 0.1.1 或更早版本生成：只有项目文件。其 Volume 当时作为单独的备份保存。
+BkProjectExternal	Not included (external volumes): {names}	未包含（外部 Volume）：{names}
+BkInProject	Also included in the backup of Compose {name}	也包含在 Compose {name} 的备份中
+BkEveryHourly	Every hour	每小时
+BkEveryDaily	Every day	每天
+BkEveryWeekly	Every week	每周
+BkEveryMonthly	Every month	每月
+BkEveryManual	Only when run by hand	仅手动运行
+BkAtMinute	Minute of the hour	每小时的第几分钟
+BkHour	Hour	小时
+BkMinute	Minute	分钟
+BkCompZstd	Zstandard (smaller, fast)	Zstandard（更小，速度快）
+BkCompGzip	gzip (opens anywhere)	gzip（兼容性最好）
+BkCompNone	None	不压缩
+BkRetentionHelp	After each run, older backups this plan made are deleted. A backup stays while any rule keeps it; 0 turns a rule off.	每次运行后，会删除本计划生成的较旧备份。只要有任一规则保留，备份就会保留；0 表示不使用该规则。
+BkRetriesHelp	The first retry waits 10 minutes, each next one twice as long, up to 2 hours.	第一次重试等待 10 分钟，之后每次加倍，最长 2 小时。
+BkEnabledHelp	A paused plan keeps its settings and backups but does not run on its schedule.	暂停的计划保留设置和备份，但不会按时间表运行。
+SetLanguage	Language	语言
+SetLanguageHelp	The language WSLPilot shows. It changes at once.	WSLPilot 界面使用的语言，立即生效。
+SetLanguageSystem	Same as Windows	跟随 Windows
+CmpProject	Project	项目
+BkRestoreProjectTitle	Restore the project {name}	还原项目 {name}
+BkRestoreVolumeCheck	Restore the volume {name}	还原 Volume {name}

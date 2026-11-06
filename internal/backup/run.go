@@ -6,8 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/version"
@@ -102,14 +100,6 @@ func (r *Runner) BackupVolume(ctx context.Context, name string, w Writer, o Opti
 	return r.pipe(ctx, w, m, func(pw io.Writer) error { _, err := r.Vol.Export(ctx, name, pw); return err })
 }
 
-// BackupFiles stores Windows files (a Compose project's files) as a tar
-// whose names are the base names given in files' keys.
-func (r *Runner) BackupFiles(ctx context.Context, source Source, files map[string]string, w Writer, o Options) (Item, error) {
-	source.Host = r.Host
-	m := Meta{Source: source, Time: time.Now(), Consistent: true, Plan: o.Plan, Tool: tool()}
-	return r.pipe(ctx, w, m, func(pw io.Writer) error { return writeFilesTar(pw, files) })
-}
-
 // pipe connects a producer of a tar stream to a Writer.
 func (r *Runner) pipe(ctx context.Context, w Writer, m Meta, produce func(io.Writer) error) (Item, error) {
 	pr, pw := io.Pipe()
@@ -131,30 +121,6 @@ func (r *Runner) pipe(ctx context.Context, w Writer, m Meta, produce func(io.Wri
 		return Item{}, perr
 	}
 	return it, werr
-}
-
-// writeFilesTar writes Windows files into a tar (mode 0644, owner root).
-func writeFilesTar(w io.Writer, files map[string]string) error {
-	tw := tar.NewWriter(w)
-	for name, path := range files {
-		st, err := os.Stat(path)
-		if err != nil {
-			return err
-		}
-		f, err := os.Open(path)
-		if err != nil {
-			return err
-		}
-		err = tw.WriteHeader(&tar.Header{Name: filepath.ToSlash(name), Typeflag: tar.TypeReg, Mode: 0o644, Size: st.Size(), ModTime: st.ModTime()})
-		if err == nil {
-			_, err = io.Copy(tw, f)
-		}
-		f.Close()
-		if err != nil {
-			return err
-		}
-	}
-	return tw.Close()
 }
 
 // RestoreAsDistro registers the item as a new distribution in location.
@@ -230,6 +196,19 @@ func (r *Runner) RestoreToVolume(ctx context.Context, it Item, name string, o vo
 	return err
 }
 
+// RestoreProjectVolume unpacks one volume of a project backup into a
+// volume (new, or replaced after the user confirmed and the caller made a
+// safety backup).
+func (r *Runner) RestoreProjectVolume(ctx context.Context, it Item, volumeName, into string, o volume.ImportOptions) error {
+	rc, err := ProjectVolumeStream(ctx, it, volumeName)
+	if err != nil {
+		return err
+	}
+	defer rc.Close()
+	_, _, err = r.Vol.Import(ctx, into, rc, o)
+	return err
+}
+
 // filterTar re-emits only entries whose name passes filter.
 func filterTar(r io.Reader, filter func(string) bool) io.Reader {
 	pr, pw := io.Pipe()
@@ -267,40 +246,3 @@ type logWriter struct{ r *Runner }
 func (l logWriter) Write(p []byte) (int, error) { l.r.logf("%s", p); return len(p), nil }
 
 func tool() string { return "WSLPilot " + version.Version }
-
-// ExtractFlat writes the regular files of a tar stream into dir by their
-// base names (a Compose project backup: compose.yaml, .env). Other entry
-// types are skipped; existing files are not overwritten.
-func ExtractFlat(r io.Reader, dir string) error {
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return err
-	}
-	tr := tar.NewReader(r)
-	for {
-		h, err := tr.Next()
-		if err == io.EOF {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-		if h.Typeflag != tar.TypeReg {
-			continue
-		}
-		name := SafeName(filepath.Base(filepath.FromSlash(h.Name)))
-		if name == "" || name == "." || name == ".." {
-			continue
-		}
-		f, err := os.OpenFile(filepath.Join(dir, name), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o644)
-		if err != nil {
-			return err
-		}
-		_, err = io.Copy(f, tr)
-		if cerr := f.Close(); err == nil {
-			err = cerr
-		}
-		if err != nil {
-			return err
-		}
-	}
-}

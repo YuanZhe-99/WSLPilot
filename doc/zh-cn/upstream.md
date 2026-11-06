@@ -10,7 +10,7 @@
 |---|---|---|
 | WSL | 3.0.3.0（内核 6.18.54.1-1） | Windows 11 ARM64，build 26300 |
 | WSLc | 3.0.3.0（session manager 3.0.3） | Windows 11 ARM64，build 26300 |
-| MyGo | v0.7.4 | Windows 11 ARM64，build 26300 |
+| MyGo | v0.8.0 | Windows 11 ARM64，build 26300 |
 
 ## wsl.exe
 
@@ -87,3 +87,6 @@ Fixture：`internal/wslc/testdata/3.0.3.0/`（用户名已替换为 `user`）。
 | `mygo.Updater.Check` 返回更新的已签名版本或 nil；`Update.Install(ctx, progress)` 下载、校验并安装；对于无法写入自身所在位置的副本，`Updater.Enabled` 为 false；`App.Relaunch` 重启到新版本（v0.7.4）。 | 应用内更新流程（`gui.md`）基于这些接口；不使用更新窗口插件。 |
 | `Power.IdleTime` 报告用户已空闲多长时间（v0.7.4）。 | 用于“电脑空闲时安装”。 |
 | `TitleBarHidden` 加 `HideWindowButtons` 把窗口框架交给应用；`.DragWindow()` 与 `.MaximizeButton()` 标出拖动区域与贴靠布局按钮（v0.7.4）。 | 面板页眉即标题栏；WSLPilot 在 Windows 上自绘窗口按钮。 |
+| `App.SetLocale(tag)` 立即切换界面语言，并在下次启动时保留；`""` 表示跟随系统（v0.8.0）。 | “语言”设置调用它。 |
+| `ui.Select` 显示并保存选项字符串本身；`ui.SelectBase` 允许每个选项显示自己的标签（v0.8.0）。 | `labeledSelect` 保存 `daily` 这样的取值，显示“每天”。 |
+| 自 v0.8.0 起，非活动窗口的强调色显示为灰色，并且所有按键都会到达 `HandleInput`。 | WSLPilot 没有使用 `HandleInput` 或 `ObserveInput`，无需改动。 |

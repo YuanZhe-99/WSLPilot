@@ -11,7 +11,7 @@ format is specified separately in [backup-format.md](backup-format.md).
 |---|---|---|---|
 | WSL distribution | `wsl-distro` | `wsl --export <name> -` | Terminated first and started again afterwards, unless the user chose a live copy |
 | WSLc volume | `wslc-volume` | helper container: `tar -cpf - --numeric-owner -C /src .` | Running containers that mount it are stopped and started again, unless live |
-| Compose project | `compose-project` | the project's Compose and env files (Windows files), plus one volume item per native named volume | Volumes as above |
+| Compose project | `compose-project` | one tar of the project's Compose and env files, bind folders and named volumes (see [Compose project backups](#compose-project-backups-layout-version-2)) | The project's running containers are stopped and the same services started again, unless live |
 
 A live copy is labeled: `consistent: false` in sidecars and folder metadata, tag `inconsistent` in
 repository snapshots. The interface shows it as "taken while running".
@@ -73,6 +73,36 @@ when complete, next to a sidecar `<archive>.wpmeta.json`:
 
 Checking an archive compares the SHA-256 and the entry count with the sidecar.
 
+## Compose project backups (layout version 2)
+
+A Compose project backup is one tar, stored like any other source in a folder, an archive or a
+repository. Its first entry is a manifest; the other entries are laid out as follows:
+
+```
+wslpilot-project.json   manifest (first entry)
+compose.yaml, .env      the project's files, at the root
+folders/<id>/…          each bind folder's content; a bound single file as folders/<id>/<name>
+volumes/<name>/…        each named volume's tar, every header kept (owners, modes, links)
+```
+
+| Manifest field | Meaning |
+|---|---|
+| `format`, `version` | `wslpilot-compose`, 2 |
+| `project`, `workingDir` | the Compose project name and the Windows folder it ran from |
+| `files` | names of the files at the root |
+| `folders` | `id`, `source` (Windows path), `relative` (slash-separated path inside the project folder, or absent when outside it), `file` (a bound single file), `services` |
+| `volumes` | `key` (Compose key), `name` (WSLc volume), `services` |
+| `external` | volumes the project uses but did not create; they are not in the backup |
+
+Windows files and folders get mode 0644 and 0755; links inside a bind folder are not followed and
+are listed in the job log. A volume's entries are its export under the prefix `volumes/<name>/`
+(the export's `./` root becomes the prefix itself), and hard link targets get the same prefix. To
+restore a volume by hand, take the entries under that prefix, strip it (also from hard link
+targets) and unpack them as root with `tar -xpf - --numeric-owner`.
+
+Version 1 backups (WSLPilot 0.1.0 and 0.1.1) hold only the files at the root, with no manifest;
+their named volumes were separate `wslc-volume` items. Both versions are read.
+
 ## Catalog: opening any backup
 
 `backup.Scan(location)` lists what a location holds, two folder levels deep:
@@ -102,7 +132,8 @@ Every restore first runs `Verify` on the item and stops if it fails.
 | Files into a distribution | `tar -xpf - --numeric-owner -C <dir>` as root, optionally only one path |
 | New volume | volume created, tar unpacked by the helper |
 | Over a volume | safety backup, volume emptied, tar unpacked |
-| Project files | Compose and env files written into a Windows folder (they are Windows files) |
+| Project | files and bind folders written into an empty or new Windows folder (folders that were inside the project folder at their relative path, others under `outside-folders<id>`); each chosen volume into a new volume (under its own name with the project's labels again), or over an existing one after a safety backup and its typed name |
+| One volume of a project | the volume's entries only, into a new or an existing volume as above |
 
 Restoring over an existing object needs the user to type its name, and is written to the audit
 log.

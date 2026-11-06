@@ -20,11 +20,12 @@ machine.
 | Volume tar import/export (owners, modes, links) | verified | live test `internal/volume` |
 | Distribution backup (folder, archive, repository), verify, restore as new, partial restore | verified | live test `internal/backup` on `wslpilot-test-d1` |
 | Compose builtin backend up / update / down | verified | live test `internal/compose` (`wslpilot-test-compose`) |
+| Compose project backup (files, bind folder, named volume) and restore | verified | live test `internal/core` (`wslpilot-test-pbk`): stopped and started again, bind file extracted, volume restored with its owner; unit tests over folder, archive and repository |
 | Distribution export as VHD and import of the copy | verified | by hand after `wsl --shutdown` on `wslpilot-test-vhd` |
 | WSLc sessions: isolation, switching the Containers page | verified | by hand with a second session attached by `session enter`; view test |
 | Scheduler, retention, retries | implemented | unit tests; user-level `schtasks /Create /SC MINUTE` verified by hand |
 | Restart watcher | implemented | unit tests over recorded events |
-| GUI pages (0.1.1 redesign) | verified | view tests; every page rendered light and dark and compared with `design/`; native window on build 26300 (`go build`, not the installer): every page, Settings sheet, theme toggle, maximize and restore, close to tray, populated container and volume tables (`wslpilot-test-ui-*`) |
+| GUI pages (0.1.1 redesign) | verified | view tests; every page rendered light and dark and compared with `design/`; native window on build 26300 (`go build`, not the installer): every page, Settings sheet, theme toggle, maximize and restore, close to tray, populated container and volume tables (`wslpilot-test-ui-*`); 0.1.2 driven with `mygo-automation`: the Compose page with its Data card, Open in Volumes, the Volumes page's project owner, a project backup and a volume restore through the window, the plan editor, and switching the language |
 | Terminal plugin, tray menu, notifications | implemented | not exercised by hand yet (closing to the tray is verified) |
 | Container edit (safety export, validated recreate) | verified | live test `internal/gui` (`wslpilot-test-edit`) |
 | WSLc data location move | verified | live test `internal/core` on an otherwise empty session: image and volume moved, content checked, settings.yaml restored |

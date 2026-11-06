@@ -23,10 +23,10 @@
 | `tools/checkdocs` | Verifies the `doc/` language mirror | `main` |
 | `tools/icon` | Renders the app icon SVG to PNG with MyGo's renderer | `render`, `matte` |
 | `tools/deps` | Compares the MyGo and WSL pins with the latest releases | `check` |
-| `internal/core` | Wires the services for each process; Compose wiring (backup, autostart) | `Core`, `New`, `BackupTarget`, `WireCompose`, `FindProject`, `MoveWSLcData`, `AgentPath` |
+| `internal/core` | Wires the services for each process; Compose wiring (project data and backup, autostart) | `Core`, `New`, `BackupTarget`, `WireCompose`, `FindProject`, `ProjectData`, `MoveWSLcData`, `AgentPath` |
 | `internal/compose` | Compose: backend interface, project metadata, loader, validation, planner, builtin and native backends, migration (see `compose.md`) | `Backend`, `Registry`, `Project`, `Projects`, `Load`, `Translate`, `Diff`, `Builtin`, `Native`, `Migrate` |
 | `internal/volume` | Volume import/export as tar through a helper container | `Pipeline`, `Import`, `Export`, `Decompress`, `HelperImage` |
-| `internal/backup` | Sources → tar → folder/archive/repository; catalog, verify, restore, retention (see `backups.md`) | `Runner`, `FolderWriter`, `ArchiveWriter`, `RepoWriter`, `Scan`, `GroupBySource`, `Open`, `Verify`, `PlanRetention`, `Delete`, `RepoPassword` |
+| `internal/backup` | Sources → tar → folder/archive/repository; catalog, verify, restore, retention (see `backups.md`) | `Runner`, `Runner.BackupProject`, `ProjectManifest`, `ReadProjectManifest`, `ExtractProject`, `ProjectVolumeStream`, `FolderWriter`, `ArchiveWriter`, `RepoWriter`, `Scan`, `GroupBySource`, `Open`, `Verify`, `PlanRetention`, `Delete`, `RepoPassword` |
 | `internal/scheduler` | Backup plans, due times, retries, retention, history, lock, Task Scheduler registration | `Service`, `Plan`, `Schedule`, `Retry`, `RunDue`, `Run`, `Install` |
 | `internal/restart` | Container restart policies from `wslc events` | `Watcher`, `Decide`, `Label` |
 | `internal/wtprofile` | Windows Terminal fragment profiles | `Fragment`, `ContainerShell`, `DistroShell`, `GUIDFor` |

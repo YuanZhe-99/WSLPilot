@@ -11,6 +11,7 @@ import (
 	"github.com/YuanZhe-99/WSLPilot/internal/backup"
 	"github.com/YuanZhe-99/WSLPilot/internal/compose"
 	"github.com/YuanZhe-99/WSLPilot/internal/configdoc"
+	"github.com/YuanZhe-99/WSLPilot/internal/core"
 	"github.com/YuanZhe-99/WSLPilot/internal/jobs"
 	L "github.com/YuanZhe-99/WSLPilot/locales"
 )
@@ -99,8 +100,8 @@ func (a *App) projectCard(c *ui.Context, i int, pr *compose.Project) {
 	}
 }
 
-// projectPage is one project as the design: its services on the left, its
-// Compose file and the validation on the right.
+// projectPage is one project as the design: its services and data on the
+// left, its Compose file and the validation on the right.
 func (a *App) projectPage(c *ui.Context, pr *compose.Project) {
 	p := &a.cmp
 	ps := p.ps[pr.ID]
@@ -115,8 +116,18 @@ func (a *App) projectPage(c *ui.Context, pr *compose.Project) {
 		a.validate(pr)
 		p.reports = ensureReports(p.reports, pr.ID)
 	}
+	if _, ok := p.data[pr.ID]; !ok {
+		if p.data == nil {
+			p.data = map[string]*core.ProjectData{}
+		}
+		p.data[pr.ID] = nil
+		a.loadProjectData(pr)
+		if !a.vol.loaded {
+			a.loadVolumes()
+		}
+	}
 	blocked := rep != nil && !rep.OK()
-	a.head(c, paneHead{crumb: L.CmpProjects(), onCrumb: func() { p.sel = -1 }, title: pr.Name, sub: strings.Join(pr.Files, " · "), badge: func() {
+	a.head(c, paneHead{crumb: L.NavCompose(), onCrumb: func() { p.sel = -1 }, title: pr.Name, sub: strings.Join(pr.Files, " · "), badge: func() {
 		k := toneNeutral
 		if running > 0 {
 			k = toneGood
@@ -124,68 +135,82 @@ func (a *App) projectPage(c *ui.Context, pr *compose.Project) {
 		pill(c, L.CmpRunningOf(running, len(ps)), k)
 		pill(c, L.CmpBackendIs(string(pr.Backend)), toneNeutral)
 	}, actions: func() {
-		ui.Checkbox(c.Key("autostart"), &pr.Autostart, L.CmpAutostart()).OnChange(func() {
-			proj := snapshotProject(pr)
-			a.async(func(ctx context.Context) func() {
-				err := a.k.Projects.Save(proj)
-				return func() {
-					if err != nil {
-						a.notify(friendlyError(err), true)
-					}
-				}
-			})
-		})
 		if ui.Button(c.Key("stop"), L.Stop()).Disabled(running == 0).Clicked() {
 			a.composeJob(pr, "stop", nil)
 		}
-		if dangerButton(c, L.CmpDown()).Clicked() {
+		if dangerButton(c, L.CmpDown()).Disabled(len(ps) == 0).Tooltip(L.CmpDownMessage()).Clicked() {
 			p.in, p.dlg = composeInput{}, "down"
 		}
-		if ui.PrimaryButton(c.Key("up"), L.CmpApply()).Disabled(blocked).Clicked() {
+		up := L.CmpUpStart()
+		if len(ps) > 0 {
+			up = L.CmpApply()
+		}
+		if ui.PrimaryButton(c.Key("up"), up).Disabled(blocked).Tooltip(L.CmpApplyHelp()).Clicked() {
 			a.composeJob(pr, "up", nil)
 		}
 	}})
 	ui.Row(c.Key("proj-main")).Grow(1).FillWidth().MinHeight(0).Padding(4, panePadX, panePadX, panePadX).Gap(20).AlignItems(ui.Stretch).Children(func() {
-		ui.Scroll(c.Key("proj-left")).Width(400).Shrink(0).Gap(12).Children(func() {
-			ui.Text(c, L.CmpServices()).FontSize(sizeHeading).Bold()
-			if len(ps) == 0 {
-				small(c, L.CmpNotUp())
-			}
-			for _, s := range ps {
-				a.serviceCard(c, s)
-			}
-			actions(c, func() {
+		ui.Scroll(c.Key("proj-left")).Width(420).Shrink(0).Gap(12).Children(func() {
+			cardHead(c, L.CmpServices(), func() {
 				if ui.Button(c.Key("logs"), L.CmpCombinedLogs()).Clicked() {
 					p.showLogs = !p.showLogs
 					if p.showLogs {
 						a.openProjectLogs(pr)
 					}
 				}
-				if ui.Button(c.Key("backup"), L.CmpBackUp()).Clicked() {
-					a.backupProjectNow(pr.Name)
-				}
 				if ui.Button(c.Key("restart"), L.Restart()).Disabled(running == 0).Clicked() {
 					a.composeJob(pr, "restart", nil)
 				}
 			})
-			a.projectVolumes(c, pr)
-			ui.Box(c).Height(8)
-			if ui.Button(c.Key("forget"), L.CmpRemove()).TextColor(c.Theme().Danger).Clicked() {
-				a.ask(L.CmpRemoveTitle(pr.Name), L.CmpRemoveMessage(), L.CmpRemove(), func(bool) {
-					id := pr.ID
-					a.async(func(ctx context.Context) func() {
-						err := a.k.Projects.Delete(id)
-						a.k.Jobs.Audit("compose.project.remove", pr.Name, "", err)
-						return func() {
-							if err != nil {
-								a.notify(friendlyError(err), true)
+			if len(ps) == 0 {
+				small(c, L.CmpNotUp())
+			}
+			var sds map[string]core.ServiceData
+			if d := p.data[pr.ID]; d != nil {
+				sds = d.Services
+			}
+			for _, s := range ps {
+				a.serviceCard(c, s, sds[s.Service])
+			}
+			a.dataCard(c, pr)
+			card(c, L.CmpProject(), func() {
+				ui.Row(c.Key("autostart-row")).FillWidth().Gap(12).AlignItems(ui.Center).Children(func() {
+					ui.Column(c).Grow(1).MinWidth(0).Gap(2).Children(func() {
+						ui.Text(c, L.CmpAutostart()).FontWeight(600)
+						small(c, L.CmpAutostartHelp())
+					})
+					ui.Switch(c.Key("autostart"), &pr.Autostart).Label(L.CmpAutostart()).OnChange(func() {
+						proj := snapshotProject(pr)
+						a.async(func(ctx context.Context) func() {
+							err := a.k.Projects.Save(proj)
+							return func() {
+								if err != nil {
+									a.notify(friendlyError(err), true)
+								}
 							}
-							p.sel = -1
-							a.loadProjects()
-						}
+						})
 					})
 				})
-			}
+				ui.Row(c.Key("remove-row")).FillWidth().Gap(12).AlignItems(ui.Center).Children(func() {
+					small(c, L.CmpRemoveMessage()).Grow(1).MinWidth(0)
+					if dangerButton(c, L.CmpRemove()).Clicked() {
+						a.ask(L.CmpRemoveTitle(pr.Name), L.CmpRemoveMessage(), L.CmpRemove(), func(bool) {
+							id := pr.ID
+							a.async(func(ctx context.Context) func() {
+								err := a.k.Projects.Delete(id)
+								a.k.Jobs.Audit("compose.project.remove", pr.Name, "", err)
+								return func() {
+									if err != nil {
+										a.notify(friendlyError(err), true)
+									}
+									p.sel = -1
+									a.loadProjects()
+								}
+							})
+						})
+					}
+				})
+			})
 		})
 		ui.Column(c.Key("proj-right")).Grow(1).MinWidth(0).Gap(12).Children(func() {
 			if p.showLogs {
@@ -201,35 +226,6 @@ func (a *App) projectPage(c *ui.Context, pr *compose.Project) {
 			}
 			a.composeFileCard(c, pr, rep)
 		})
-	})
-}
-
-// serviceCard is one service's container: its name and state, image and
-// resources, ports and mounts.
-func (a *App) serviceCard(c *ui.Context, s compose.ContainerStatus) {
-	t := c.Theme()
-	ui.Column(c.Key("svc-"+s.Name)).FillWidth().Gap(4).Padding(14, 16).Radius(cardRadius).Border(1, t.Border).Background(t.Background).Children(func() {
-		ui.Row(c).FillWidth().AlignItems(ui.Center).Children(func() {
-			ui.Text(c, s.Service).Bold().Grow(1)
-			label, k := s.State, toneNeutral
-			switch {
-			case s.Health == "healthy":
-				label, k = L.CtrHealthy(), toneGood
-			case s.Health == "unhealthy":
-				label, k = L.CtrUnhealthy(), toneBad
-			case s.State == "running":
-				label, k = L.StateRunning(), toneGood
-			case s.State == "exited" && s.Exit != 0:
-				label, k = L.CtrExited(s.Exit), toneBad
-			}
-			ui.Text(c, label).FontSize(13).FontWeight(600).TextColor(toneColor(t, k))
-		})
-		line := s.Image
-		if st, ok := a.ctr.stats[shortID(s.ID)]; ok {
-			line += " · " + st.CPUPerc + " · " + strings.SplitN(st.MemUsage, " /", 2)[0]
-		}
-		small(c, line).SingleLine()
-		small(c, s.Name).SingleLine()
 	})
 }
 
@@ -261,7 +257,7 @@ func (a *App) composeFileCard(c *ui.Context, pr *compose.Project, rep *compose.R
 	}
 	ui.Column(c.Key("file-card")).Grow(1).MinHeight(0).FillWidth().Radius(cardRadius).Border(1, t.Border).Background(t.Background).Clip().Children(func() {
 		ui.Row(c).FillWidth().Height(48).Shrink(0).Padding(0, 12, 0, 16).Gap(8).AlignItems(ui.Center).Children(func() {
-			ui.Text(c, filepath.Base(path)).Bold().Grow(1)
+			ui.Text(c, filepath.Base(path)).Bold().Grow(1).MinWidth(0).SingleLine().Tooltip(path)
 			if p.file != nil && p.file.Buffer.Modified() {
 				small(c, L.CmpEdited())
 			}
@@ -301,22 +297,28 @@ func (a *App) composeFileCard(c *ui.Context, pr *compose.Project, rep *compose.R
 					issueLine(c, "w"+itoa(i), L.CmpWarning(), toneWarn, is.String())
 				}
 				if rep.OK() && len(rep.Warnings) == 0 {
-					issueLine(c, "ok", L.CmpOK(), toneGood, L.CmpValid())
+					ui.Row(c.Key("ok")).FillWidth().Gap(8).AlignItems(ui.Center).Children(func() {
+						ui.Icon(c, iconCheck).Size(16, 16).TextColor(t.Success)
+						ui.Text(c, L.CmpValid()).FontSize(13).TextColor(t.Success).Grow(1)
+					})
 				}
 				native := L.CmpNativeNo()
 				if a.report != nil && a.report.NativeCompose {
 					native = L.CmpNativeYes()
 				}
-				issueLine(c, "info", L.CmpInfo(), toneNeutral, native)
+				ui.Row(c.Key("info")).FillWidth().Gap(8).AlignItems(ui.Center).Children(func() {
+					ui.Icon(c, iconInfo).Size(16, 16).TextColor(t.TextMuted)
+					small(c, native).Grow(1)
+				})
 			}
 		})
 	})
 }
 
-// issueLine is one line of the problems panel.
+// issueLine is one problem of the panel: its kind, then the message.
 func issueLine(c *ui.Context, key, kind string, k tone, msg string) {
-	ui.Row(c.Key(key)).FillWidth().Gap(16).Children(func() {
-		ui.Text(c, kind).FontSize(13).FontWeight(600).TextColor(toneColor(c.Theme(), k)).Width(64).Shrink(0)
+	ui.Row(c.Key(key)).FillWidth().Gap(12).Children(func() {
+		ui.Text(c, kind).FontSize(13).FontWeight(600).TextColor(toneColor(c.Theme(), k)).MinWidth(56).NoWrap().Shrink(0)
 		ui.Text(c, msg).FontSize(13).Grow(1).Selectable()
 	})
 }
@@ -384,14 +386,17 @@ func (a *App) saveComposeFile(pr *compose.Project) {
 	})
 }
 
-// backupProjectNow backs a project up into the default repository.
-func (a *App) backupProjectNow(name string) {
-	a.startJob(L.CmpBackUp()+" "+name, func(ctx context.Context, j *jobs.Job) error {
+// backupProjectNow backs a project up into the default repository; live
+// leaves running services running.
+func (a *App) backupProjectNow(name string, live bool) {
+	a.startJob(L.CmpBackUpTitle(name), func(ctx context.Context, j *jobs.Job) error {
 		if a.k.ComposeBackup == nil {
 			return nil
 		}
 		w := &backup.RepoWriter{Dir: filepath.Join(a.backupDir(), "Repository")}
-		_, err := a.k.ComposeBackup(ctx, name, w, backupOptions())
+		o := backupOptions()
+		o.Live = live
+		_, err := a.k.ComposeBackup(ctx, name, w, o)
 		return err
 	}, func() { a.bk.loaded = false })
 }

@@ -45,7 +45,21 @@ and remove resources named `wslpilot-test-*`.
 They need WSL 3.0.3.0 or later with WSL Containers and the `alpine:3.20` image. They cover the
 volume tar round trip (`internal/volume`), distribution backup to every kind and restore as a new
 distribution (`internal/backup`, needs `wslpilot-test-d1`), and a Compose project up, update and
-down (`internal/compose`).
+down (`internal/compose`), and a Compose project backup with its folder and volume restored
+(`internal/core`, `wslpilot-test-pbk`).
+
+## Driving the window
+
+A build tagged `e2e` links MyGo's automation plugin (`cmd/wslpilot/automation_e2e.go`); release
+builds leave it out. Started with `MYGO_AUTOMATION` naming a socket, the window can be read as
+text and driven with `mygo-automation` (snapshot, press, fill, screenshot). Set `WSLPILOT_DATA` to
+an empty folder to keep its settings and projects apart from yours, and set a backup folder in that
+copy's settings: the default backup folder is in your profile either way.
+
+```bash
+go build -tags e2e -o .dev/wslpilot-check.exe ./cmd/wslpilot
+go build -o .dev/mygo-automation.exe github.com/egoist/mygo/plugins/automation/cmd/mygo-automation
+```
 
 ## Capturing fixtures
 

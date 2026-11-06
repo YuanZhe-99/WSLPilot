@@ -23,10 +23,10 @@
 | `tools/checkdocs` | 校验 `doc/` 语言镜像 | `main` |
 | `tools/icon` | 使用 MyGo 渲染器将应用图标 SVG 渲染为 PNG | `render`、`matte` |
 | `tools/deps` | 比较 MyGo 与 WSL 的固定版本和最新发布 | `check` |
-| `internal/core` | 为各进程装配服务；Compose 接线（备份、自启） | `Core`、`New`、`BackupTarget`、`WireCompose`、`FindProject`、`MoveWSLcData`、`AgentPath` |
+| `internal/core` | 为各进程装配服务；Compose 接线（项目数据与备份、自启） | `Core`、`New`、`BackupTarget`、`WireCompose`、`FindProject`、`ProjectData`、`MoveWSLcData`、`AgentPath` |
 | `internal/compose` | Compose：Backend 接口、项目元数据、加载、校验、规划、builtin 与 native Backend、迁移（见 `compose.md`） | `Backend`、`Registry`、`Project`、`Projects`、`Load`、`Translate`、`Diff`、`Builtin`、`Native`、`Migrate` |
 | `internal/volume` | 经辅助容器以 tar 导入导出 Volume | `Pipeline`、`Import`、`Export`、`Decompress`、`HelperImage` |
-| `internal/backup` | 来源→tar→目录/归档/仓库；目录扫描、校验、恢复、保留（见 `backups.md`） | `Runner`、`FolderWriter`、`ArchiveWriter`、`RepoWriter`、`Scan`、`GroupBySource`、`Open`、`Verify`、`PlanRetention`、`Delete`、`RepoPassword` |
+| `internal/backup` | 来源→tar→目录/归档/仓库；目录扫描、校验、恢复、保留（见 `backups.md`） | `Runner`、`Runner.BackupProject`、`ProjectManifest`、`ReadProjectManifest`、`ExtractProject`、`ProjectVolumeStream`、`FolderWriter`、`ArchiveWriter`、`RepoWriter`、`Scan`、`GroupBySource`、`Open`、`Verify`、`PlanRetention`、`Delete`、`RepoPassword` |
 | `internal/scheduler` | 备份计划、到期计算、重试、保留、历史、锁、计划任务注册 | `Service`、`Plan`、`Schedule`、`Retry`、`RunDue`、`Run`、`Install` |
 | `internal/restart` | 基于 `wslc events` 的容器重启策略 | `Watcher`、`Decide`、`Label` |
 | `internal/wtprofile` | Windows Terminal fragment 配置 | `Fragment`、`ContainerShell`、`DistroShell`、`GUIDFor` |

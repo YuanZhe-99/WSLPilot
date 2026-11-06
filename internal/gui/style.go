@@ -311,3 +311,34 @@ func selTone(k tone, selected bool) tone {
 	}
 	return k
 }
+
+// labeledSelect is a drop-down that stores one of values in *selected
+// and shows each as label(value), so a stored "daily" reads "Every day".
+func labeledSelect(c *ui.Context, key string, selected *string, values []string, label func(string) string) ui.Element {
+	t := c.Theme()
+	sel := ui.SelectBase(c.Key(key), selected)
+	b := sel.Trigger
+	face := t.Surface
+	if b.Hovered() {
+		face = t.SurfaceHover
+	}
+	b.Padding(6, 12).Radius(t.Radius).Border(1, t.Border).Background(face).MinWidth(140).Justify(ui.SpaceBetween).Gap(10).AlignItems(ui.Center)
+	b.Children(func() {
+		ui.Text(c, label(*selected)).SingleLine()
+		ui.Icon(c, iconChevronDown).Size(14, 14).TextColor(t.TextMuted)
+	})
+	sel.Popup(func(panel ui.Element) {
+		panel.Padding(4).Radius(t.Radius).Background(t.Background).Border(1, t.Border)
+		for _, v := range values {
+			item := sel.Item(v).Padding(6, 10).Radius(t.Radius)
+			switch {
+			case item.Highlighted():
+				item.Background(t.Accent).TextColor(t.AccentText)
+			case v == *selected:
+				item.Background(t.Surface)
+			}
+			item.Children(func() { ui.Text(c, label(v)).SingleLine() })
+		}
+	})
+	return b
+}
