@@ -136,9 +136,22 @@ func testApp(t *testing.T) (*App, *fakeCmd, *fakeHost) {
 	h := &fakeHost{}
 	var a *App
 	// Updates queue up and run on the test goroutine (drain), as
-	// Window.Update runs them on the UI thread.
-	pending = make(chan func(), 1024)
-	a = New(k, h, func(fn func()) { pending <- fn })
+	// Window.Update runs them on the UI thread. The closure keeps this test's
+	// channel: work left over from an earlier test must not read the
+	// variable while this one replaces it (race detector).
+	ch := make(chan func(), 1024)
+	pending = ch
+	a = New(k, h, func(fn func()) { ch <- fn })
+	// Background work writes into the store; it must end before the store's
+	// temporary folder is removed (cleanups run last first).
+	t.Cleanup(func() {
+		done := make(chan struct{})
+		go func() { a.bg.Wait(); close(done) }()
+		select {
+		case <-done:
+		case <-time.After(5 * time.Second):
+		}
+	})
 	a.probe = func(context.Context) capability.Report {
 		return capability.Report{WSL: wsl.Version{WSL: "3.0.3.0", Kernel: "6.18.54.1-1"}, Distros: []string{"Debian"}, WSLcErr: errors.New("not installed")}
 	}

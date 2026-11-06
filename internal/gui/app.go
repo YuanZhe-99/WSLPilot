@@ -6,6 +6,7 @@ package gui
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/capability"
@@ -35,6 +36,10 @@ const commandTimeout = 60 * time.Second
 // only; background work hands results back through update.
 type App struct {
 	page string
+
+	// bg counts background work started by async, so tests can wait for
+	// it before their temporary folders go away.
+	bg sync.WaitGroup
 
 	probing bool
 	report  *capability.Report
@@ -121,7 +126,9 @@ func (a *App) Refresh() {
 // async runs fn on a goroutine with a command timeout; the function fn
 // returns is applied on the UI thread.
 func (a *App) async(fn func(ctx context.Context) func()) {
+	a.bg.Add(1)
 	go func() {
+		defer a.bg.Done()
 		ctx, cancel := context.WithTimeout(context.Background(), commandTimeout)
 		defer cancel()
 		apply := fn(ctx)
