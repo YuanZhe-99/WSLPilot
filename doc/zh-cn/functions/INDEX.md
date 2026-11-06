@@ -9,7 +9,7 @@
 | `internal/upstream` | WSLPilot 测试过的上游版本（`tested.json`） | `Tested`、`Manifest`、`Compare`、`NewerThanTested` |
 | `internal/procexec` | 以参数向量启动子进程；输出解码；原始数据流 | `Runner`、`Run`、`Streamer`、`Stream`、`Spec`、`RunnerFrom`、`Decode`、`ExitError` |
 | `internal/wsl` | `wsl.exe` 适配层：列表、生命周期、导入导出、迁移、压缩、稀疏、exec、文件读写 | `Client`、`Distro`、`List`、`ParseListVerbose`、`ParseListOnline`、`InstallArgs`、`ExecArgs`、`Compact`、`ReadFile`、`WriteFile` |
-| `internal/wslc` | `wslc.exe` 适配层：容器、镜像、Volume、网络、stats、事件、build | `Client`、`Container`、`ContainerSpec`、`CreateArgs`、`Volume`、`Network`、`Event`、`ParseLines`、`ParseArray`、`HasNativeCompose` |
+| `internal/wslc` | `wslc.exe` 适配层：容器、镜像、Volume、网络、stats、事件、build | `Client`、`WithSession`、`IsCLISession`、`Container`、`ContainerSpec`、`CreateArgs`、`Volume`、`Network`、`Event`、`ParseLines`、`ParseArray`、`HasNativeCompose` |
 | `internal/capability` | 对 WSL、WSLc 与原生 Compose 的一次合并探测 | `Prober`、`Report` |
 | `internal/store` | WSLPilot 元数据：带版本的 JSON 文档，原子写入 | `Store`、`Default`、`Load`、`Save`、`WriteFileAtomic`、`ErrNewerSchema` |
 | `internal/jobs` | 长任务：进度、取消、日志、破坏性操作的审计日志 | `Manager`、`Job`、`Snapshot`、`Audit`、`ProgressWriter`、`FormatBytes` |

@@ -4855,3 +4855,23 @@ func WSLExportVHDWarning() string { return In(i18n.Locale()).WSLExportVHDWarning
 func (msgs Messages) WSLExportVHDWarning() string {
 	return Catalog.Format(msgs.locale, "WSLExportVHDWarning", nil)
 }
+
+// CtrSession says "Session"
+// in the language the app shows.
+func CtrSession() string { return In(i18n.Locale()).CtrSession() }
+
+// CtrSession says "Session"
+// in the language of msgs.
+func (msgs Messages) CtrSession() string {
+	return Catalog.Format(msgs.locale, "CtrSession", nil)
+}
+
+// CtrOtherSession says "Showing session {name}, which another app created. Its containers, images and volumes are separate from the ones WSLP…"
+// in the language the app shows.
+func CtrOtherSession(name string) string { return In(i18n.Locale()).CtrOtherSession(name) }
+
+// CtrOtherSession says "Showing session {name}, which another app created. Its containers, images and volumes are separate from the ones WSLP…"
+// in the language of msgs.
+func (msgs Messages) CtrOtherSession(name string) string {
+	return Catalog.Format(msgs.locale, "CtrOtherSession", map[string]any{"name": name})
+}

@@ -337,3 +337,21 @@ func TestRunSpecParsesDialog(t *testing.T) {
 func (h *fakeHost) CheckForUpdates()   {}
 func (h *fakeHost) AutoUpdate() bool   { return true }
 func (h *fakeHost) SetAutoUpdate(bool) {}
+
+func TestContainersSessionSwitch(t *testing.T) {
+	a, cmd, _ := testApp(t)
+	cmd.out["info --format json"] = fixture(t, "wslc/testdata/3.0.3.0/info-two-sessions.json")
+	cmd.out["--session wslpilot-test-sess container list --all --no-trunc --format json"] = ""
+	tt := ui.NewTester(a.View, 1300, 820)
+	tt.Click(L.NavWSLc())
+	settle(t, tt, func() bool { return len(a.ctr.sessions) == 2 && a.ctr.choice == "wslc-cli-user" })
+	a.ctr.choice = "wslpilot-test-sess"
+	a.selectSession(a.ctr.choice)
+	settle(t, tt, func() bool {
+		return cmd.ran("--session wslpilot-test-sess container list") && tt.HasText(L.CtrOtherSession("wslpilot-test-sess"))
+	})
+	a.selectSession("wslc-cli-user")
+	if a.wc() != a.k.WSLc {
+		t.Error("default session not restored")
+	}
+}

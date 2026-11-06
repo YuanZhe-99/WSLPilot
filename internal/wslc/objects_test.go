@@ -108,3 +108,19 @@ func TestSessionOption(t *testing.T) {
 		t.Errorf("args = %q", got)
 	}
 }
+
+func TestTwoSessions(t *testing.T) {
+	info, err := ParseInfo(read(t, "info-two-sessions.json"))
+	if err != nil || len(info.Server.Sessions) != 2 {
+		t.Fatalf("%+v %v", info, err)
+	}
+	if !IsCLISession(info.Server.Sessions[0].Name) || IsCLISession(info.Server.Sessions[1].Name) {
+		t.Error("CLI session not recognized")
+	}
+	var got []string
+	c := &Client{Run: func(ctx context.Context, name string, args ...string) (string, error) { got = args; return "", nil }}
+	c.WithSession("wslpilot-test-sess").Volumes(context.Background())
+	if got[0] != "--session" || got[1] != "wslpilot-test-sess" || c.Session != "" {
+		t.Errorf("args %q, original session %q", got, c.Session)
+	}
+}

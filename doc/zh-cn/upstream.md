@@ -59,6 +59,8 @@ Fixture：`internal/wsl/testdata/3.0.3.0/`（真实录制）、`internal/wsl/tes
 | `wslc build` 存在（`--file`、`--tag`、`--build-arg`、`--target`、`--progress plain`）。 | 通过它支持 Compose 的 `build`。 |
 | 带 `--health-cmd` 时 `inspect` 报告 `State.Health.Status`（`healthy`…）；`--memory 64M` 得到 `HostConfig.Memory` 64 MiB；容器的 `Image` 等于镜像 inspect 的 `Id`；label 同时出现在 `Config.Labels` 与顶层 `Labels` 中。 | Compose 据此等待健康状态，并按 ID 检测镜像变化。 |
 | `system session terminate` 停止 CLI session 虚拟机；下一条命令会启动新的 session。 | `TerminateSession`（使设置生效、可压缩 vhd Volume）。 |
+| session 相互隔离：每个 session 有自己的存储（`<storagePath>\wslc\sessions\<name>\storage.vhdx`）、镜像、Volume 与容器。`--session <name>` 访问其它 session；`wslc info --format json` 列出全部（`system session list` 没有 JSON 输出）。CLI 自己的 session 名为 `wslc-cli-<user>`。 | 有多个 session 运行时，容器页提供 session 切换，并对其它应用创建的 session 给出提示。 |
+| `system session enter <storage dir> --name N` 挂载一个已有的 session 存储（空目录会以 `ERROR_PATH_NOT_FOUND` 拒绝），需要控制台，且该进程退出后 session 随之结束（`CreatorPid`）。 | WSLPilot 从不创建 session。 |
 | `settings.yaml` 键（Microsoft Learn，2026-10-16）：`session.cpuCount`、`memorySize`、`maxStorageSize`、`storagePath`、`defaultBindingAddress`、`hostLoopback`、`idleTimeout` 以及 `credentialStore`；所有值都接受 `default`。修改 `storagePath` 不会移动已有数据。 | `configdoc.WSLcSettings`；数据位置迁移靠导出再导入。 |
 
 Fixture：`internal/wslc/testdata/3.0.3.0/`（用户名已替换为 `user`）。

@@ -480,5 +480,7 @@
   "BkWrongPassword": "密码错误。",
   "BkEncryptedRepo": "加密仓库 {name}",
   "BkNoteEncrypted": "已加密：输入密码后才能查看并恢复其中的备份。",
-  "WSLExportVHDWarning": "磁盘镜像只能在 WSL 关闭时复制：所有运行中的发行版都会停止。WSL 容器会继续运行。"
+  "WSLExportVHDWarning": "磁盘镜像只能在 WSL 关闭时复制：所有运行中的发行版都会停止。WSL 容器会继续运行。",
+  "CtrSession": "Session",
+  "CtrOtherSession": "正在显示 session {name}，它由其它应用创建。其容器、镜像与 Volume 与 WSLPilot 和 wslc 命令使用的相互独立；在此处的修改会影响该应用。"
 }

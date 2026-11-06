@@ -9,7 +9,7 @@
 | `internal/upstream` | Upstream versions WSLPilot was tested with (`tested.json`) | `Tested`, `Manifest`, `Compare`, `NewerThanTested` |
 | `internal/procexec` | Child processes from argument vectors; output decoding; raw streams | `Runner`, `Run`, `Streamer`, `Stream`, `Spec`, `RunnerFrom`, `Decode`, `ExitError` |
 | `internal/wsl` | `wsl.exe` adapter: list, lifecycle, import/export, move, compact, sparse, exec, file read/write | `Client`, `Distro`, `List`, `ParseListVerbose`, `ParseListOnline`, `InstallArgs`, `ExecArgs`, `Compact`, `ReadFile`, `WriteFile` |
-| `internal/wslc` | `wslc.exe` adapter: containers, images, volumes, networks, stats, events, build | `Client`, `Container`, `ContainerSpec`, `CreateArgs`, `Volume`, `Network`, `Event`, `ParseLines`, `ParseArray`, `HasNativeCompose` |
+| `internal/wslc` | `wslc.exe` adapter: containers, images, volumes, networks, stats, events, build | `Client`, `WithSession`, `IsCLISession`, `Container`, `ContainerSpec`, `CreateArgs`, `Volume`, `Network`, `Event`, `ParseLines`, `ParseArray`, `HasNativeCompose` |
 | `internal/capability` | One combined probe of WSL, WSLc and native Compose | `Prober`, `Report` |
 | `internal/store` | WSLPilot metadata: versioned JSON documents, atomic writes | `Store`, `Default`, `Load`, `Save`, `WriteFileAtomic`, `ErrNewerSchema` |
 | `internal/jobs` | Long operations: progress, cancel, log, audit log of destructive actions | `Manager`, `Job`, `Snapshot`, `Audit`, `ProgressWriter`, `FormatBytes` |

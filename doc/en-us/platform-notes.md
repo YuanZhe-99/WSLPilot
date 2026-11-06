@@ -21,6 +21,7 @@ machine.
 | Distribution backup (folder, archive, repository), verify, restore as new, partial restore | verified | live test `internal/backup` on `wslpilot-test-d1` |
 | Compose builtin backend up / update / down | verified | live test `internal/compose` (`wslpilot-test-compose`) |
 | Distribution export as VHD and import of the copy | verified | by hand after `wsl --shutdown` on `wslpilot-test-vhd` |
+| WSLc sessions: isolation, switching the Containers page | verified | by hand with a second session attached by `session enter`; view test |
 | Scheduler, retention, retries | implemented | unit tests; user-level `schtasks /Create /SC MINUTE` verified by hand |
 | Restart watcher | implemented | unit tests over recorded events |
 | GUI pages | implemented | view tests, page renders checked by eye; packaged app starts (10 s smoke run) |

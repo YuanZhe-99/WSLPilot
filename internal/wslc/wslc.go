@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/procexec"
 )
@@ -94,4 +95,20 @@ func (c *Client) HasNativeCompose(ctx context.Context) (bool, error) {
 		return false, nil
 	}
 	return false, err
+}
+
+// IsCLISession reports whether a session is the default session the wslc
+// CLI uses ("wslc-cli-<user>"); others belong to apps that use the WSL
+// container API, or to `wslc system session enter`.
+// Notes: sessions are isolated: each has its own storage, images,
+// volumes and containers, and lives only while its creator process runs
+// (verified on 3.0.3.0).
+func IsCLISession(name string) bool { return strings.HasPrefix(name, "wslc-cli-") }
+
+// WithSession returns a client like c that addresses session name ("" =
+// the default CLI session).
+func (c *Client) WithSession(name string) *Client {
+	cp := *c
+	cp.Session = name
+	return &cp
 }

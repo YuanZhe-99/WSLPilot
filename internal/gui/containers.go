@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/egoist/mygo/ui"
@@ -35,6 +36,13 @@ type containersPage struct {
 	csel, isel, nsel int
 	showAll          bool
 	wt               bool // Windows Terminal is installed
+
+	// sessions are the WSLc sessions running; choice is the selected name.
+	// client addresses it (nil = the default CLI session); it is read by
+	// background jobs, hence atomic.
+	sessions []string
+	choice   string
+	client   atomic.Pointer[wslc.Client]
 
 	logsFor    string
 	logs       *logBuffer
@@ -80,6 +88,26 @@ func (b *logBuffer) String() string {
 	return string(b.text)
 }
 
+// wc is the wslc client of the session the page shows.
+func (a *App) wc() *wslc.Client {
+	if c := a.ctr.client.Load(); c != nil {
+		return c
+	}
+	return a.k.WSLc
+}
+
+// selectSession switches the page to another WSLc session.
+func (a *App) selectSession(name string) {
+	if name == "" || wslc.IsCLISession(name) {
+		a.ctr.client.Store(nil)
+	} else {
+		a.ctr.client.Store(a.k.WSLc.WithSession(name))
+	}
+	a.closeLogs()
+	a.ctr.csel, a.ctr.isel, a.ctr.nsel = -1, -1, -1
+	a.loadContainers()
+}
+
 // loadContainers reads containers, images and networks.
 func (a *App) loadContainers() {
 	p := &a.ctr
@@ -88,30 +116,44 @@ func (a *App) loadContainers() {
 	}
 	p.loading = true
 	a.async(func(ctx context.Context) func() {
-		list, err := a.k.WSLc.Containers(ctx)
+		var sessions []string
+		if info, ierr := a.k.WSLc.Info(ctx); ierr == nil {
+			for _, s := range info.Server.Sessions {
+				sessions = append(sessions, s.Name)
+			}
+		}
+		list, err := a.wc().Containers(ctx)
 		ids := make([]string, 0, len(list))
 		for _, s := range list {
 			ids = append(ids, s.ID)
 		}
 		detail := map[string]wslc.Container{}
-		if ds, derr := a.k.WSLc.InspectContainers(ctx, ids...); derr == nil {
+		if ds, derr := a.wc().InspectContainers(ctx, ids...); derr == nil {
 			for _, d := range ds {
 				detail[shortID(d.ID)] = d
 			}
 		}
 		stats := map[string]wslc.Stats{}
-		if ss, serr := a.k.WSLc.Stats(ctx); serr == nil {
+		if ss, serr := a.wc().Stats(ctx); serr == nil {
 			for _, s := range ss {
 				stats[shortID(s.ID)] = s
 			}
 		}
-		imgs, _ := a.k.WSLc.Images(ctx)
-		nets, _ := a.k.WSLc.Networks(ctx)
+		imgs, _ := a.wc().Images(ctx)
+		nets, _ := a.wc().Networks(ctx)
 		wt := wtprofile.Installed()
 		sort.Slice(list, func(i, j int) bool { return list[i].Names < list[j].Names })
 		return func() {
 			p.loading, p.loaded, p.err = false, true, err
 			p.list, p.detail, p.stats, p.images, p.networks, p.wt = list, detail, stats, imgs, nets, wt
+			p.sessions = sessions
+			if p.choice == "" {
+				for _, s := range sessions {
+					if wslc.IsCLISession(s) {
+						p.choice = s
+					}
+				}
+			}
 		}
 	})
 }
@@ -147,11 +189,17 @@ func (a *App) containersView(c *ui.Context) {
 		a.loadContainers()
 	}
 	a.header(c, L.NavWSLc(), func() {
+		if len(p.sessions) > 1 {
+			ui.Select(c, &p.choice, p.sessions).Label(L.CtrSession()).OnChange(func() { a.selectSession(p.choice) })
+		}
 		ui.Button(c, L.Refresh()).Disabled(p.loading).OnClick(a.loadContainers)
 	})
 	if a.report != nil && !a.report.HasWSLc() {
 		card(c, L.DashNotFound(), func() { muted(c, L.DashWSLcHint()) })
 		return
+	}
+	if a.ctr.client.Load() != nil {
+		ui.Text(c, L.CtrOtherSession(p.choice)).TextColor(c.Theme().Warning)
 	}
 	if p.err != nil {
 		errorText(c, friendlyError(p.err))
@@ -177,7 +225,7 @@ func (a *App) containerList(c *ui.Context) {
 		ui.Checkbox(c, &p.showAll, L.CtrShowAll())
 		dangerButton(c, L.CtrPrune()).OnClick(func() {
 			a.ask(L.CtrPruneTitle(), L.CtrPruneMessage(), L.CtrPrune(), func(bool) {
-				a.wslcJob(L.CtrPrune(), "wslc.container.prune", func(ctx context.Context) error { _, err := a.k.WSLc.Prune(ctx, "container"); return err })
+				a.wslcJob(L.CtrPrune(), "wslc.container.prune", func(ctx context.Context) error { _, err := a.wc().Prune(ctx, "container"); return err })
 			})
 		})
 	})
@@ -222,14 +270,14 @@ func (a *App) containerDetail(c *ui.Context, s wslc.ContainerSummary) {
 				a.openTerminal(s.Names, []string{"wslc.exe", "container", "exec", "--interactive", "--tty", s.ID, "sh", "-c", "command -v bash >/dev/null && exec bash || exec sh"})
 			})
 			ui.Button(c, L.Stop()).OnClick(func() {
-				a.wslcJob(L.JobStop(s.Names), "", func(ctx context.Context) error { return a.k.WSLc.Stop(ctx, -1, s.ID) })
+				a.wslcJob(L.JobStop(s.Names), "", func(ctx context.Context) error { return a.wc().Stop(ctx, -1, s.ID) })
 			})
 			ui.Button(c, L.Restart()).OnClick(func() {
-				a.wslcJob(L.Restart()+" "+s.Names, "", func(ctx context.Context) error { return a.k.WSLc.Restart(ctx, s.ID) })
+				a.wslcJob(L.Restart()+" "+s.Names, "", func(ctx context.Context) error { return a.wc().Restart(ctx, s.ID) })
 			})
 		} else {
 			ui.PrimaryButton(c, L.Start()).OnClick(func() {
-				a.wslcJob(L.JobStart(s.Names), "", func(ctx context.Context) error { return a.k.WSLc.Start(ctx, s.ID) })
+				a.wslcJob(L.JobStart(s.Names), "", func(ctx context.Context) error { return a.wc().Start(ctx, s.ID) })
 			})
 		}
 		ui.Button(c, L.CtrLogs()).OnClick(func() { a.openLogs(s.ID) })
@@ -287,7 +335,7 @@ func (a *App) containerDetail(c *ui.Context, s wslc.ContainerSummary) {
 			dangerButton(c, L.CtrRemove()).OnClick(func() {
 				a.ask(L.CtrRemoveTitle(s.Names), L.CtrRemoveMessage(), L.CtrRemove(), func(bool) {
 					a.wslcJob(L.CtrRemove()+" "+s.Names, "wslc.container.remove", func(ctx context.Context) error {
-						return a.k.WSLc.Remove(ctx, true, false, s.ID)
+						return a.wc().Remove(ctx, true, false, s.ID)
 					})
 				})
 			})
@@ -311,7 +359,7 @@ func (a *App) openLogs(id string) {
 	ctx, cancel := context.WithCancel(context.Background())
 	p.logsFor, p.logsCancel, p.logs = id, cancel, &logBuffer{a: a}
 	buf := p.logs
-	go a.k.WSLc.Logs(ctx, id, wslc.LogOptions{Follow: true, Tail: 500, Timestamps: true}, buf)
+	go a.wc().Logs(ctx, id, wslc.LogOptions{Follow: true, Tail: 500, Timestamps: true}, buf)
 }
 
 // closeLogs stops following.
@@ -341,7 +389,7 @@ func (a *App) imageList(c *ui.Context) {
 		ui.Spacer(c)
 		dangerButton(c, L.ImgPrune()).OnClick(func() {
 			a.ask(L.ImgPruneTitle(), L.ImgPruneMessage(), L.ImgPrune(), func(bool) {
-				a.wslcJob(L.ImgPrune(), "wslc.image.prune", func(ctx context.Context) error { _, err := a.k.WSLc.Prune(ctx, "image"); return err })
+				a.wslcJob(L.ImgPrune(), "wslc.image.prune", func(ctx context.Context) error { _, err := a.wc().Prune(ctx, "image"); return err })
 			})
 		})
 	})
@@ -368,7 +416,7 @@ func (a *App) imageList(c *ui.Context) {
 			ui.Button(c, L.CtrRun()).OnClick(func() { p.in = ctrInput{image: im.Ref(), start: true, restart: restart.No}; p.dlg = "run" })
 			dangerButton(c, L.ImgRemove()).OnClick(func() {
 				a.ask(L.ImgRemoveTitle(im.Ref()), L.ImgRemoveMessage(), L.ImgRemove(), func(bool) {
-					a.wslcJob(L.ImgRemove()+" "+im.Ref(), "wslc.image.remove", func(ctx context.Context) error { return a.k.WSLc.RemoveImages(ctx, false, im.Ref()) })
+					a.wslcJob(L.ImgRemove()+" "+im.Ref(), "wslc.image.remove", func(ctx context.Context) error { return a.wc().RemoveImages(ctx, false, im.Ref()) })
 				})
 			})
 		})
@@ -401,7 +449,7 @@ func (a *App) networkList(c *ui.Context) {
 		if !n.Builtin() {
 			dangerButton(c, L.NetRemove()+" "+n.Name).OnClick(func() {
 				a.ask(L.NetRemoveTitle(n.Name), L.NetRemoveMessage(), L.NetRemove(), func(bool) {
-					a.wslcJob(L.NetRemove()+" "+n.Name, "wslc.network.remove", func(ctx context.Context) error { return a.k.WSLc.RemoveNetworks(ctx, n.Name) })
+					a.wslcJob(L.NetRemove()+" "+n.Name, "wslc.network.remove", func(ctx context.Context) error { return a.wc().RemoveNetworks(ctx, n.Name) })
 				})
 			})
 		}
@@ -443,11 +491,11 @@ func (a *App) containerDialogs(c *ui.Context) {
 						return
 					}
 					a.wslcJob(L.CtrRun()+" "+spec.Image, "", func(ctx context.Context) error {
-						id, err := a.k.WSLc.Create(ctx, spec)
+						id, err := a.wc().Create(ctx, spec)
 						if err != nil {
 							return err
 						}
-						return a.k.WSLc.Start(ctx, id)
+						return a.wc().Start(ctx, id)
 					})
 				})
 			case "pull":
@@ -455,7 +503,7 @@ func (a *App) containerDialogs(c *ui.Context) {
 				ui.Field(c, L.CtrImage(), func() { ui.TextInput(c, &p.in.ref).Placeholder("alpine:3.20").Label(L.CtrImage()).AutoFocus() })
 				dialogButtons(c, a, L.ImgPull(), strings.TrimSpace(p.in.ref) != "", func() {
 					ref := strings.TrimSpace(p.in.ref)
-					a.startJob(L.ImgPull()+" "+ref, func(ctx context.Context, j *jobs.Job) error { return a.k.WSLc.Pull(ctx, ref, j) }, a.loadContainers)
+					a.startJob(L.ImgPull()+" "+ref, func(ctx context.Context, j *jobs.Job) error { return a.wc().Pull(ctx, ref, j) }, a.loadContainers)
 				})
 			case "network":
 				ui.Text(c, L.NetCreate()).FontSize(sectionSize).Bold()
@@ -464,7 +512,7 @@ func (a *App) containerDialogs(c *ui.Context) {
 				dialogButtons(c, a, L.NetCreate(), strings.TrimSpace(p.in.network) != "", func() {
 					in := p.in
 					a.wslcJob(L.NetCreate()+" "+in.network, "", func(ctx context.Context) error {
-						return a.k.WSLc.CreateNetwork(ctx, strings.TrimSpace(in.network), wslc.NetworkOptions{Subnet: strings.TrimSpace(in.subnet)})
+						return a.wc().CreateNetwork(ctx, strings.TrimSpace(in.network), wslc.NetworkOptions{Subnet: strings.TrimSpace(in.subnet)})
 					})
 				})
 			}
@@ -579,14 +627,14 @@ func (a *App) recreate(oldID string, spec wslc.ContainerSpec) {
 		probe := spec
 		probe.Name = spec.Name + "-wslpilot-check"
 		probe.Ports = nil // the old container still holds them
-		id, err := a.k.WSLc.Create(ctx, probe)
+		id, err := a.wc().Create(ctx, probe)
 		if err != nil {
 			return err
 		}
-		a.k.WSLc.Remove(ctx, true, false, id)
+		a.wc().Remove(ctx, true, false, id)
 		// Safety copy of the container's own files (wslc exports only
 		// stopped containers).
-		if err := a.k.WSLc.Stop(ctx, -1, oldID); err != nil {
+		if err := a.wc().Stop(ctx, -1, oldID); err != nil {
 			return err
 		}
 		dir := filepath.Join(a.backupDir(), "Safety")
@@ -596,7 +644,7 @@ func (a *App) recreate(oldID string, spec wslc.ContainerSpec) {
 		if err != nil {
 			return err
 		}
-		err = a.k.WSLc.ExportContainer(ctx, oldID, f)
+		err = a.wc().ExportContainer(ctx, oldID, f)
 		if cerr := f.Close(); err == nil {
 			err = cerr
 		}
@@ -604,13 +652,13 @@ func (a *App) recreate(oldID string, spec wslc.ContainerSpec) {
 			os.Remove(safety)
 			return fmt.Errorf("%s: %w", L.JobBackupFailedStop(), err)
 		}
-		if err := a.k.WSLc.Remove(ctx, true, false, oldID); err != nil {
+		if err := a.wc().Remove(ctx, true, false, oldID); err != nil {
 			return err
 		}
-		id, err = a.k.WSLc.Create(ctx, spec)
+		id, err = a.wc().Create(ctx, spec)
 		if err != nil {
 			return err
 		}
-		return a.k.WSLc.Start(ctx, id)
+		return a.wc().Start(ctx, id)
 	})
 }

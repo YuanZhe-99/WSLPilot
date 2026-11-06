@@ -923,5 +923,14 @@
     }
   },
   "BkNoteEncrypted": "Encrypted: enter its password to see and restore its backups.",
-  "WSLExportVHDWarning": "A disk image can only be copied while WSL is shut down: every running distribution stops. WSL containers keep running."
+  "WSLExportVHDWarning": "A disk image can only be copied while WSL is shut down: every running distribution stops. WSL containers keep running.",
+  "CtrSession": "Session",
+  "CtrOtherSession": "Showing session {name}, which another app created. Its containers, images and volumes are separate from the ones WSLPilot and the wslc command use; changes here affect that app.",
+  "@CtrOtherSession": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }
