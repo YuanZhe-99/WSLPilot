@@ -406,7 +406,7 @@ BkEnabled	Enabled	启用
 BkNeedName	Give the plan a name.	请为计划命名。
 BkNeedTarget	Choose at least one thing to back up.	至少选择一项备份内容。
 TermNew	New terminal	新建终端
-TermNone	No terminals open. Start one from a distribution or a container, or with New terminal.	没有打开的终端。可从发行版或容器启动，或点击“新建终端”。
+TermNone	No terminals open	没有打开的终端
 TermEnded	ended	已结束
 TermFailed	The terminal could not start: {error}	终端无法启动：{error}
 SetGeneral	General	常规
@@ -464,3 +464,201 @@ BkNoteEncrypted	Encrypted: enter its password to see and restore its backups.	�
 WSLExportVHDWarning	A disk image can only be copied while WSL is shut down: every running distribution stops. WSL containers keep running.	磁盘镜像只能在 WSL 关闭时复制：所有运行中的发行版都会停止。WSL 容器会继续运行。
 CtrSession	Session	Session
 CtrOtherSession	Showing session {name}, which another app created. Its containers, images and volumes are separate from the ones WSLPilot and the wslc command use; changes here affect that app.	正在显示 session {name}，它由其它应用创建。其容器、镜像与 Volume 与 WSLPilot 和 wslc 命令使用的相互独立；在此处的修改会影响该应用。
+NavTasks	Tasks	任务
+TasksAbout	Long operations run here; their logs stay until you close WSLPilot.	耗时操作在这里运行；日志会保留到关闭 WSLPilot 为止。
+TasksEmpty	Nothing has run yet	还没有运行过任务
+WindowMinimize	Minimize	最小化
+WindowMaximize	Maximize	最大化
+WindowRestore	Restore	还原
+WindowClose	Close	关闭
+TermSubtitle	Shells in your distributions and containers	进入发行版与容器的 Shell
+TermNoneHint	Open a shell in a distribution, a running container or PowerShell.	在发行版、运行中的容器或 PowerShell 中打开 Shell。
+SetGroupPreferences	Preferences	偏好设置
+SetGroupComputer	This computer	本机
+SetBackupsAgent	Backups & agent	备份与代理
+SetAboutUpdates	About & updates	关于与更新
+SetSearch	Search settings	搜索设置
+SetSearchNone	No settings match	没有匹配的设置
+SetThemeHelp	Follow Windows, or always light or dark.	跟随 Windows，或始终使用浅色或深色。
+SetOpenAtLoginHelp	Start in the tray when you sign in to Windows.	登录 Windows 时在托盘中启动。
+SetCloseWindow	Closing the window	关闭窗口时
+SetCloseWindowHelp	Keep running in the tray so scheduled backups and update checks continue, or quit.	保留在托盘中运行，使计划备份与更新检查继续进行；或直接退出。
+SetCloseToTray	Keep in tray	保留在托盘
+SetCloseQuit	Quit	退出
+SetWSLcFile	WSL Containers settings file	WSL 容器设置文件
+SetCheckDaily	Check for updates daily	每天检查更新
+SetCheckDailyHelp	Checks GitHub once a day and tells you once per new version.	每天检查一次 GitHub，每个新版本只提醒一次。
+SetAutoInstall	Install updates automatically	自动安装更新
+SetAutoInstallHelp	Installs and restarts WSLPilot at the time you choose; running tasks are never interrupted.	在你选择的时间安装并重启 WSLPilot；不会打断正在运行的任务。
+SetLicenses	Open source licenses	开源许可证
+SetLicensesHelp	WSLPilot is GPL-3.0; the components it uses keep their own licenses.	WSLPilot 以 GPL-3.0 发布；所用组件保留各自的许可证。
+SetDataHelp	Preferences, project metadata, plans and the activity log.	偏好设置、项目元数据、备份计划与操作日志。
+SetGeneralAbout	How WSLPilot looks, starts and closes.	WSLPilot 的外观、启动与关闭方式。
+SetGroupLook	Appearance	外观
+SetGroupStartClose	Start and close	启动与关闭
+SetBackupsAbout	Where backups go and the agent that runs scheduled plans.	备份存放位置，以及运行计划备份的代理。
+SetGroupStorage	Storage	存储
+SetWSLcAbout	Settings of the WSL Containers session and where its data lives.	WSL 容器 session 的设置及其数据位置。
+SetGroupData	Data	数据
+SetAboutAbout	Version, licenses and updates.	版本、许可证与更新。
+SetSource	Source code	源代码
+SetShow	Show	查看
+SetDiagnostics	WSLPilot data folder	WSLPilot 数据文件夹
+UpdCheckFailed	Could not check for updates: {error}	无法检查更新：{error}
+UpdUpToDate	WSLPilot is up to date.	WSLPilot 已是最新版本。
+UpdAvailable	Version {version} is available.	{version} 版本可用。
+UpdInstallFailed	The update could not be installed: {error}	无法安装更新：{error}
+UpdUnavailable	Updates are not available in this build.	此构建不提供更新。
+UpdInstalling	Downloading the update… {percent:int}%	正在下载更新… {percent:int}%
+UpdInstallingAbout	WSLPilot restarts when the download is complete.	下载完成后 WSLPilot 会重新启动。
+UpdInstalled	You have {version}.	当前版本为 {version}。
+UpdInstallRestart	Install and restart	安装并重启
+UpdNeverChecked	Not checked yet	尚未检查
+UpdLastChecked	Last checked {time}	上次检查：{time}
+UpdLatest	WSLPilot {version}	WSLPilot {version}
+UpdCheckNow	Check now	立即检查
+UpdAutoOff	Never	从不
+UpdAutoIdle	When the computer is idle	电脑空闲时
+UpdAutoDaily	Every day at	每天于
+DashCheckedAt	Checked at {time}	检查于 {time}
+DashOpenTerminal	Open {name}	打开 {name}
+DashInstallDistro	Install a distribution	安装发行版
+DashRunContainer	Run a container	运行容器
+DashImportTar	Import a TAR	导入 TAR
+DashWSLMissing	WSL is not installed	未安装 WSL
+DashWSLLine	{running:int} running · default {name} · WSL {wsl} · kernel {kernel}	{running:int} 个运行中 · 默认 {name} · WSL {wsl} · 内核 {kernel}
+DashReady	Ready	就绪
+DashManageDistros	Manage distributions	管理发行版
+DashWSLcLine	{running:int} running · {images, plural, one {# image} other {# images}} · {volumes, plural, one {# volume} other {# volumes}} · wslc {version}	{running:int} 个运行中 · {images:int} 个镜像 · {volumes:int} 个 Volume · wslc {version}
+DashContainersN	{count, plural, one {# container} other {# containers}}	{count:int} 个容器
+DashManageContainers	Manage containers	管理容器
+DashBuiltin	Built-in	内置
+DashNative	Native	原生
+DashProjects	{count, plural, one {# project} other {# projects}}	{count:int} 个项目
+DashOpenProjects	Open projects	打开项目
+DashDiskUsage	Disk usage	磁盘占用
+DashDiskLine	{disk} on disk · {used} used inside	磁盘上 {disk} · 内部已用 {used}
+DashDiskOnly	{disk} on disk	磁盘上 {disk}
+DashWSLcData	WSL Containers data	WSL 容器数据
+DashNoDisks	No virtual disks found	未找到虚拟磁盘
+DashUsed	Used	已用
+DashReclaimable	Reclaimable	可回收
+DashActivity	Recent activity	最近活动
+DashNoActivity	Nothing has happened yet	还没有任何活动
+DashNextBackup	Next backup: {plan} at {time}	下次备份：{plan}，{time}
+WSLSubtitle	Distributions on this computer	本机的发行版
+WSLSubtitleVersion	Distributions on this computer · WSL {version}	本机的发行版 · WSL {version}
+WSLTitle	Distributions	发行版
+WSLSettingsAll	WSL settings	WSL 设置
+ColLocation	Location	位置
+WSLDefault	Default	默认
+WSLExportBackup	Export or back up…	导出或备份…
+WSLSettingsBtn	Settings	设置
+WSLTerminalProfile	Add a Windows Terminal profile	添加 Windows Terminal 配置文件
+WSLMoreActions	More actions	更多操作
+WSLSparse	Sparse disk	稀疏磁盘
+WSLSparseSet	Set sparse…	设置稀疏…
+WSLReclaimShort	About {size} can be reclaimed	约可回收 {size}
+WSLMeasuring	Measuring…	正在测量…
+WSLCompactOpen	Reclaim disk space…	回收磁盘空间…
+WSLCompactStep1	{name} is shut down	关闭 {name}
+WSLCompactStep2Official	wsl.exe compacts the disk of {name}	由 wsl.exe 压缩 {name} 的磁盘
+WSLCompactStep2Shutdown	WSL shuts down; {count, plural, =0 {no other distribution is running} one {# other running distribution stops too} other {# other running distributions stop too}}	WSL 关闭；另外 {count:int} 个运行中的发行版也会停止
+WSLCompactStep3Admin	diskpart compacts the disk in a separate administrator window	diskpart 在单独的管理员窗口中压缩磁盘
+WSLCompactStepCheck	The new size of {name} is measured	重新测量 {name} 的大小
+WSLCompactBackupFirst	Back up first	先备份
+WSLCompactShutdown	Shut down and reclaim	关闭并回收
+WSLDistroSettingsTitle	Settings of {name}	{name} 的设置
+WSLThisDistro	This distribution (/etc/wsl.conf)	此发行版（/etc/wsl.conf）
+CfgSaveRestart	Save and restart {name}	保存并重启 {name}
+CfgGroupBoot	Boot	启动
+CfgGroupUser	User	用户
+CfgGroupNetwork	Network	网络
+CfgGroupWindows	Windows interop	Windows 互操作
+CfgGroupSystem	System	系统
+CfgGroupVM	Virtual machine	虚拟机
+CfgGroupGeneral	General	常规
+CfgGroupExperimental	Experimental	实验性
+CfgGroupSession	Session	Session
+CfgGroupOther	Other	其他
+CfgChanged	Changed	已更改
+CfgCannotSave	This draft cannot be saved	此草稿无法保存
+CfgChangesToSave	{count, plural, one {# change to save} other {# changes to save}}	{count:int} 项更改待保存
+CfgAdvancedTitle	The file as text	文件原文
+CfgEditRaw	Edit as text	以文本编辑
+CfgBackToForm	Back to the form	返回表单
+CtrSubtitle	WSL Containers · wslc {version}	WSL 容器 · wslc {version}
+CtrHealthy	Healthy	健康
+CtrUnhealthy	Unhealthy	不健康
+CtrExited	Exited ({code:int})	已退出（{code:int}）
+CtrRestartNo	No restart	不重启
+CtrRestartAlways	Always	始终
+CtrRestartUnless	Unless stopped	除非手动停止
+CtrRestartOnFailure	On failure	失败时
+CtrNoneHint	Run one from an image, or start a Compose project.	从镜像运行一个，或启动 Compose 项目。
+CtrLogsOf	Logs of {name}	{name} 的日志
+CtrSearchLogs	Search logs	搜索日志
+CtrNoLogs	No output yet	暂无输出
+CtrRestartNote	Restart policy is enforced by WSLPilot, as WSL Containers has none.	重启策略由 WSLPilot 负责执行，因为 WSL 容器本身没有。
+ImgNone	No images	没有镜像
+ImgNoneHint	Pull one from a registry to run containers.	从镜像仓库拉取一个镜像来运行容器。
+ImgPick	Select an image to see what you can do with it.	选择一个镜像以查看可执行的操作。
+NetBuiltin	Built-in	内置
+CmpNone	No Compose projects	没有 Compose 项目
+CmpBackendIs	Backend: {backend}	后端：{backend}
+CmpProjects	Projects	项目
+CmpRunningOf	{running:int} of {count:int} running	{count:int} 个中 {running:int} 个运行中
+CmpApply	Apply changes	应用更改
+CmpCombinedLogs	Combined logs	合并日志
+CmpBackUp	Back up…	备份…
+CmpEdited	Edited	已编辑
+CmpValidate	Validate	验证
+CmpValidating	Validating…	正在验证…
+CmpError	Error	错误
+CmpWarning	Warning	警告
+CmpOK	No problems found	未发现问题
+CmpInfo	Note	提示
+CmpNativeNo	Not supported by the native backend	原生后端不支持
+CmpNativeYes	Supported by the native backend	原生后端支持
+BkOpenBackup	Open a backup…	打开备份…
+BkDropTitle	Restore from a backup made anywhere	从任意位置的备份还原
+BkDropHelp	A WSLPilot repository or folder, a wsl --export archive or VHDX, or any Linux tar.	WSLPilot 仓库或文件夹、wsl --export 归档或 VHDX，或任意 Linux tar。
+BkChooseFile	Choose file…	选择文件…
+BkChooseFolder	Choose folder…	选择文件夹…
+BkAdd	Add	添加
+BkLocked	Locked	已加密
+BkFromOtherPC	From another PC	来自其他电脑
+BkGroupLine	{count, plural, one {# version} other {# versions}} · latest {time}	{count:int} 个版本 · 最新 {time}
+BkVersionsOf	Versions of {name}	{name} 的版本
+BkWhere	Where	位置
+BkRestoreFrom	Restore {name} from {time}	从 {time} 还原 {name}
+BkStepCheck	Check the backup	检查备份
+BkStepCheckAbout	Reads it through once; nothing is changed.	完整读取一遍；不做任何更改。
+BkStepChecked	The backup is intact	备份完好
+BkStepRestoreAs	Restore as	还原为
+BkStopFirst	Running distributions and containers are stopped for the backup, then started again.	备份时会停止运行中的发行版与容器，然后再启动。
+BkRunsClosed	Runs while WSLPilot is closed, through the background agent.	WSLPilot 关闭时也会通过后台代理运行。
+BkNoHistory	No runs yet	还没有运行记录
+VolSubtitle	Native WSLc volumes keep Linux permissions intact, unlike Windows folders	原生 WSLc Volume 能完整保留 Linux 权限，Windows 文件夹则不能
+VolRemoveUnused	Remove unused…	删除未使用的…
+VolNew	New volume	新建 Volume
+VolNone	No volumes	没有 Volume
+VolNotInUse	Not in use	未使用
+VolBackUp	Back up…	备份…
+VolDelete	Delete…	删除…
+VolPickHint	Select a volume to export, back up or delete it.	选择一个 Volume 以导出、备份或删除。
+VolRemoveUnusedTitle	Remove {count, plural, one {# unused volume} other {# unused volumes}}?	删除 {count:int} 个未使用的 Volume？
+VolRemoveUnusedMessage	These volumes and all their data are deleted: {names}	以下 Volume 及其全部数据会被删除：{names}
+VolImportTitle	Import a TAR archive	导入 TAR 归档
+VolArchive	Archive	归档
+VolArchiveSize	{size} archive	归档大小 {size}
+VolIntoNew	A new volume	新的 Volume
+VolIntoExisting	Replace the contents of an existing volume	替换现有 Volume 的内容
+VolKeptTitle	Kept exactly as in the archive	与归档完全一致地保留
+VolKept	Owners and groups (numeric IDs) · permissions · symlinks and hard links · timestamps · extended attributes	属主与属组（数字 ID）· 权限 · 符号链接与硬链接 · 时间戳 · 扩展属性
+VolCheckAfter	Check entry count after import	导入后检查条目数
+VolCheckFailed	The archive has {count:int} entries but only {found:int} were found in the volume.	归档有 {count:int} 个条目，但 Volume 中只找到 {found:int} 个。
+VolImportGo	Import	导入
+TrayCheckUpdates	Check for updates	检查更新
+TrayHint	WSLPilot keeps running in the tray so scheduled backups continue. Choose Quit in the tray menu to close it, or change this in Settings.	WSLPilot 会继续在托盘中运行，以便计划备份照常进行。要退出，请在托盘菜单中选择“退出”，或在设置中更改。
+DashOnDisk	On disk (usage inside not measured)	磁盘占用（未测量内部用量）

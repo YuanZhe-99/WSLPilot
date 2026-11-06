@@ -45,57 +45,86 @@ func (a *App) closeTerminal(i int) {
 	}
 }
 
-// terminalView draws the Terminal page: tabs of sessions and a launcher.
+// terminalView draws the Terminal page: a tab strip of sessions with a
+// launcher, and the active session.
 func (a *App) terminalView(c *ui.Context) {
 	p := &a.term
 	t := c.Theme()
-	a.header(c, L.NavTerminal(), func() {
-		ui.MenuButton(c, L.TermNew(), func(m *ui.Menu) {
-			for _, d := range a.wsl.distros {
-				if m.Item(d.Name).Chosen() {
-					a.openTerminal(d.Name, []string{"wsl.exe", "--distribution", d.Name, "--cd", "~"})
-				}
-			}
-			m.Separator()
-			for _, s := range a.ctr.list {
-				if s.Running() && m.Item(s.Names+" (WSLc)").Chosen() {
-					a.openTerminal(s.Names, []string{"wslc.exe", "container", "exec", "--interactive", "--tty", s.ID, "sh"})
-				}
-			}
-			m.Separator()
-			if m.Item("PowerShell").Chosen() {
-				a.openTerminal("PowerShell", nil)
-			}
-		})
-	})
 	if !a.wsl.loaded {
 		a.loadDistros()
 	}
+	a.head(c, paneHead{icon: iconTerminal, title: L.NavTerminal(), sub: L.TermSubtitle(), actions: func() {
+		ui.PrimaryButton(c.Key("new"), L.TermNew()).Menu(func(m *ui.Menu) { a.terminalMenu(m) })
+	}})
 	if len(p.sessions) == 0 {
-		muted(c, L.TermNone())
+		body(c, func() {
+			emptyState(c, iconTerminal, L.TermNone(), L.TermNoneHint(), func() {
+				ui.Button(c.Key("new-empty"), L.TermNew()).Menu(func(m *ui.Menu) { a.terminalMenu(m) })
+			})
+		})
 		return
 	}
-	ui.Row(c).FillWidth().Gap(4).Children(func() {
-		for i, s := range p.sessions {
-			idx := i
-			tab := ui.Row(c.Key(s.id)).Gap(4).Padding(4, 10).Radius(6).AlignItems(ui.Center)
-			if i == p.active {
-				tab.Background(t.Surface).Border(1, t.Border)
-			}
-			tab.Children(func() {
-				title := s.title
-				if s.term.Done() {
-					title += " · " + L.TermEnded()
+	ui.Column(c.Key("term")).Grow(1).FillWidth().MinHeight(0).Padding(4, panePadX, panePadX, panePadX).Gap(0).Children(func() {
+		ui.Row(c.Key("tabs")).FillWidth().Gap(4).AlignItems(ui.End).Children(func() {
+			for i, s := range p.sessions {
+				idx := i
+				b := ui.ButtonBase(c.Key("tab-"+itoa(s.id))).Padding(7, 8, 7, 12).Radius(8).Label(s.title)
+				if i == p.active {
+					b.Background(consoleBg)
+				} else if b.Hovered() {
+					b.Background(t.SurfaceHover)
 				}
-				ui.Button(c, title).OnClick(func() { p.active = idx })
-				ui.Button(c, "×").Label(L.Close()).OnClick(func() { a.closeTerminal(idx) })
+				b.Children(func() {
+					ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
+						fg := t.TextMuted
+						if i == p.active {
+							fg = consoleText
+						}
+						ui.Icon(c, iconTerminal).Size(13, 13).TextColor(fg)
+						title := s.title
+						if s.term.Done() {
+							title += " · " + L.TermEnded()
+						}
+						ui.Text(c, title).FontSize(13).TextColor(fg).NoWrap()
+						x := ui.ButtonBase(c.Key("close-"+itoa(s.id))).Size(18, 18).Radius(4).Center().Label(L.Close()).Tooltip(L.Close())
+						if x.Hovered() {
+							x.Background(fg.Alpha(0.15))
+						}
+						x.Children(func() { ui.Icon(c, iconClose).Size(11, 11).TextColor(fg) })
+						if x.Clicked() {
+							a.closeTerminal(idx)
+						}
+					})
+				})
+				if b.Clicked() {
+					p.active = idx
+				}
+			}
+		})
+		if p.active >= 0 && p.active < len(p.sessions) {
+			s := p.sessions[p.active]
+			ui.Column(c.Key("term-" + itoa(s.id))).Grow(1).FillWidth().MinHeight(0).Padding(8).Radius(cardRadius).Background(consoleBg).Children(func() {
+				s.term.View(c).Fill().AutoFocus()
 			})
 		}
 	})
-	if p.active >= 0 && p.active < len(p.sessions) {
-		s := p.sessions[p.active]
-		ui.Column(c.Key("term-" + itoa(s.id))).Grow(1).FillWidth().Children(func() {
-			s.term.View(c).Fill().AutoFocus()
-		})
+}
+
+// terminalMenu lists what a new terminal can open.
+func (a *App) terminalMenu(m *ui.Menu) {
+	for _, d := range a.wsl.distros {
+		if m.Item(d.Name).Chosen() {
+			a.openTerminal(d.Name, []string{"wsl.exe", "--distribution", d.Name, "--cd", "~"})
+		}
+	}
+	m.Separator()
+	for _, s := range a.ctr.list {
+		if s.Running() && m.Item(s.Names+" (WSLc)").Chosen() {
+			a.openTerminal(s.Names, []string{"wslc.exe", "container", "exec", "--interactive", "--tty", s.ID, "sh"})
+		}
+	}
+	m.Separator()
+	if m.Item("PowerShell").Chosen() {
+		a.openTerminal("PowerShell", nil)
 	}
 }

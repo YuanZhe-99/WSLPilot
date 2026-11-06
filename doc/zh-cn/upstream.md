@@ -83,3 +83,7 @@ Fixture：`internal/wslc/testdata/3.0.3.0/`（用户名已替换为 `user`）。
 |---|---|
 | 原生 UI 不需要 WebView2；在 Windows 10/11 x64 与 arm64 上用 Direct3D 11 绘制。 | WSLPilot 只使用原生 UI。 |
 | `mygo generate` 根据 ARB 目录生成 `locales/catalog_gen.go`。 | 编辑目录后运行；该文件需提交。 |
+| `ui.Segmented` 通过 `Changed` / `OnChange` 报告新的选择；其上的 `OnClick` 从不触发（v0.7.4）。 | 设置中的分段控件使用 `OnChange`；视图测试点击它们并检查保存的偏好。 |
+| `mygo.Updater.Check` 返回更新的已签名版本或 nil；`Update.Install(ctx, progress)` 下载、校验并安装；对于无法写入自身所在位置的副本，`Updater.Enabled` 为 false；`App.Relaunch` 重启到新版本（v0.7.4）。 | 应用内更新流程（`gui.md`）基于这些接口；不使用更新窗口插件。 |
+| `Power.IdleTime` 报告用户已空闲多长时间（v0.7.4）。 | 用于“电脑空闲时安装”。 |
+| `TitleBarHidden` 加 `HideWindowButtons` 把窗口框架交给应用；`.DragWindow()` 与 `.MaximizeButton()` 标出拖动区域与贴靠布局按钮（v0.7.4）。 | 面板页眉即标题栏；WSLPilot 在 Windows 上自绘窗口按钮。 |

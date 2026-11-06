@@ -19,6 +19,7 @@ written in Go with [MyGo](https://github.com/egoist/mygo)'s native UI. It drives
 | [backups.md](backups.md) | Backup kinds, folder and archive formats, catalog, restore, plans, restart policies |
 | [compose.md](compose.md) | Compose backends, project metadata, supported keys, migration |
 | [app-data.md](app-data.md) | What WSLPilot stores and where |
+| [gui.md](gui.md) | The window shell, settings sheet, in-app updates and the pages |
 | [translation-guide.md](translation-guide.md) | Mirror rules and the glossary |
 | [version-history.md](version-history.md) | Releases and the upstream versions they were tested with |
 | [functions/INDEX.md](functions/INDEX.md) | Per-package roles and key declarations |
@@ -29,6 +30,6 @@ written in Go with [MyGo](https://github.com/egoist/mygo)'s native UI. It drives
 |---|---|---|
 | Go | 1.27.3 | `go.mod` |
 | MyGo | v0.7.4 | `go.mod` |
-| WSLPilot | 0.1.0 | `internal/version`, `mygo.json` |
+| WSLPilot | 0.1.1 | `internal/version`, `mygo.json` |
 | WSL (tested, not bundled) | 3.0.3.0 | `internal/upstream/tested.json`, `upstream.md` |
 | WSLc (tested, not bundled) | 3.0.3.0 | `upstream.md` |

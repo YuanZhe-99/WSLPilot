@@ -4294,11 +4294,11 @@ func (msgs Messages) TermNew() string {
 	return Catalog.Format(msgs.locale, "TermNew", nil)
 }
 
-// TermNone says "No terminals open. Start one from a distribution or a container, or with New terminal."
+// TermNone says "No terminals open"
 // in the language the app shows.
 func TermNone() string { return In(i18n.Locale()).TermNone() }
 
-// TermNone says "No terminals open. Start one from a distribution or a container, or with New terminal."
+// TermNone says "No terminals open"
 // in the language of msgs.
 func (msgs Messages) TermNone() string {
 	return Catalog.Format(msgs.locale, "TermNone", nil)
@@ -4874,4 +4874,2004 @@ func CtrOtherSession(name string) string { return In(i18n.Locale()).CtrOtherSess
 // in the language of msgs.
 func (msgs Messages) CtrOtherSession(name string) string {
 	return Catalog.Format(msgs.locale, "CtrOtherSession", map[string]any{"name": name})
+}
+
+// NavTasks says "Tasks"
+// in the language the app shows.
+func NavTasks() string { return In(i18n.Locale()).NavTasks() }
+
+// NavTasks says "Tasks"
+// in the language of msgs.
+func (msgs Messages) NavTasks() string {
+	return Catalog.Format(msgs.locale, "NavTasks", nil)
+}
+
+// TasksAbout says "Long operations run here; their logs stay until you close WSLPilot."
+// in the language the app shows.
+func TasksAbout() string { return In(i18n.Locale()).TasksAbout() }
+
+// TasksAbout says "Long operations run here; their logs stay until you close WSLPilot."
+// in the language of msgs.
+func (msgs Messages) TasksAbout() string {
+	return Catalog.Format(msgs.locale, "TasksAbout", nil)
+}
+
+// TasksEmpty says "Nothing has run yet"
+// in the language the app shows.
+func TasksEmpty() string { return In(i18n.Locale()).TasksEmpty() }
+
+// TasksEmpty says "Nothing has run yet"
+// in the language of msgs.
+func (msgs Messages) TasksEmpty() string {
+	return Catalog.Format(msgs.locale, "TasksEmpty", nil)
+}
+
+// WindowMinimize says "Minimize"
+// in the language the app shows.
+func WindowMinimize() string { return In(i18n.Locale()).WindowMinimize() }
+
+// WindowMinimize says "Minimize"
+// in the language of msgs.
+func (msgs Messages) WindowMinimize() string {
+	return Catalog.Format(msgs.locale, "WindowMinimize", nil)
+}
+
+// WindowMaximize says "Maximize"
+// in the language the app shows.
+func WindowMaximize() string { return In(i18n.Locale()).WindowMaximize() }
+
+// WindowMaximize says "Maximize"
+// in the language of msgs.
+func (msgs Messages) WindowMaximize() string {
+	return Catalog.Format(msgs.locale, "WindowMaximize", nil)
+}
+
+// WindowRestore says "Restore"
+// in the language the app shows.
+func WindowRestore() string { return In(i18n.Locale()).WindowRestore() }
+
+// WindowRestore says "Restore"
+// in the language of msgs.
+func (msgs Messages) WindowRestore() string {
+	return Catalog.Format(msgs.locale, "WindowRestore", nil)
+}
+
+// WindowClose says "Close"
+// in the language the app shows.
+func WindowClose() string { return In(i18n.Locale()).WindowClose() }
+
+// WindowClose says "Close"
+// in the language of msgs.
+func (msgs Messages) WindowClose() string {
+	return Catalog.Format(msgs.locale, "WindowClose", nil)
+}
+
+// TermSubtitle says "Shells in your distributions and containers"
+// in the language the app shows.
+func TermSubtitle() string { return In(i18n.Locale()).TermSubtitle() }
+
+// TermSubtitle says "Shells in your distributions and containers"
+// in the language of msgs.
+func (msgs Messages) TermSubtitle() string {
+	return Catalog.Format(msgs.locale, "TermSubtitle", nil)
+}
+
+// TermNoneHint says "Open a shell in a distribution, a running container or PowerShell."
+// in the language the app shows.
+func TermNoneHint() string { return In(i18n.Locale()).TermNoneHint() }
+
+// TermNoneHint says "Open a shell in a distribution, a running container or PowerShell."
+// in the language of msgs.
+func (msgs Messages) TermNoneHint() string {
+	return Catalog.Format(msgs.locale, "TermNoneHint", nil)
+}
+
+// SetGroupPreferences says "Preferences"
+// in the language the app shows.
+func SetGroupPreferences() string { return In(i18n.Locale()).SetGroupPreferences() }
+
+// SetGroupPreferences says "Preferences"
+// in the language of msgs.
+func (msgs Messages) SetGroupPreferences() string {
+	return Catalog.Format(msgs.locale, "SetGroupPreferences", nil)
+}
+
+// SetGroupComputer says "This computer"
+// in the language the app shows.
+func SetGroupComputer() string { return In(i18n.Locale()).SetGroupComputer() }
+
+// SetGroupComputer says "This computer"
+// in the language of msgs.
+func (msgs Messages) SetGroupComputer() string {
+	return Catalog.Format(msgs.locale, "SetGroupComputer", nil)
+}
+
+// SetBackupsAgent says "Backups & agent"
+// in the language the app shows.
+func SetBackupsAgent() string { return In(i18n.Locale()).SetBackupsAgent() }
+
+// SetBackupsAgent says "Backups & agent"
+// in the language of msgs.
+func (msgs Messages) SetBackupsAgent() string {
+	return Catalog.Format(msgs.locale, "SetBackupsAgent", nil)
+}
+
+// SetAboutUpdates says "About & updates"
+// in the language the app shows.
+func SetAboutUpdates() string { return In(i18n.Locale()).SetAboutUpdates() }
+
+// SetAboutUpdates says "About & updates"
+// in the language of msgs.
+func (msgs Messages) SetAboutUpdates() string {
+	return Catalog.Format(msgs.locale, "SetAboutUpdates", nil)
+}
+
+// SetSearch says "Search settings"
+// in the language the app shows.
+func SetSearch() string { return In(i18n.Locale()).SetSearch() }
+
+// SetSearch says "Search settings"
+// in the language of msgs.
+func (msgs Messages) SetSearch() string {
+	return Catalog.Format(msgs.locale, "SetSearch", nil)
+}
+
+// SetSearchNone says "No settings match"
+// in the language the app shows.
+func SetSearchNone() string { return In(i18n.Locale()).SetSearchNone() }
+
+// SetSearchNone says "No settings match"
+// in the language of msgs.
+func (msgs Messages) SetSearchNone() string {
+	return Catalog.Format(msgs.locale, "SetSearchNone", nil)
+}
+
+// SetThemeHelp says "Follow Windows, or always light or dark."
+// in the language the app shows.
+func SetThemeHelp() string { return In(i18n.Locale()).SetThemeHelp() }
+
+// SetThemeHelp says "Follow Windows, or always light or dark."
+// in the language of msgs.
+func (msgs Messages) SetThemeHelp() string {
+	return Catalog.Format(msgs.locale, "SetThemeHelp", nil)
+}
+
+// SetOpenAtLoginHelp says "Start in the tray when you sign in to Windows."
+// in the language the app shows.
+func SetOpenAtLoginHelp() string { return In(i18n.Locale()).SetOpenAtLoginHelp() }
+
+// SetOpenAtLoginHelp says "Start in the tray when you sign in to Windows."
+// in the language of msgs.
+func (msgs Messages) SetOpenAtLoginHelp() string {
+	return Catalog.Format(msgs.locale, "SetOpenAtLoginHelp", nil)
+}
+
+// SetCloseWindow says "Closing the window"
+// in the language the app shows.
+func SetCloseWindow() string { return In(i18n.Locale()).SetCloseWindow() }
+
+// SetCloseWindow says "Closing the window"
+// in the language of msgs.
+func (msgs Messages) SetCloseWindow() string {
+	return Catalog.Format(msgs.locale, "SetCloseWindow", nil)
+}
+
+// SetCloseWindowHelp says "Keep running in the tray so scheduled backups and update checks continue, or quit."
+// in the language the app shows.
+func SetCloseWindowHelp() string { return In(i18n.Locale()).SetCloseWindowHelp() }
+
+// SetCloseWindowHelp says "Keep running in the tray so scheduled backups and update checks continue, or quit."
+// in the language of msgs.
+func (msgs Messages) SetCloseWindowHelp() string {
+	return Catalog.Format(msgs.locale, "SetCloseWindowHelp", nil)
+}
+
+// SetCloseToTray says "Keep in tray"
+// in the language the app shows.
+func SetCloseToTray() string { return In(i18n.Locale()).SetCloseToTray() }
+
+// SetCloseToTray says "Keep in tray"
+// in the language of msgs.
+func (msgs Messages) SetCloseToTray() string {
+	return Catalog.Format(msgs.locale, "SetCloseToTray", nil)
+}
+
+// SetCloseQuit says "Quit"
+// in the language the app shows.
+func SetCloseQuit() string { return In(i18n.Locale()).SetCloseQuit() }
+
+// SetCloseQuit says "Quit"
+// in the language of msgs.
+func (msgs Messages) SetCloseQuit() string {
+	return Catalog.Format(msgs.locale, "SetCloseQuit", nil)
+}
+
+// SetWSLcFile says "WSL Containers settings file"
+// in the language the app shows.
+func SetWSLcFile() string { return In(i18n.Locale()).SetWSLcFile() }
+
+// SetWSLcFile says "WSL Containers settings file"
+// in the language of msgs.
+func (msgs Messages) SetWSLcFile() string {
+	return Catalog.Format(msgs.locale, "SetWSLcFile", nil)
+}
+
+// SetCheckDaily says "Check for updates daily"
+// in the language the app shows.
+func SetCheckDaily() string { return In(i18n.Locale()).SetCheckDaily() }
+
+// SetCheckDaily says "Check for updates daily"
+// in the language of msgs.
+func (msgs Messages) SetCheckDaily() string {
+	return Catalog.Format(msgs.locale, "SetCheckDaily", nil)
+}
+
+// SetCheckDailyHelp says "Checks GitHub once a day and tells you once per new version."
+// in the language the app shows.
+func SetCheckDailyHelp() string { return In(i18n.Locale()).SetCheckDailyHelp() }
+
+// SetCheckDailyHelp says "Checks GitHub once a day and tells you once per new version."
+// in the language of msgs.
+func (msgs Messages) SetCheckDailyHelp() string {
+	return Catalog.Format(msgs.locale, "SetCheckDailyHelp", nil)
+}
+
+// SetAutoInstall says "Install updates automatically"
+// in the language the app shows.
+func SetAutoInstall() string { return In(i18n.Locale()).SetAutoInstall() }
+
+// SetAutoInstall says "Install updates automatically"
+// in the language of msgs.
+func (msgs Messages) SetAutoInstall() string {
+	return Catalog.Format(msgs.locale, "SetAutoInstall", nil)
+}
+
+// SetAutoInstallHelp says "Installs and restarts WSLPilot at the time you choose; running tasks are never interrupted."
+// in the language the app shows.
+func SetAutoInstallHelp() string { return In(i18n.Locale()).SetAutoInstallHelp() }
+
+// SetAutoInstallHelp says "Installs and restarts WSLPilot at the time you choose; running tasks are never interrupted."
+// in the language of msgs.
+func (msgs Messages) SetAutoInstallHelp() string {
+	return Catalog.Format(msgs.locale, "SetAutoInstallHelp", nil)
+}
+
+// SetLicenses says "Open source licenses"
+// in the language the app shows.
+func SetLicenses() string { return In(i18n.Locale()).SetLicenses() }
+
+// SetLicenses says "Open source licenses"
+// in the language of msgs.
+func (msgs Messages) SetLicenses() string {
+	return Catalog.Format(msgs.locale, "SetLicenses", nil)
+}
+
+// SetLicensesHelp says "WSLPilot is GPL-3.0; the components it uses keep their own licenses."
+// in the language the app shows.
+func SetLicensesHelp() string { return In(i18n.Locale()).SetLicensesHelp() }
+
+// SetLicensesHelp says "WSLPilot is GPL-3.0; the components it uses keep their own licenses."
+// in the language of msgs.
+func (msgs Messages) SetLicensesHelp() string {
+	return Catalog.Format(msgs.locale, "SetLicensesHelp", nil)
+}
+
+// SetDataHelp says "Preferences, project metadata, plans and the activity log."
+// in the language the app shows.
+func SetDataHelp() string { return In(i18n.Locale()).SetDataHelp() }
+
+// SetDataHelp says "Preferences, project metadata, plans and the activity log."
+// in the language of msgs.
+func (msgs Messages) SetDataHelp() string {
+	return Catalog.Format(msgs.locale, "SetDataHelp", nil)
+}
+
+// SetGeneralAbout says "How WSLPilot looks, starts and closes."
+// in the language the app shows.
+func SetGeneralAbout() string { return In(i18n.Locale()).SetGeneralAbout() }
+
+// SetGeneralAbout says "How WSLPilot looks, starts and closes."
+// in the language of msgs.
+func (msgs Messages) SetGeneralAbout() string {
+	return Catalog.Format(msgs.locale, "SetGeneralAbout", nil)
+}
+
+// SetGroupLook says "Appearance"
+// in the language the app shows.
+func SetGroupLook() string { return In(i18n.Locale()).SetGroupLook() }
+
+// SetGroupLook says "Appearance"
+// in the language of msgs.
+func (msgs Messages) SetGroupLook() string {
+	return Catalog.Format(msgs.locale, "SetGroupLook", nil)
+}
+
+// SetGroupStartClose says "Start and close"
+// in the language the app shows.
+func SetGroupStartClose() string { return In(i18n.Locale()).SetGroupStartClose() }
+
+// SetGroupStartClose says "Start and close"
+// in the language of msgs.
+func (msgs Messages) SetGroupStartClose() string {
+	return Catalog.Format(msgs.locale, "SetGroupStartClose", nil)
+}
+
+// SetBackupsAbout says "Where backups go and the agent that runs scheduled plans."
+// in the language the app shows.
+func SetBackupsAbout() string { return In(i18n.Locale()).SetBackupsAbout() }
+
+// SetBackupsAbout says "Where backups go and the agent that runs scheduled plans."
+// in the language of msgs.
+func (msgs Messages) SetBackupsAbout() string {
+	return Catalog.Format(msgs.locale, "SetBackupsAbout", nil)
+}
+
+// SetGroupStorage says "Storage"
+// in the language the app shows.
+func SetGroupStorage() string { return In(i18n.Locale()).SetGroupStorage() }
+
+// SetGroupStorage says "Storage"
+// in the language of msgs.
+func (msgs Messages) SetGroupStorage() string {
+	return Catalog.Format(msgs.locale, "SetGroupStorage", nil)
+}
+
+// SetWSLcAbout says "Settings of the WSL Containers session and where its data lives."
+// in the language the app shows.
+func SetWSLcAbout() string { return In(i18n.Locale()).SetWSLcAbout() }
+
+// SetWSLcAbout says "Settings of the WSL Containers session and where its data lives."
+// in the language of msgs.
+func (msgs Messages) SetWSLcAbout() string {
+	return Catalog.Format(msgs.locale, "SetWSLcAbout", nil)
+}
+
+// SetGroupData says "Data"
+// in the language the app shows.
+func SetGroupData() string { return In(i18n.Locale()).SetGroupData() }
+
+// SetGroupData says "Data"
+// in the language of msgs.
+func (msgs Messages) SetGroupData() string {
+	return Catalog.Format(msgs.locale, "SetGroupData", nil)
+}
+
+// SetAboutAbout says "Version, licenses and updates."
+// in the language the app shows.
+func SetAboutAbout() string { return In(i18n.Locale()).SetAboutAbout() }
+
+// SetAboutAbout says "Version, licenses and updates."
+// in the language of msgs.
+func (msgs Messages) SetAboutAbout() string {
+	return Catalog.Format(msgs.locale, "SetAboutAbout", nil)
+}
+
+// SetSource says "Source code"
+// in the language the app shows.
+func SetSource() string { return In(i18n.Locale()).SetSource() }
+
+// SetSource says "Source code"
+// in the language of msgs.
+func (msgs Messages) SetSource() string {
+	return Catalog.Format(msgs.locale, "SetSource", nil)
+}
+
+// SetShow says "Show"
+// in the language the app shows.
+func SetShow() string { return In(i18n.Locale()).SetShow() }
+
+// SetShow says "Show"
+// in the language of msgs.
+func (msgs Messages) SetShow() string {
+	return Catalog.Format(msgs.locale, "SetShow", nil)
+}
+
+// SetDiagnostics says "WSLPilot data folder"
+// in the language the app shows.
+func SetDiagnostics() string { return In(i18n.Locale()).SetDiagnostics() }
+
+// SetDiagnostics says "WSLPilot data folder"
+// in the language of msgs.
+func (msgs Messages) SetDiagnostics() string {
+	return Catalog.Format(msgs.locale, "SetDiagnostics", nil)
+}
+
+// UpdCheckFailed says "Could not check for updates: {error}"
+// in the language the app shows.
+func UpdCheckFailed(error string) string { return In(i18n.Locale()).UpdCheckFailed(error) }
+
+// UpdCheckFailed says "Could not check for updates: {error}"
+// in the language of msgs.
+func (msgs Messages) UpdCheckFailed(error string) string {
+	return Catalog.Format(msgs.locale, "UpdCheckFailed", map[string]any{"error": error})
+}
+
+// UpdUpToDate says "WSLPilot is up to date."
+// in the language the app shows.
+func UpdUpToDate() string { return In(i18n.Locale()).UpdUpToDate() }
+
+// UpdUpToDate says "WSLPilot is up to date."
+// in the language of msgs.
+func (msgs Messages) UpdUpToDate() string {
+	return Catalog.Format(msgs.locale, "UpdUpToDate", nil)
+}
+
+// UpdAvailable says "Version {version} is available."
+// in the language the app shows.
+func UpdAvailable(version string) string { return In(i18n.Locale()).UpdAvailable(version) }
+
+// UpdAvailable says "Version {version} is available."
+// in the language of msgs.
+func (msgs Messages) UpdAvailable(version string) string {
+	return Catalog.Format(msgs.locale, "UpdAvailable", map[string]any{"version": version})
+}
+
+// UpdInstallFailed says "The update could not be installed: {error}"
+// in the language the app shows.
+func UpdInstallFailed(error string) string { return In(i18n.Locale()).UpdInstallFailed(error) }
+
+// UpdInstallFailed says "The update could not be installed: {error}"
+// in the language of msgs.
+func (msgs Messages) UpdInstallFailed(error string) string {
+	return Catalog.Format(msgs.locale, "UpdInstallFailed", map[string]any{"error": error})
+}
+
+// UpdUnavailable says "Updates are not available in this build."
+// in the language the app shows.
+func UpdUnavailable() string { return In(i18n.Locale()).UpdUnavailable() }
+
+// UpdUnavailable says "Updates are not available in this build."
+// in the language of msgs.
+func (msgs Messages) UpdUnavailable() string {
+	return Catalog.Format(msgs.locale, "UpdUnavailable", nil)
+}
+
+// UpdInstalling says "Downloading the update… {percent}%"
+// in the language the app shows.
+func UpdInstalling(percent int) string { return In(i18n.Locale()).UpdInstalling(percent) }
+
+// UpdInstalling says "Downloading the update… {percent}%"
+// in the language of msgs.
+func (msgs Messages) UpdInstalling(percent int) string {
+	return Catalog.Format(msgs.locale, "UpdInstalling", map[string]any{"percent": percent})
+}
+
+// UpdInstallingAbout says "WSLPilot restarts when the download is complete."
+// in the language the app shows.
+func UpdInstallingAbout() string { return In(i18n.Locale()).UpdInstallingAbout() }
+
+// UpdInstallingAbout says "WSLPilot restarts when the download is complete."
+// in the language of msgs.
+func (msgs Messages) UpdInstallingAbout() string {
+	return Catalog.Format(msgs.locale, "UpdInstallingAbout", nil)
+}
+
+// UpdInstalled says "You have {version}."
+// in the language the app shows.
+func UpdInstalled(version string) string { return In(i18n.Locale()).UpdInstalled(version) }
+
+// UpdInstalled says "You have {version}."
+// in the language of msgs.
+func (msgs Messages) UpdInstalled(version string) string {
+	return Catalog.Format(msgs.locale, "UpdInstalled", map[string]any{"version": version})
+}
+
+// UpdInstallRestart says "Install and restart"
+// in the language the app shows.
+func UpdInstallRestart() string { return In(i18n.Locale()).UpdInstallRestart() }
+
+// UpdInstallRestart says "Install and restart"
+// in the language of msgs.
+func (msgs Messages) UpdInstallRestart() string {
+	return Catalog.Format(msgs.locale, "UpdInstallRestart", nil)
+}
+
+// UpdNeverChecked says "Not checked yet"
+// in the language the app shows.
+func UpdNeverChecked() string { return In(i18n.Locale()).UpdNeverChecked() }
+
+// UpdNeverChecked says "Not checked yet"
+// in the language of msgs.
+func (msgs Messages) UpdNeverChecked() string {
+	return Catalog.Format(msgs.locale, "UpdNeverChecked", nil)
+}
+
+// UpdLastChecked says "Last checked {time}"
+// in the language the app shows.
+func UpdLastChecked(time_ string) string { return In(i18n.Locale()).UpdLastChecked(time_) }
+
+// UpdLastChecked says "Last checked {time}"
+// in the language of msgs.
+func (msgs Messages) UpdLastChecked(time_ string) string {
+	return Catalog.Format(msgs.locale, "UpdLastChecked", map[string]any{"time": time_})
+}
+
+// UpdLatest says "WSLPilot {version}"
+// in the language the app shows.
+func UpdLatest(version string) string { return In(i18n.Locale()).UpdLatest(version) }
+
+// UpdLatest says "WSLPilot {version}"
+// in the language of msgs.
+func (msgs Messages) UpdLatest(version string) string {
+	return Catalog.Format(msgs.locale, "UpdLatest", map[string]any{"version": version})
+}
+
+// UpdCheckNow says "Check now"
+// in the language the app shows.
+func UpdCheckNow() string { return In(i18n.Locale()).UpdCheckNow() }
+
+// UpdCheckNow says "Check now"
+// in the language of msgs.
+func (msgs Messages) UpdCheckNow() string {
+	return Catalog.Format(msgs.locale, "UpdCheckNow", nil)
+}
+
+// UpdAutoOff says "Never"
+// in the language the app shows.
+func UpdAutoOff() string { return In(i18n.Locale()).UpdAutoOff() }
+
+// UpdAutoOff says "Never"
+// in the language of msgs.
+func (msgs Messages) UpdAutoOff() string {
+	return Catalog.Format(msgs.locale, "UpdAutoOff", nil)
+}
+
+// UpdAutoIdle says "When the computer is idle"
+// in the language the app shows.
+func UpdAutoIdle() string { return In(i18n.Locale()).UpdAutoIdle() }
+
+// UpdAutoIdle says "When the computer is idle"
+// in the language of msgs.
+func (msgs Messages) UpdAutoIdle() string {
+	return Catalog.Format(msgs.locale, "UpdAutoIdle", nil)
+}
+
+// UpdAutoDaily says "Every day at"
+// in the language the app shows.
+func UpdAutoDaily() string { return In(i18n.Locale()).UpdAutoDaily() }
+
+// UpdAutoDaily says "Every day at"
+// in the language of msgs.
+func (msgs Messages) UpdAutoDaily() string {
+	return Catalog.Format(msgs.locale, "UpdAutoDaily", nil)
+}
+
+// DashCheckedAt says "Checked at {time}"
+// in the language the app shows.
+func DashCheckedAt(time_ string) string { return In(i18n.Locale()).DashCheckedAt(time_) }
+
+// DashCheckedAt says "Checked at {time}"
+// in the language of msgs.
+func (msgs Messages) DashCheckedAt(time_ string) string {
+	return Catalog.Format(msgs.locale, "DashCheckedAt", map[string]any{"time": time_})
+}
+
+// DashOpenTerminal says "Open {name}"
+// in the language the app shows.
+func DashOpenTerminal(name string) string { return In(i18n.Locale()).DashOpenTerminal(name) }
+
+// DashOpenTerminal says "Open {name}"
+// in the language of msgs.
+func (msgs Messages) DashOpenTerminal(name string) string {
+	return Catalog.Format(msgs.locale, "DashOpenTerminal", map[string]any{"name": name})
+}
+
+// DashInstallDistro says "Install a distribution"
+// in the language the app shows.
+func DashInstallDistro() string { return In(i18n.Locale()).DashInstallDistro() }
+
+// DashInstallDistro says "Install a distribution"
+// in the language of msgs.
+func (msgs Messages) DashInstallDistro() string {
+	return Catalog.Format(msgs.locale, "DashInstallDistro", nil)
+}
+
+// DashRunContainer says "Run a container"
+// in the language the app shows.
+func DashRunContainer() string { return In(i18n.Locale()).DashRunContainer() }
+
+// DashRunContainer says "Run a container"
+// in the language of msgs.
+func (msgs Messages) DashRunContainer() string {
+	return Catalog.Format(msgs.locale, "DashRunContainer", nil)
+}
+
+// DashImportTar says "Import a TAR"
+// in the language the app shows.
+func DashImportTar() string { return In(i18n.Locale()).DashImportTar() }
+
+// DashImportTar says "Import a TAR"
+// in the language of msgs.
+func (msgs Messages) DashImportTar() string {
+	return Catalog.Format(msgs.locale, "DashImportTar", nil)
+}
+
+// DashWSLMissing says "WSL is not installed"
+// in the language the app shows.
+func DashWSLMissing() string { return In(i18n.Locale()).DashWSLMissing() }
+
+// DashWSLMissing says "WSL is not installed"
+// in the language of msgs.
+func (msgs Messages) DashWSLMissing() string {
+	return Catalog.Format(msgs.locale, "DashWSLMissing", nil)
+}
+
+// DashWSLLine says "{running} running · default {name} · WSL {wsl} · kernel {kernel}"
+// in the language the app shows.
+func DashWSLLine(running int, name string, wsl string, kernel string) string {
+	return In(i18n.Locale()).DashWSLLine(running, name, wsl, kernel)
+}
+
+// DashWSLLine says "{running} running · default {name} · WSL {wsl} · kernel {kernel}"
+// in the language of msgs.
+func (msgs Messages) DashWSLLine(running int, name string, wsl string, kernel string) string {
+	return Catalog.Format(msgs.locale, "DashWSLLine", map[string]any{"running": running, "name": name, "wsl": wsl, "kernel": kernel})
+}
+
+// DashReady says "Ready"
+// in the language the app shows.
+func DashReady() string { return In(i18n.Locale()).DashReady() }
+
+// DashReady says "Ready"
+// in the language of msgs.
+func (msgs Messages) DashReady() string {
+	return Catalog.Format(msgs.locale, "DashReady", nil)
+}
+
+// DashManageDistros says "Manage distributions"
+// in the language the app shows.
+func DashManageDistros() string { return In(i18n.Locale()).DashManageDistros() }
+
+// DashManageDistros says "Manage distributions"
+// in the language of msgs.
+func (msgs Messages) DashManageDistros() string {
+	return Catalog.Format(msgs.locale, "DashManageDistros", nil)
+}
+
+// DashWSLcLine says "{running} running · {images, plural, one {# image} other {# images}} · {volumes, plural, one {# volume} other {# vo…"
+// in the language the app shows.
+func DashWSLcLine(running int, images int, volumes int, version string) string {
+	return In(i18n.Locale()).DashWSLcLine(running, images, volumes, version)
+}
+
+// DashWSLcLine says "{running} running · {images, plural, one {# image} other {# images}} · {volumes, plural, one {# volume} other {# vo…"
+// in the language of msgs.
+func (msgs Messages) DashWSLcLine(running int, images int, volumes int, version string) string {
+	return Catalog.Format(msgs.locale, "DashWSLcLine", map[string]any{"running": running, "images": images, "volumes": volumes, "version": version})
+}
+
+// DashContainersN says "{count, plural, one {# container} other {# containers}}"
+// in the language the app shows.
+func DashContainersN(count int) string { return In(i18n.Locale()).DashContainersN(count) }
+
+// DashContainersN says "{count, plural, one {# container} other {# containers}}"
+// in the language of msgs.
+func (msgs Messages) DashContainersN(count int) string {
+	return Catalog.Format(msgs.locale, "DashContainersN", map[string]any{"count": count})
+}
+
+// DashManageContainers says "Manage containers"
+// in the language the app shows.
+func DashManageContainers() string { return In(i18n.Locale()).DashManageContainers() }
+
+// DashManageContainers says "Manage containers"
+// in the language of msgs.
+func (msgs Messages) DashManageContainers() string {
+	return Catalog.Format(msgs.locale, "DashManageContainers", nil)
+}
+
+// DashBuiltin says "Built-in"
+// in the language the app shows.
+func DashBuiltin() string { return In(i18n.Locale()).DashBuiltin() }
+
+// DashBuiltin says "Built-in"
+// in the language of msgs.
+func (msgs Messages) DashBuiltin() string {
+	return Catalog.Format(msgs.locale, "DashBuiltin", nil)
+}
+
+// DashNative says "Native"
+// in the language the app shows.
+func DashNative() string { return In(i18n.Locale()).DashNative() }
+
+// DashNative says "Native"
+// in the language of msgs.
+func (msgs Messages) DashNative() string {
+	return Catalog.Format(msgs.locale, "DashNative", nil)
+}
+
+// DashProjects says "{count, plural, one {# project} other {# projects}}"
+// in the language the app shows.
+func DashProjects(count int) string { return In(i18n.Locale()).DashProjects(count) }
+
+// DashProjects says "{count, plural, one {# project} other {# projects}}"
+// in the language of msgs.
+func (msgs Messages) DashProjects(count int) string {
+	return Catalog.Format(msgs.locale, "DashProjects", map[string]any{"count": count})
+}
+
+// DashOpenProjects says "Open projects"
+// in the language the app shows.
+func DashOpenProjects() string { return In(i18n.Locale()).DashOpenProjects() }
+
+// DashOpenProjects says "Open projects"
+// in the language of msgs.
+func (msgs Messages) DashOpenProjects() string {
+	return Catalog.Format(msgs.locale, "DashOpenProjects", nil)
+}
+
+// DashDiskUsage says "Disk usage"
+// in the language the app shows.
+func DashDiskUsage() string { return In(i18n.Locale()).DashDiskUsage() }
+
+// DashDiskUsage says "Disk usage"
+// in the language of msgs.
+func (msgs Messages) DashDiskUsage() string {
+	return Catalog.Format(msgs.locale, "DashDiskUsage", nil)
+}
+
+// DashDiskLine says "{disk} on disk · {used} used inside"
+// in the language the app shows.
+func DashDiskLine(disk string, used string) string { return In(i18n.Locale()).DashDiskLine(disk, used) }
+
+// DashDiskLine says "{disk} on disk · {used} used inside"
+// in the language of msgs.
+func (msgs Messages) DashDiskLine(disk string, used string) string {
+	return Catalog.Format(msgs.locale, "DashDiskLine", map[string]any{"disk": disk, "used": used})
+}
+
+// DashDiskOnly says "{disk} on disk"
+// in the language the app shows.
+func DashDiskOnly(disk string) string { return In(i18n.Locale()).DashDiskOnly(disk) }
+
+// DashDiskOnly says "{disk} on disk"
+// in the language of msgs.
+func (msgs Messages) DashDiskOnly(disk string) string {
+	return Catalog.Format(msgs.locale, "DashDiskOnly", map[string]any{"disk": disk})
+}
+
+// DashWSLcData says "WSL Containers data"
+// in the language the app shows.
+func DashWSLcData() string { return In(i18n.Locale()).DashWSLcData() }
+
+// DashWSLcData says "WSL Containers data"
+// in the language of msgs.
+func (msgs Messages) DashWSLcData() string {
+	return Catalog.Format(msgs.locale, "DashWSLcData", nil)
+}
+
+// DashNoDisks says "No virtual disks found"
+// in the language the app shows.
+func DashNoDisks() string { return In(i18n.Locale()).DashNoDisks() }
+
+// DashNoDisks says "No virtual disks found"
+// in the language of msgs.
+func (msgs Messages) DashNoDisks() string {
+	return Catalog.Format(msgs.locale, "DashNoDisks", nil)
+}
+
+// DashUsed says "Used"
+// in the language the app shows.
+func DashUsed() string { return In(i18n.Locale()).DashUsed() }
+
+// DashUsed says "Used"
+// in the language of msgs.
+func (msgs Messages) DashUsed() string {
+	return Catalog.Format(msgs.locale, "DashUsed", nil)
+}
+
+// DashReclaimable says "Reclaimable"
+// in the language the app shows.
+func DashReclaimable() string { return In(i18n.Locale()).DashReclaimable() }
+
+// DashReclaimable says "Reclaimable"
+// in the language of msgs.
+func (msgs Messages) DashReclaimable() string {
+	return Catalog.Format(msgs.locale, "DashReclaimable", nil)
+}
+
+// DashActivity says "Recent activity"
+// in the language the app shows.
+func DashActivity() string { return In(i18n.Locale()).DashActivity() }
+
+// DashActivity says "Recent activity"
+// in the language of msgs.
+func (msgs Messages) DashActivity() string {
+	return Catalog.Format(msgs.locale, "DashActivity", nil)
+}
+
+// DashNoActivity says "Nothing has happened yet"
+// in the language the app shows.
+func DashNoActivity() string { return In(i18n.Locale()).DashNoActivity() }
+
+// DashNoActivity says "Nothing has happened yet"
+// in the language of msgs.
+func (msgs Messages) DashNoActivity() string {
+	return Catalog.Format(msgs.locale, "DashNoActivity", nil)
+}
+
+// DashNextBackup says "Next backup: {plan} at {time}"
+// in the language the app shows.
+func DashNextBackup(plan string, time_ string) string {
+	return In(i18n.Locale()).DashNextBackup(plan, time_)
+}
+
+// DashNextBackup says "Next backup: {plan} at {time}"
+// in the language of msgs.
+func (msgs Messages) DashNextBackup(plan string, time_ string) string {
+	return Catalog.Format(msgs.locale, "DashNextBackup", map[string]any{"plan": plan, "time": time_})
+}
+
+// WSLSubtitle says "Distributions on this computer"
+// in the language the app shows.
+func WSLSubtitle() string { return In(i18n.Locale()).WSLSubtitle() }
+
+// WSLSubtitle says "Distributions on this computer"
+// in the language of msgs.
+func (msgs Messages) WSLSubtitle() string {
+	return Catalog.Format(msgs.locale, "WSLSubtitle", nil)
+}
+
+// WSLSubtitleVersion says "Distributions on this computer · WSL {version}"
+// in the language the app shows.
+func WSLSubtitleVersion(version string) string { return In(i18n.Locale()).WSLSubtitleVersion(version) }
+
+// WSLSubtitleVersion says "Distributions on this computer · WSL {version}"
+// in the language of msgs.
+func (msgs Messages) WSLSubtitleVersion(version string) string {
+	return Catalog.Format(msgs.locale, "WSLSubtitleVersion", map[string]any{"version": version})
+}
+
+// WSLTitle says "Distributions"
+// in the language the app shows.
+func WSLTitle() string { return In(i18n.Locale()).WSLTitle() }
+
+// WSLTitle says "Distributions"
+// in the language of msgs.
+func (msgs Messages) WSLTitle() string {
+	return Catalog.Format(msgs.locale, "WSLTitle", nil)
+}
+
+// WSLSettingsAll says "WSL settings"
+// in the language the app shows.
+func WSLSettingsAll() string { return In(i18n.Locale()).WSLSettingsAll() }
+
+// WSLSettingsAll says "WSL settings"
+// in the language of msgs.
+func (msgs Messages) WSLSettingsAll() string {
+	return Catalog.Format(msgs.locale, "WSLSettingsAll", nil)
+}
+
+// ColLocation says "Location"
+// in the language the app shows.
+func ColLocation() string { return In(i18n.Locale()).ColLocation() }
+
+// ColLocation says "Location"
+// in the language of msgs.
+func (msgs Messages) ColLocation() string {
+	return Catalog.Format(msgs.locale, "ColLocation", nil)
+}
+
+// WSLDefault says "Default"
+// in the language the app shows.
+func WSLDefault() string { return In(i18n.Locale()).WSLDefault() }
+
+// WSLDefault says "Default"
+// in the language of msgs.
+func (msgs Messages) WSLDefault() string {
+	return Catalog.Format(msgs.locale, "WSLDefault", nil)
+}
+
+// WSLExportBackup says "Export or back up…"
+// in the language the app shows.
+func WSLExportBackup() string { return In(i18n.Locale()).WSLExportBackup() }
+
+// WSLExportBackup says "Export or back up…"
+// in the language of msgs.
+func (msgs Messages) WSLExportBackup() string {
+	return Catalog.Format(msgs.locale, "WSLExportBackup", nil)
+}
+
+// WSLSettingsBtn says "Settings"
+// in the language the app shows.
+func WSLSettingsBtn() string { return In(i18n.Locale()).WSLSettingsBtn() }
+
+// WSLSettingsBtn says "Settings"
+// in the language of msgs.
+func (msgs Messages) WSLSettingsBtn() string {
+	return Catalog.Format(msgs.locale, "WSLSettingsBtn", nil)
+}
+
+// WSLTerminalProfile says "Add a Windows Terminal profile"
+// in the language the app shows.
+func WSLTerminalProfile() string { return In(i18n.Locale()).WSLTerminalProfile() }
+
+// WSLTerminalProfile says "Add a Windows Terminal profile"
+// in the language of msgs.
+func (msgs Messages) WSLTerminalProfile() string {
+	return Catalog.Format(msgs.locale, "WSLTerminalProfile", nil)
+}
+
+// WSLMoreActions says "More actions"
+// in the language the app shows.
+func WSLMoreActions() string { return In(i18n.Locale()).WSLMoreActions() }
+
+// WSLMoreActions says "More actions"
+// in the language of msgs.
+func (msgs Messages) WSLMoreActions() string {
+	return Catalog.Format(msgs.locale, "WSLMoreActions", nil)
+}
+
+// WSLSparse says "Sparse disk"
+// in the language the app shows.
+func WSLSparse() string { return In(i18n.Locale()).WSLSparse() }
+
+// WSLSparse says "Sparse disk"
+// in the language of msgs.
+func (msgs Messages) WSLSparse() string {
+	return Catalog.Format(msgs.locale, "WSLSparse", nil)
+}
+
+// WSLSparseSet says "Set sparse…"
+// in the language the app shows.
+func WSLSparseSet() string { return In(i18n.Locale()).WSLSparseSet() }
+
+// WSLSparseSet says "Set sparse…"
+// in the language of msgs.
+func (msgs Messages) WSLSparseSet() string {
+	return Catalog.Format(msgs.locale, "WSLSparseSet", nil)
+}
+
+// WSLReclaimShort says "About {size} can be reclaimed"
+// in the language the app shows.
+func WSLReclaimShort(size string) string { return In(i18n.Locale()).WSLReclaimShort(size) }
+
+// WSLReclaimShort says "About {size} can be reclaimed"
+// in the language of msgs.
+func (msgs Messages) WSLReclaimShort(size string) string {
+	return Catalog.Format(msgs.locale, "WSLReclaimShort", map[string]any{"size": size})
+}
+
+// WSLMeasuring says "Measuring…"
+// in the language the app shows.
+func WSLMeasuring() string { return In(i18n.Locale()).WSLMeasuring() }
+
+// WSLMeasuring says "Measuring…"
+// in the language of msgs.
+func (msgs Messages) WSLMeasuring() string {
+	return Catalog.Format(msgs.locale, "WSLMeasuring", nil)
+}
+
+// WSLCompactOpen says "Reclaim disk space…"
+// in the language the app shows.
+func WSLCompactOpen() string { return In(i18n.Locale()).WSLCompactOpen() }
+
+// WSLCompactOpen says "Reclaim disk space…"
+// in the language of msgs.
+func (msgs Messages) WSLCompactOpen() string {
+	return Catalog.Format(msgs.locale, "WSLCompactOpen", nil)
+}
+
+// WSLCompactStep1 says "{name} is shut down"
+// in the language the app shows.
+func WSLCompactStep1(name string) string { return In(i18n.Locale()).WSLCompactStep1(name) }
+
+// WSLCompactStep1 says "{name} is shut down"
+// in the language of msgs.
+func (msgs Messages) WSLCompactStep1(name string) string {
+	return Catalog.Format(msgs.locale, "WSLCompactStep1", map[string]any{"name": name})
+}
+
+// WSLCompactStep2Official says "wsl.exe compacts the disk of {name}"
+// in the language the app shows.
+func WSLCompactStep2Official(name string) string {
+	return In(i18n.Locale()).WSLCompactStep2Official(name)
+}
+
+// WSLCompactStep2Official says "wsl.exe compacts the disk of {name}"
+// in the language of msgs.
+func (msgs Messages) WSLCompactStep2Official(name string) string {
+	return Catalog.Format(msgs.locale, "WSLCompactStep2Official", map[string]any{"name": name})
+}
+
+// WSLCompactStep2Shutdown says "WSL shuts down; {count, plural, =0 {no other distribution is running} one {# other running distribution stops too} ot…"
+// in the language the app shows.
+func WSLCompactStep2Shutdown(count int) string {
+	return In(i18n.Locale()).WSLCompactStep2Shutdown(count)
+}
+
+// WSLCompactStep2Shutdown says "WSL shuts down; {count, plural, =0 {no other distribution is running} one {# other running distribution stops too} ot…"
+// in the language of msgs.
+func (msgs Messages) WSLCompactStep2Shutdown(count int) string {
+	return Catalog.Format(msgs.locale, "WSLCompactStep2Shutdown", map[string]any{"count": count})
+}
+
+// WSLCompactStep3Admin says "diskpart compacts the disk in a separate administrator window"
+// in the language the app shows.
+func WSLCompactStep3Admin() string { return In(i18n.Locale()).WSLCompactStep3Admin() }
+
+// WSLCompactStep3Admin says "diskpart compacts the disk in a separate administrator window"
+// in the language of msgs.
+func (msgs Messages) WSLCompactStep3Admin() string {
+	return Catalog.Format(msgs.locale, "WSLCompactStep3Admin", nil)
+}
+
+// WSLCompactStepCheck says "The new size of {name} is measured"
+// in the language the app shows.
+func WSLCompactStepCheck(name string) string { return In(i18n.Locale()).WSLCompactStepCheck(name) }
+
+// WSLCompactStepCheck says "The new size of {name} is measured"
+// in the language of msgs.
+func (msgs Messages) WSLCompactStepCheck(name string) string {
+	return Catalog.Format(msgs.locale, "WSLCompactStepCheck", map[string]any{"name": name})
+}
+
+// WSLCompactBackupFirst says "Back up first"
+// in the language the app shows.
+func WSLCompactBackupFirst() string { return In(i18n.Locale()).WSLCompactBackupFirst() }
+
+// WSLCompactBackupFirst says "Back up first"
+// in the language of msgs.
+func (msgs Messages) WSLCompactBackupFirst() string {
+	return Catalog.Format(msgs.locale, "WSLCompactBackupFirst", nil)
+}
+
+// WSLCompactShutdown says "Shut down and reclaim"
+// in the language the app shows.
+func WSLCompactShutdown() string { return In(i18n.Locale()).WSLCompactShutdown() }
+
+// WSLCompactShutdown says "Shut down and reclaim"
+// in the language of msgs.
+func (msgs Messages) WSLCompactShutdown() string {
+	return Catalog.Format(msgs.locale, "WSLCompactShutdown", nil)
+}
+
+// WSLDistroSettingsTitle says "Settings of {name}"
+// in the language the app shows.
+func WSLDistroSettingsTitle(name string) string {
+	return In(i18n.Locale()).WSLDistroSettingsTitle(name)
+}
+
+// WSLDistroSettingsTitle says "Settings of {name}"
+// in the language of msgs.
+func (msgs Messages) WSLDistroSettingsTitle(name string) string {
+	return Catalog.Format(msgs.locale, "WSLDistroSettingsTitle", map[string]any{"name": name})
+}
+
+// WSLThisDistro says "This distribution (/etc/wsl.conf)"
+// in the language the app shows.
+func WSLThisDistro() string { return In(i18n.Locale()).WSLThisDistro() }
+
+// WSLThisDistro says "This distribution (/etc/wsl.conf)"
+// in the language of msgs.
+func (msgs Messages) WSLThisDistro() string {
+	return Catalog.Format(msgs.locale, "WSLThisDistro", nil)
+}
+
+// CfgSaveRestart says "Save and restart {name}"
+// in the language the app shows.
+func CfgSaveRestart(name string) string { return In(i18n.Locale()).CfgSaveRestart(name) }
+
+// CfgSaveRestart says "Save and restart {name}"
+// in the language of msgs.
+func (msgs Messages) CfgSaveRestart(name string) string {
+	return Catalog.Format(msgs.locale, "CfgSaveRestart", map[string]any{"name": name})
+}
+
+// CfgGroupBoot says "Boot"
+// in the language the app shows.
+func CfgGroupBoot() string { return In(i18n.Locale()).CfgGroupBoot() }
+
+// CfgGroupBoot says "Boot"
+// in the language of msgs.
+func (msgs Messages) CfgGroupBoot() string {
+	return Catalog.Format(msgs.locale, "CfgGroupBoot", nil)
+}
+
+// CfgGroupUser says "User"
+// in the language the app shows.
+func CfgGroupUser() string { return In(i18n.Locale()).CfgGroupUser() }
+
+// CfgGroupUser says "User"
+// in the language of msgs.
+func (msgs Messages) CfgGroupUser() string {
+	return Catalog.Format(msgs.locale, "CfgGroupUser", nil)
+}
+
+// CfgGroupNetwork says "Network"
+// in the language the app shows.
+func CfgGroupNetwork() string { return In(i18n.Locale()).CfgGroupNetwork() }
+
+// CfgGroupNetwork says "Network"
+// in the language of msgs.
+func (msgs Messages) CfgGroupNetwork() string {
+	return Catalog.Format(msgs.locale, "CfgGroupNetwork", nil)
+}
+
+// CfgGroupWindows says "Windows interop"
+// in the language the app shows.
+func CfgGroupWindows() string { return In(i18n.Locale()).CfgGroupWindows() }
+
+// CfgGroupWindows says "Windows interop"
+// in the language of msgs.
+func (msgs Messages) CfgGroupWindows() string {
+	return Catalog.Format(msgs.locale, "CfgGroupWindows", nil)
+}
+
+// CfgGroupSystem says "System"
+// in the language the app shows.
+func CfgGroupSystem() string { return In(i18n.Locale()).CfgGroupSystem() }
+
+// CfgGroupSystem says "System"
+// in the language of msgs.
+func (msgs Messages) CfgGroupSystem() string {
+	return Catalog.Format(msgs.locale, "CfgGroupSystem", nil)
+}
+
+// CfgGroupVM says "Virtual machine"
+// in the language the app shows.
+func CfgGroupVM() string { return In(i18n.Locale()).CfgGroupVM() }
+
+// CfgGroupVM says "Virtual machine"
+// in the language of msgs.
+func (msgs Messages) CfgGroupVM() string {
+	return Catalog.Format(msgs.locale, "CfgGroupVM", nil)
+}
+
+// CfgGroupGeneral says "General"
+// in the language the app shows.
+func CfgGroupGeneral() string { return In(i18n.Locale()).CfgGroupGeneral() }
+
+// CfgGroupGeneral says "General"
+// in the language of msgs.
+func (msgs Messages) CfgGroupGeneral() string {
+	return Catalog.Format(msgs.locale, "CfgGroupGeneral", nil)
+}
+
+// CfgGroupExperimental says "Experimental"
+// in the language the app shows.
+func CfgGroupExperimental() string { return In(i18n.Locale()).CfgGroupExperimental() }
+
+// CfgGroupExperimental says "Experimental"
+// in the language of msgs.
+func (msgs Messages) CfgGroupExperimental() string {
+	return Catalog.Format(msgs.locale, "CfgGroupExperimental", nil)
+}
+
+// CfgGroupSession says "Session"
+// in the language the app shows.
+func CfgGroupSession() string { return In(i18n.Locale()).CfgGroupSession() }
+
+// CfgGroupSession says "Session"
+// in the language of msgs.
+func (msgs Messages) CfgGroupSession() string {
+	return Catalog.Format(msgs.locale, "CfgGroupSession", nil)
+}
+
+// CfgGroupOther says "Other"
+// in the language the app shows.
+func CfgGroupOther() string { return In(i18n.Locale()).CfgGroupOther() }
+
+// CfgGroupOther says "Other"
+// in the language of msgs.
+func (msgs Messages) CfgGroupOther() string {
+	return Catalog.Format(msgs.locale, "CfgGroupOther", nil)
+}
+
+// CfgChanged says "Changed"
+// in the language the app shows.
+func CfgChanged() string { return In(i18n.Locale()).CfgChanged() }
+
+// CfgChanged says "Changed"
+// in the language of msgs.
+func (msgs Messages) CfgChanged() string {
+	return Catalog.Format(msgs.locale, "CfgChanged", nil)
+}
+
+// CfgCannotSave says "This draft cannot be saved"
+// in the language the app shows.
+func CfgCannotSave() string { return In(i18n.Locale()).CfgCannotSave() }
+
+// CfgCannotSave says "This draft cannot be saved"
+// in the language of msgs.
+func (msgs Messages) CfgCannotSave() string {
+	return Catalog.Format(msgs.locale, "CfgCannotSave", nil)
+}
+
+// CfgChangesToSave says "{count, plural, one {# change to save} other {# changes to save}}"
+// in the language the app shows.
+func CfgChangesToSave(count int) string { return In(i18n.Locale()).CfgChangesToSave(count) }
+
+// CfgChangesToSave says "{count, plural, one {# change to save} other {# changes to save}}"
+// in the language of msgs.
+func (msgs Messages) CfgChangesToSave(count int) string {
+	return Catalog.Format(msgs.locale, "CfgChangesToSave", map[string]any{"count": count})
+}
+
+// CfgAdvancedTitle says "The file as text"
+// in the language the app shows.
+func CfgAdvancedTitle() string { return In(i18n.Locale()).CfgAdvancedTitle() }
+
+// CfgAdvancedTitle says "The file as text"
+// in the language of msgs.
+func (msgs Messages) CfgAdvancedTitle() string {
+	return Catalog.Format(msgs.locale, "CfgAdvancedTitle", nil)
+}
+
+// CfgEditRaw says "Edit as text"
+// in the language the app shows.
+func CfgEditRaw() string { return In(i18n.Locale()).CfgEditRaw() }
+
+// CfgEditRaw says "Edit as text"
+// in the language of msgs.
+func (msgs Messages) CfgEditRaw() string {
+	return Catalog.Format(msgs.locale, "CfgEditRaw", nil)
+}
+
+// CfgBackToForm says "Back to the form"
+// in the language the app shows.
+func CfgBackToForm() string { return In(i18n.Locale()).CfgBackToForm() }
+
+// CfgBackToForm says "Back to the form"
+// in the language of msgs.
+func (msgs Messages) CfgBackToForm() string {
+	return Catalog.Format(msgs.locale, "CfgBackToForm", nil)
+}
+
+// CtrSubtitle says "WSL Containers · wslc {version}"
+// in the language the app shows.
+func CtrSubtitle(version string) string { return In(i18n.Locale()).CtrSubtitle(version) }
+
+// CtrSubtitle says "WSL Containers · wslc {version}"
+// in the language of msgs.
+func (msgs Messages) CtrSubtitle(version string) string {
+	return Catalog.Format(msgs.locale, "CtrSubtitle", map[string]any{"version": version})
+}
+
+// CtrHealthy says "Healthy"
+// in the language the app shows.
+func CtrHealthy() string { return In(i18n.Locale()).CtrHealthy() }
+
+// CtrHealthy says "Healthy"
+// in the language of msgs.
+func (msgs Messages) CtrHealthy() string {
+	return Catalog.Format(msgs.locale, "CtrHealthy", nil)
+}
+
+// CtrUnhealthy says "Unhealthy"
+// in the language the app shows.
+func CtrUnhealthy() string { return In(i18n.Locale()).CtrUnhealthy() }
+
+// CtrUnhealthy says "Unhealthy"
+// in the language of msgs.
+func (msgs Messages) CtrUnhealthy() string {
+	return Catalog.Format(msgs.locale, "CtrUnhealthy", nil)
+}
+
+// CtrExited says "Exited ({code})"
+// in the language the app shows.
+func CtrExited(code int) string { return In(i18n.Locale()).CtrExited(code) }
+
+// CtrExited says "Exited ({code})"
+// in the language of msgs.
+func (msgs Messages) CtrExited(code int) string {
+	return Catalog.Format(msgs.locale, "CtrExited", map[string]any{"code": code})
+}
+
+// CtrRestartNo says "No restart"
+// in the language the app shows.
+func CtrRestartNo() string { return In(i18n.Locale()).CtrRestartNo() }
+
+// CtrRestartNo says "No restart"
+// in the language of msgs.
+func (msgs Messages) CtrRestartNo() string {
+	return Catalog.Format(msgs.locale, "CtrRestartNo", nil)
+}
+
+// CtrRestartAlways says "Always"
+// in the language the app shows.
+func CtrRestartAlways() string { return In(i18n.Locale()).CtrRestartAlways() }
+
+// CtrRestartAlways says "Always"
+// in the language of msgs.
+func (msgs Messages) CtrRestartAlways() string {
+	return Catalog.Format(msgs.locale, "CtrRestartAlways", nil)
+}
+
+// CtrRestartUnless says "Unless stopped"
+// in the language the app shows.
+func CtrRestartUnless() string { return In(i18n.Locale()).CtrRestartUnless() }
+
+// CtrRestartUnless says "Unless stopped"
+// in the language of msgs.
+func (msgs Messages) CtrRestartUnless() string {
+	return Catalog.Format(msgs.locale, "CtrRestartUnless", nil)
+}
+
+// CtrRestartOnFailure says "On failure"
+// in the language the app shows.
+func CtrRestartOnFailure() string { return In(i18n.Locale()).CtrRestartOnFailure() }
+
+// CtrRestartOnFailure says "On failure"
+// in the language of msgs.
+func (msgs Messages) CtrRestartOnFailure() string {
+	return Catalog.Format(msgs.locale, "CtrRestartOnFailure", nil)
+}
+
+// CtrNoneHint says "Run one from an image, or start a Compose project."
+// in the language the app shows.
+func CtrNoneHint() string { return In(i18n.Locale()).CtrNoneHint() }
+
+// CtrNoneHint says "Run one from an image, or start a Compose project."
+// in the language of msgs.
+func (msgs Messages) CtrNoneHint() string {
+	return Catalog.Format(msgs.locale, "CtrNoneHint", nil)
+}
+
+// CtrLogsOf says "Logs of {name}"
+// in the language the app shows.
+func CtrLogsOf(name string) string { return In(i18n.Locale()).CtrLogsOf(name) }
+
+// CtrLogsOf says "Logs of {name}"
+// in the language of msgs.
+func (msgs Messages) CtrLogsOf(name string) string {
+	return Catalog.Format(msgs.locale, "CtrLogsOf", map[string]any{"name": name})
+}
+
+// CtrSearchLogs says "Search logs"
+// in the language the app shows.
+func CtrSearchLogs() string { return In(i18n.Locale()).CtrSearchLogs() }
+
+// CtrSearchLogs says "Search logs"
+// in the language of msgs.
+func (msgs Messages) CtrSearchLogs() string {
+	return Catalog.Format(msgs.locale, "CtrSearchLogs", nil)
+}
+
+// CtrNoLogs says "No output yet"
+// in the language the app shows.
+func CtrNoLogs() string { return In(i18n.Locale()).CtrNoLogs() }
+
+// CtrNoLogs says "No output yet"
+// in the language of msgs.
+func (msgs Messages) CtrNoLogs() string {
+	return Catalog.Format(msgs.locale, "CtrNoLogs", nil)
+}
+
+// CtrRestartNote says "Restart policy is enforced by WSLPilot, as WSL Containers has none."
+// in the language the app shows.
+func CtrRestartNote() string { return In(i18n.Locale()).CtrRestartNote() }
+
+// CtrRestartNote says "Restart policy is enforced by WSLPilot, as WSL Containers has none."
+// in the language of msgs.
+func (msgs Messages) CtrRestartNote() string {
+	return Catalog.Format(msgs.locale, "CtrRestartNote", nil)
+}
+
+// ImgNone says "No images"
+// in the language the app shows.
+func ImgNone() string { return In(i18n.Locale()).ImgNone() }
+
+// ImgNone says "No images"
+// in the language of msgs.
+func (msgs Messages) ImgNone() string {
+	return Catalog.Format(msgs.locale, "ImgNone", nil)
+}
+
+// ImgNoneHint says "Pull one from a registry to run containers."
+// in the language the app shows.
+func ImgNoneHint() string { return In(i18n.Locale()).ImgNoneHint() }
+
+// ImgNoneHint says "Pull one from a registry to run containers."
+// in the language of msgs.
+func (msgs Messages) ImgNoneHint() string {
+	return Catalog.Format(msgs.locale, "ImgNoneHint", nil)
+}
+
+// ImgPick says "Select an image to see what you can do with it."
+// in the language the app shows.
+func ImgPick() string { return In(i18n.Locale()).ImgPick() }
+
+// ImgPick says "Select an image to see what you can do with it."
+// in the language of msgs.
+func (msgs Messages) ImgPick() string {
+	return Catalog.Format(msgs.locale, "ImgPick", nil)
+}
+
+// NetBuiltin says "Built-in"
+// in the language the app shows.
+func NetBuiltin() string { return In(i18n.Locale()).NetBuiltin() }
+
+// NetBuiltin says "Built-in"
+// in the language of msgs.
+func (msgs Messages) NetBuiltin() string {
+	return Catalog.Format(msgs.locale, "NetBuiltin", nil)
+}
+
+// CmpNone says "No Compose projects"
+// in the language the app shows.
+func CmpNone() string { return In(i18n.Locale()).CmpNone() }
+
+// CmpNone says "No Compose projects"
+// in the language of msgs.
+func (msgs Messages) CmpNone() string {
+	return Catalog.Format(msgs.locale, "CmpNone", nil)
+}
+
+// CmpBackendIs says "Backend: {backend}"
+// in the language the app shows.
+func CmpBackendIs(backend string) string { return In(i18n.Locale()).CmpBackendIs(backend) }
+
+// CmpBackendIs says "Backend: {backend}"
+// in the language of msgs.
+func (msgs Messages) CmpBackendIs(backend string) string {
+	return Catalog.Format(msgs.locale, "CmpBackendIs", map[string]any{"backend": backend})
+}
+
+// CmpProjects says "Projects"
+// in the language the app shows.
+func CmpProjects() string { return In(i18n.Locale()).CmpProjects() }
+
+// CmpProjects says "Projects"
+// in the language of msgs.
+func (msgs Messages) CmpProjects() string {
+	return Catalog.Format(msgs.locale, "CmpProjects", nil)
+}
+
+// CmpRunningOf says "{running} of {count} running"
+// in the language the app shows.
+func CmpRunningOf(running int, count int) string {
+	return In(i18n.Locale()).CmpRunningOf(running, count)
+}
+
+// CmpRunningOf says "{running} of {count} running"
+// in the language of msgs.
+func (msgs Messages) CmpRunningOf(running int, count int) string {
+	return Catalog.Format(msgs.locale, "CmpRunningOf", map[string]any{"running": running, "count": count})
+}
+
+// CmpApply says "Apply changes"
+// in the language the app shows.
+func CmpApply() string { return In(i18n.Locale()).CmpApply() }
+
+// CmpApply says "Apply changes"
+// in the language of msgs.
+func (msgs Messages) CmpApply() string {
+	return Catalog.Format(msgs.locale, "CmpApply", nil)
+}
+
+// CmpCombinedLogs says "Combined logs"
+// in the language the app shows.
+func CmpCombinedLogs() string { return In(i18n.Locale()).CmpCombinedLogs() }
+
+// CmpCombinedLogs says "Combined logs"
+// in the language of msgs.
+func (msgs Messages) CmpCombinedLogs() string {
+	return Catalog.Format(msgs.locale, "CmpCombinedLogs", nil)
+}
+
+// CmpBackUp says "Back up…"
+// in the language the app shows.
+func CmpBackUp() string { return In(i18n.Locale()).CmpBackUp() }
+
+// CmpBackUp says "Back up…"
+// in the language of msgs.
+func (msgs Messages) CmpBackUp() string {
+	return Catalog.Format(msgs.locale, "CmpBackUp", nil)
+}
+
+// CmpEdited says "Edited"
+// in the language the app shows.
+func CmpEdited() string { return In(i18n.Locale()).CmpEdited() }
+
+// CmpEdited says "Edited"
+// in the language of msgs.
+func (msgs Messages) CmpEdited() string {
+	return Catalog.Format(msgs.locale, "CmpEdited", nil)
+}
+
+// CmpValidate says "Validate"
+// in the language the app shows.
+func CmpValidate() string { return In(i18n.Locale()).CmpValidate() }
+
+// CmpValidate says "Validate"
+// in the language of msgs.
+func (msgs Messages) CmpValidate() string {
+	return Catalog.Format(msgs.locale, "CmpValidate", nil)
+}
+
+// CmpValidating says "Validating…"
+// in the language the app shows.
+func CmpValidating() string { return In(i18n.Locale()).CmpValidating() }
+
+// CmpValidating says "Validating…"
+// in the language of msgs.
+func (msgs Messages) CmpValidating() string {
+	return Catalog.Format(msgs.locale, "CmpValidating", nil)
+}
+
+// CmpError says "Error"
+// in the language the app shows.
+func CmpError() string { return In(i18n.Locale()).CmpError() }
+
+// CmpError says "Error"
+// in the language of msgs.
+func (msgs Messages) CmpError() string {
+	return Catalog.Format(msgs.locale, "CmpError", nil)
+}
+
+// CmpWarning says "Warning"
+// in the language the app shows.
+func CmpWarning() string { return In(i18n.Locale()).CmpWarning() }
+
+// CmpWarning says "Warning"
+// in the language of msgs.
+func (msgs Messages) CmpWarning() string {
+	return Catalog.Format(msgs.locale, "CmpWarning", nil)
+}
+
+// CmpOK says "No problems found"
+// in the language the app shows.
+func CmpOK() string { return In(i18n.Locale()).CmpOK() }
+
+// CmpOK says "No problems found"
+// in the language of msgs.
+func (msgs Messages) CmpOK() string {
+	return Catalog.Format(msgs.locale, "CmpOK", nil)
+}
+
+// CmpInfo says "Note"
+// in the language the app shows.
+func CmpInfo() string { return In(i18n.Locale()).CmpInfo() }
+
+// CmpInfo says "Note"
+// in the language of msgs.
+func (msgs Messages) CmpInfo() string {
+	return Catalog.Format(msgs.locale, "CmpInfo", nil)
+}
+
+// CmpNativeNo says "Not supported by the native backend"
+// in the language the app shows.
+func CmpNativeNo() string { return In(i18n.Locale()).CmpNativeNo() }
+
+// CmpNativeNo says "Not supported by the native backend"
+// in the language of msgs.
+func (msgs Messages) CmpNativeNo() string {
+	return Catalog.Format(msgs.locale, "CmpNativeNo", nil)
+}
+
+// CmpNativeYes says "Supported by the native backend"
+// in the language the app shows.
+func CmpNativeYes() string { return In(i18n.Locale()).CmpNativeYes() }
+
+// CmpNativeYes says "Supported by the native backend"
+// in the language of msgs.
+func (msgs Messages) CmpNativeYes() string {
+	return Catalog.Format(msgs.locale, "CmpNativeYes", nil)
+}
+
+// BkOpenBackup says "Open a backup…"
+// in the language the app shows.
+func BkOpenBackup() string { return In(i18n.Locale()).BkOpenBackup() }
+
+// BkOpenBackup says "Open a backup…"
+// in the language of msgs.
+func (msgs Messages) BkOpenBackup() string {
+	return Catalog.Format(msgs.locale, "BkOpenBackup", nil)
+}
+
+// BkDropTitle says "Restore from a backup made anywhere"
+// in the language the app shows.
+func BkDropTitle() string { return In(i18n.Locale()).BkDropTitle() }
+
+// BkDropTitle says "Restore from a backup made anywhere"
+// in the language of msgs.
+func (msgs Messages) BkDropTitle() string {
+	return Catalog.Format(msgs.locale, "BkDropTitle", nil)
+}
+
+// BkDropHelp says "A WSLPilot repository or folder, a wsl --export archive or VHDX, or any Linux tar."
+// in the language the app shows.
+func BkDropHelp() string { return In(i18n.Locale()).BkDropHelp() }
+
+// BkDropHelp says "A WSLPilot repository or folder, a wsl --export archive or VHDX, or any Linux tar."
+// in the language of msgs.
+func (msgs Messages) BkDropHelp() string {
+	return Catalog.Format(msgs.locale, "BkDropHelp", nil)
+}
+
+// BkChooseFile says "Choose file…"
+// in the language the app shows.
+func BkChooseFile() string { return In(i18n.Locale()).BkChooseFile() }
+
+// BkChooseFile says "Choose file…"
+// in the language of msgs.
+func (msgs Messages) BkChooseFile() string {
+	return Catalog.Format(msgs.locale, "BkChooseFile", nil)
+}
+
+// BkChooseFolder says "Choose folder…"
+// in the language the app shows.
+func BkChooseFolder() string { return In(i18n.Locale()).BkChooseFolder() }
+
+// BkChooseFolder says "Choose folder…"
+// in the language of msgs.
+func (msgs Messages) BkChooseFolder() string {
+	return Catalog.Format(msgs.locale, "BkChooseFolder", nil)
+}
+
+// BkAdd says "Add"
+// in the language the app shows.
+func BkAdd() string { return In(i18n.Locale()).BkAdd() }
+
+// BkAdd says "Add"
+// in the language of msgs.
+func (msgs Messages) BkAdd() string {
+	return Catalog.Format(msgs.locale, "BkAdd", nil)
+}
+
+// BkLocked says "Locked"
+// in the language the app shows.
+func BkLocked() string { return In(i18n.Locale()).BkLocked() }
+
+// BkLocked says "Locked"
+// in the language of msgs.
+func (msgs Messages) BkLocked() string {
+	return Catalog.Format(msgs.locale, "BkLocked", nil)
+}
+
+// BkFromOtherPC says "From another PC"
+// in the language the app shows.
+func BkFromOtherPC() string { return In(i18n.Locale()).BkFromOtherPC() }
+
+// BkFromOtherPC says "From another PC"
+// in the language of msgs.
+func (msgs Messages) BkFromOtherPC() string {
+	return Catalog.Format(msgs.locale, "BkFromOtherPC", nil)
+}
+
+// BkGroupLine says "{count, plural, one {# version} other {# versions}} · latest {time}"
+// in the language the app shows.
+func BkGroupLine(count int, time_ string) string { return In(i18n.Locale()).BkGroupLine(count, time_) }
+
+// BkGroupLine says "{count, plural, one {# version} other {# versions}} · latest {time}"
+// in the language of msgs.
+func (msgs Messages) BkGroupLine(count int, time_ string) string {
+	return Catalog.Format(msgs.locale, "BkGroupLine", map[string]any{"count": count, "time": time_})
+}
+
+// BkVersionsOf says "Versions of {name}"
+// in the language the app shows.
+func BkVersionsOf(name string) string { return In(i18n.Locale()).BkVersionsOf(name) }
+
+// BkVersionsOf says "Versions of {name}"
+// in the language of msgs.
+func (msgs Messages) BkVersionsOf(name string) string {
+	return Catalog.Format(msgs.locale, "BkVersionsOf", map[string]any{"name": name})
+}
+
+// BkWhere says "Where"
+// in the language the app shows.
+func BkWhere() string { return In(i18n.Locale()).BkWhere() }
+
+// BkWhere says "Where"
+// in the language of msgs.
+func (msgs Messages) BkWhere() string {
+	return Catalog.Format(msgs.locale, "BkWhere", nil)
+}
+
+// BkRestoreFrom says "Restore {name} from {time}"
+// in the language the app shows.
+func BkRestoreFrom(name string, time_ string) string {
+	return In(i18n.Locale()).BkRestoreFrom(name, time_)
+}
+
+// BkRestoreFrom says "Restore {name} from {time}"
+// in the language of msgs.
+func (msgs Messages) BkRestoreFrom(name string, time_ string) string {
+	return Catalog.Format(msgs.locale, "BkRestoreFrom", map[string]any{"name": name, "time": time_})
+}
+
+// BkStepCheck says "Check the backup"
+// in the language the app shows.
+func BkStepCheck() string { return In(i18n.Locale()).BkStepCheck() }
+
+// BkStepCheck says "Check the backup"
+// in the language of msgs.
+func (msgs Messages) BkStepCheck() string {
+	return Catalog.Format(msgs.locale, "BkStepCheck", nil)
+}
+
+// BkStepCheckAbout says "Reads it through once; nothing is changed."
+// in the language the app shows.
+func BkStepCheckAbout() string { return In(i18n.Locale()).BkStepCheckAbout() }
+
+// BkStepCheckAbout says "Reads it through once; nothing is changed."
+// in the language of msgs.
+func (msgs Messages) BkStepCheckAbout() string {
+	return Catalog.Format(msgs.locale, "BkStepCheckAbout", nil)
+}
+
+// BkStepChecked says "The backup is intact"
+// in the language the app shows.
+func BkStepChecked() string { return In(i18n.Locale()).BkStepChecked() }
+
+// BkStepChecked says "The backup is intact"
+// in the language of msgs.
+func (msgs Messages) BkStepChecked() string {
+	return Catalog.Format(msgs.locale, "BkStepChecked", nil)
+}
+
+// BkStepRestoreAs says "Restore as"
+// in the language the app shows.
+func BkStepRestoreAs() string { return In(i18n.Locale()).BkStepRestoreAs() }
+
+// BkStepRestoreAs says "Restore as"
+// in the language of msgs.
+func (msgs Messages) BkStepRestoreAs() string {
+	return Catalog.Format(msgs.locale, "BkStepRestoreAs", nil)
+}
+
+// BkStopFirst says "Running distributions and containers are stopped for the backup, then started again."
+// in the language the app shows.
+func BkStopFirst() string { return In(i18n.Locale()).BkStopFirst() }
+
+// BkStopFirst says "Running distributions and containers are stopped for the backup, then started again."
+// in the language of msgs.
+func (msgs Messages) BkStopFirst() string {
+	return Catalog.Format(msgs.locale, "BkStopFirst", nil)
+}
+
+// BkRunsClosed says "Runs while WSLPilot is closed, through the background agent."
+// in the language the app shows.
+func BkRunsClosed() string { return In(i18n.Locale()).BkRunsClosed() }
+
+// BkRunsClosed says "Runs while WSLPilot is closed, through the background agent."
+// in the language of msgs.
+func (msgs Messages) BkRunsClosed() string {
+	return Catalog.Format(msgs.locale, "BkRunsClosed", nil)
+}
+
+// BkNoHistory says "No runs yet"
+// in the language the app shows.
+func BkNoHistory() string { return In(i18n.Locale()).BkNoHistory() }
+
+// BkNoHistory says "No runs yet"
+// in the language of msgs.
+func (msgs Messages) BkNoHistory() string {
+	return Catalog.Format(msgs.locale, "BkNoHistory", nil)
+}
+
+// VolSubtitle says "Native WSLc volumes keep Linux permissions intact, unlike Windows folders"
+// in the language the app shows.
+func VolSubtitle() string { return In(i18n.Locale()).VolSubtitle() }
+
+// VolSubtitle says "Native WSLc volumes keep Linux permissions intact, unlike Windows folders"
+// in the language of msgs.
+func (msgs Messages) VolSubtitle() string {
+	return Catalog.Format(msgs.locale, "VolSubtitle", nil)
+}
+
+// VolRemoveUnused says "Remove unused…"
+// in the language the app shows.
+func VolRemoveUnused() string { return In(i18n.Locale()).VolRemoveUnused() }
+
+// VolRemoveUnused says "Remove unused…"
+// in the language of msgs.
+func (msgs Messages) VolRemoveUnused() string {
+	return Catalog.Format(msgs.locale, "VolRemoveUnused", nil)
+}
+
+// VolNew says "New volume"
+// in the language the app shows.
+func VolNew() string { return In(i18n.Locale()).VolNew() }
+
+// VolNew says "New volume"
+// in the language of msgs.
+func (msgs Messages) VolNew() string {
+	return Catalog.Format(msgs.locale, "VolNew", nil)
+}
+
+// VolNone says "No volumes"
+// in the language the app shows.
+func VolNone() string { return In(i18n.Locale()).VolNone() }
+
+// VolNone says "No volumes"
+// in the language of msgs.
+func (msgs Messages) VolNone() string {
+	return Catalog.Format(msgs.locale, "VolNone", nil)
+}
+
+// VolNotInUse says "Not in use"
+// in the language the app shows.
+func VolNotInUse() string { return In(i18n.Locale()).VolNotInUse() }
+
+// VolNotInUse says "Not in use"
+// in the language of msgs.
+func (msgs Messages) VolNotInUse() string {
+	return Catalog.Format(msgs.locale, "VolNotInUse", nil)
+}
+
+// VolBackUp says "Back up…"
+// in the language the app shows.
+func VolBackUp() string { return In(i18n.Locale()).VolBackUp() }
+
+// VolBackUp says "Back up…"
+// in the language of msgs.
+func (msgs Messages) VolBackUp() string {
+	return Catalog.Format(msgs.locale, "VolBackUp", nil)
+}
+
+// VolDelete says "Delete…"
+// in the language the app shows.
+func VolDelete() string { return In(i18n.Locale()).VolDelete() }
+
+// VolDelete says "Delete…"
+// in the language of msgs.
+func (msgs Messages) VolDelete() string {
+	return Catalog.Format(msgs.locale, "VolDelete", nil)
+}
+
+// VolPickHint says "Select a volume to export, back up or delete it."
+// in the language the app shows.
+func VolPickHint() string { return In(i18n.Locale()).VolPickHint() }
+
+// VolPickHint says "Select a volume to export, back up or delete it."
+// in the language of msgs.
+func (msgs Messages) VolPickHint() string {
+	return Catalog.Format(msgs.locale, "VolPickHint", nil)
+}
+
+// VolRemoveUnusedTitle says "Remove {count, plural, one {# unused volume} other {# unused volumes}}?"
+// in the language the app shows.
+func VolRemoveUnusedTitle(count int) string { return In(i18n.Locale()).VolRemoveUnusedTitle(count) }
+
+// VolRemoveUnusedTitle says "Remove {count, plural, one {# unused volume} other {# unused volumes}}?"
+// in the language of msgs.
+func (msgs Messages) VolRemoveUnusedTitle(count int) string {
+	return Catalog.Format(msgs.locale, "VolRemoveUnusedTitle", map[string]any{"count": count})
+}
+
+// VolRemoveUnusedMessage says "These volumes and all their data are deleted: {names}"
+// in the language the app shows.
+func VolRemoveUnusedMessage(names string) string {
+	return In(i18n.Locale()).VolRemoveUnusedMessage(names)
+}
+
+// VolRemoveUnusedMessage says "These volumes and all their data are deleted: {names}"
+// in the language of msgs.
+func (msgs Messages) VolRemoveUnusedMessage(names string) string {
+	return Catalog.Format(msgs.locale, "VolRemoveUnusedMessage", map[string]any{"names": names})
+}
+
+// VolImportTitle says "Import a TAR archive"
+// in the language the app shows.
+func VolImportTitle() string { return In(i18n.Locale()).VolImportTitle() }
+
+// VolImportTitle says "Import a TAR archive"
+// in the language of msgs.
+func (msgs Messages) VolImportTitle() string {
+	return Catalog.Format(msgs.locale, "VolImportTitle", nil)
+}
+
+// VolArchive says "Archive"
+// in the language the app shows.
+func VolArchive() string { return In(i18n.Locale()).VolArchive() }
+
+// VolArchive says "Archive"
+// in the language of msgs.
+func (msgs Messages) VolArchive() string {
+	return Catalog.Format(msgs.locale, "VolArchive", nil)
+}
+
+// VolArchiveSize says "{size} archive"
+// in the language the app shows.
+func VolArchiveSize(size string) string { return In(i18n.Locale()).VolArchiveSize(size) }
+
+// VolArchiveSize says "{size} archive"
+// in the language of msgs.
+func (msgs Messages) VolArchiveSize(size string) string {
+	return Catalog.Format(msgs.locale, "VolArchiveSize", map[string]any{"size": size})
+}
+
+// VolIntoNew says "A new volume"
+// in the language the app shows.
+func VolIntoNew() string { return In(i18n.Locale()).VolIntoNew() }
+
+// VolIntoNew says "A new volume"
+// in the language of msgs.
+func (msgs Messages) VolIntoNew() string {
+	return Catalog.Format(msgs.locale, "VolIntoNew", nil)
+}
+
+// VolIntoExisting says "Replace the contents of an existing volume"
+// in the language the app shows.
+func VolIntoExisting() string { return In(i18n.Locale()).VolIntoExisting() }
+
+// VolIntoExisting says "Replace the contents of an existing volume"
+// in the language of msgs.
+func (msgs Messages) VolIntoExisting() string {
+	return Catalog.Format(msgs.locale, "VolIntoExisting", nil)
+}
+
+// VolKeptTitle says "Kept exactly as in the archive"
+// in the language the app shows.
+func VolKeptTitle() string { return In(i18n.Locale()).VolKeptTitle() }
+
+// VolKeptTitle says "Kept exactly as in the archive"
+// in the language of msgs.
+func (msgs Messages) VolKeptTitle() string {
+	return Catalog.Format(msgs.locale, "VolKeptTitle", nil)
+}
+
+// VolKept says "Owners and groups (numeric IDs) · permissions · symlinks and hard links · timestamps · extended attributes"
+// in the language the app shows.
+func VolKept() string { return In(i18n.Locale()).VolKept() }
+
+// VolKept says "Owners and groups (numeric IDs) · permissions · symlinks and hard links · timestamps · extended attributes"
+// in the language of msgs.
+func (msgs Messages) VolKept() string {
+	return Catalog.Format(msgs.locale, "VolKept", nil)
+}
+
+// VolCheckAfter says "Check entry count after import"
+// in the language the app shows.
+func VolCheckAfter() string { return In(i18n.Locale()).VolCheckAfter() }
+
+// VolCheckAfter says "Check entry count after import"
+// in the language of msgs.
+func (msgs Messages) VolCheckAfter() string {
+	return Catalog.Format(msgs.locale, "VolCheckAfter", nil)
+}
+
+// VolCheckFailed says "The archive has {count} entries but only {found} were found in the volume."
+// in the language the app shows.
+func VolCheckFailed(count int, found int) string {
+	return In(i18n.Locale()).VolCheckFailed(count, found)
+}
+
+// VolCheckFailed says "The archive has {count} entries but only {found} were found in the volume."
+// in the language of msgs.
+func (msgs Messages) VolCheckFailed(count int, found int) string {
+	return Catalog.Format(msgs.locale, "VolCheckFailed", map[string]any{"count": count, "found": found})
+}
+
+// VolImportGo says "Import"
+// in the language the app shows.
+func VolImportGo() string { return In(i18n.Locale()).VolImportGo() }
+
+// VolImportGo says "Import"
+// in the language of msgs.
+func (msgs Messages) VolImportGo() string {
+	return Catalog.Format(msgs.locale, "VolImportGo", nil)
+}
+
+// TrayCheckUpdates says "Check for updates"
+// in the language the app shows.
+func TrayCheckUpdates() string { return In(i18n.Locale()).TrayCheckUpdates() }
+
+// TrayCheckUpdates says "Check for updates"
+// in the language of msgs.
+func (msgs Messages) TrayCheckUpdates() string {
+	return Catalog.Format(msgs.locale, "TrayCheckUpdates", nil)
+}
+
+// TrayHint says "WSLPilot keeps running in the tray so scheduled backups continue. Choose Quit in the tray menu to close it, or change…"
+// in the language the app shows.
+func TrayHint() string { return In(i18n.Locale()).TrayHint() }
+
+// TrayHint says "WSLPilot keeps running in the tray so scheduled backups continue. Choose Quit in the tray menu to close it, or change…"
+// in the language of msgs.
+func (msgs Messages) TrayHint() string {
+	return Catalog.Format(msgs.locale, "TrayHint", nil)
+}
+
+// DashOnDisk says "On disk (usage inside not measured)"
+// in the language the app shows.
+func DashOnDisk() string { return In(i18n.Locale()).DashOnDisk() }
+
+// DashOnDisk says "On disk (usage inside not measured)"
+// in the language of msgs.
+func (msgs Messages) DashOnDisk() string {
+	return Catalog.Format(msgs.locale, "DashOnDisk", nil)
 }

@@ -17,7 +17,7 @@ and never rewrites it.
 
 | Path | Content | Schema |
 |---|---|---|
-| `settings.json` | `theme` (`system`, `light`, `dark`), `backupDir`, `helperImage` (volume helper image, empty = `alpine:3.20`) | 1 |
+| `settings.json` | `theme` (`system`, `light`, `dark`), `backupDir`, `helperImage` (volume helper image, empty = `alpine:3.20`); window: `closeQuits`, `closeHinted`, `relaunchHidden`; updates: `noUpdateCheck`, `lastUpdateCheck`, `announcedVersion`, `autoInstall` (`""`, `idle`, `daily`), `autoInstallHour` (see `gui.md`) | 1 |
 | `locations.json` | backup locations opened from outside: `path`, `readOnly`, `label` | 1 |
 | `projects/<id>/project.json` | a Compose project (see [compose.md](compose.md)) | 1 |
 | `plans/<id>.json` | a backup plan (see [backups.md](backups.md)) | 1 |

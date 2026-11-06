@@ -824,7 +824,7 @@
   "BkNeedName": "Give the plan a name.",
   "BkNeedTarget": "Choose at least one thing to back up.",
   "TermNew": "New terminal",
-  "TermNone": "No terminals open. Start one from a distribution or a container, or with New terminal.",
+  "TermNone": "No terminals open",
   "TermEnded": "ended",
   "TermFailed": "The terminal could not start: {error}",
   "@TermFailed": {
@@ -932,5 +932,498 @@
         "type": "String"
       }
     }
-  }
+  },
+  "NavTasks": "Tasks",
+  "TasksAbout": "Long operations run here; their logs stay until you close WSLPilot.",
+  "TasksEmpty": "Nothing has run yet",
+  "WindowMinimize": "Minimize",
+  "WindowMaximize": "Maximize",
+  "WindowRestore": "Restore",
+  "WindowClose": "Close",
+  "TermSubtitle": "Shells in your distributions and containers",
+  "TermNoneHint": "Open a shell in a distribution, a running container or PowerShell.",
+  "SetGroupPreferences": "Preferences",
+  "SetGroupComputer": "This computer",
+  "SetBackupsAgent": "Backups & agent",
+  "SetAboutUpdates": "About & updates",
+  "SetSearch": "Search settings",
+  "SetSearchNone": "No settings match",
+  "SetThemeHelp": "Follow Windows, or always light or dark.",
+  "SetOpenAtLoginHelp": "Start in the tray when you sign in to Windows.",
+  "SetCloseWindow": "Closing the window",
+  "SetCloseWindowHelp": "Keep running in the tray so scheduled backups and update checks continue, or quit.",
+  "SetCloseToTray": "Keep in tray",
+  "SetCloseQuit": "Quit",
+  "SetWSLcFile": "WSL Containers settings file",
+  "SetCheckDaily": "Check for updates daily",
+  "SetCheckDailyHelp": "Checks GitHub once a day and tells you once per new version.",
+  "SetAutoInstall": "Install updates automatically",
+  "SetAutoInstallHelp": "Installs and restarts WSLPilot at the time you choose; running tasks are never interrupted.",
+  "SetLicenses": "Open source licenses",
+  "SetLicensesHelp": "WSLPilot is GPL-3.0; the components it uses keep their own licenses.",
+  "SetDataHelp": "Preferences, project metadata, plans and the activity log.",
+  "SetGeneralAbout": "How WSLPilot looks, starts and closes.",
+  "SetGroupLook": "Appearance",
+  "SetGroupStartClose": "Start and close",
+  "SetBackupsAbout": "Where backups go and the agent that runs scheduled plans.",
+  "SetGroupStorage": "Storage",
+  "SetWSLcAbout": "Settings of the WSL Containers session and where its data lives.",
+  "SetGroupData": "Data",
+  "SetAboutAbout": "Version, licenses and updates.",
+  "SetSource": "Source code",
+  "SetShow": "Show",
+  "SetDiagnostics": "WSLPilot data folder",
+  "UpdCheckFailed": "Could not check for updates: {error}",
+  "@UpdCheckFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "UpdUpToDate": "WSLPilot is up to date.",
+  "UpdAvailable": "Version {version} is available.",
+  "@UpdAvailable": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "UpdInstallFailed": "The update could not be installed: {error}",
+  "@UpdInstallFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "UpdUnavailable": "Updates are not available in this build.",
+  "UpdInstalling": "Downloading the update… {percent}%",
+  "@UpdInstalling": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "UpdInstallingAbout": "WSLPilot restarts when the download is complete.",
+  "UpdInstalled": "You have {version}.",
+  "UpdInstallRestart": "Install and restart",
+  "UpdNeverChecked": "Not checked yet",
+  "UpdLastChecked": "Last checked {time}",
+  "@UpdLastChecked": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "UpdLatest": "WSLPilot {version}",
+  "@UpdLatest": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "UpdCheckNow": "Check now",
+  "UpdAutoOff": "Never",
+  "UpdAutoIdle": "When the computer is idle",
+  "UpdAutoDaily": "Every day at",
+  "DashCheckedAt": "Checked at {time}",
+  "@DashCheckedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "DashOpenTerminal": "Open {name}",
+  "@DashOpenTerminal": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "DashInstallDistro": "Install a distribution",
+  "DashRunContainer": "Run a container",
+  "DashImportTar": "Import a TAR",
+  "DashWSLMissing": "WSL is not installed",
+  "DashWSLLine": "{running} running · default {name} · WSL {wsl} · kernel {kernel}",
+  "@DashWSLLine": {
+    "placeholders": {
+      "running": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "wsl": {
+        "type": "String"
+      },
+      "kernel": {
+        "type": "String"
+      }
+    }
+  },
+  "DashReady": "Ready",
+  "DashManageDistros": "Manage distributions",
+  "DashWSLcLine": "{running} running · {images, plural, one {# image} other {# images}} · {volumes, plural, one {# volume} other {# volumes}} · wslc {version}",
+  "@DashWSLcLine": {
+    "placeholders": {
+      "running": {
+        "type": "int"
+      },
+      "images": {
+        "type": "int"
+      },
+      "volumes": {
+        "type": "int"
+      },
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "DashContainersN": "{count, plural, one {# container} other {# containers}}",
+  "@DashContainersN": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "DashManageContainers": "Manage containers",
+  "DashBuiltin": "Built-in",
+  "DashNative": "Native",
+  "DashProjects": "{count, plural, one {# project} other {# projects}}",
+  "@DashProjects": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "DashOpenProjects": "Open projects",
+  "DashDiskUsage": "Disk usage",
+  "DashDiskLine": "{disk} on disk · {used} used inside",
+  "@DashDiskLine": {
+    "placeholders": {
+      "disk": {
+        "type": "String"
+      },
+      "used": {
+        "type": "String"
+      }
+    }
+  },
+  "DashDiskOnly": "{disk} on disk",
+  "@DashDiskOnly": {
+    "placeholders": {
+      "disk": {
+        "type": "String"
+      }
+    }
+  },
+  "DashWSLcData": "WSL Containers data",
+  "DashNoDisks": "No virtual disks found",
+  "DashUsed": "Used",
+  "DashReclaimable": "Reclaimable",
+  "DashActivity": "Recent activity",
+  "DashNoActivity": "Nothing has happened yet",
+  "DashNextBackup": "Next backup: {plan} at {time}",
+  "@DashNextBackup": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "WSLSubtitle": "Distributions on this computer",
+  "WSLSubtitleVersion": "Distributions on this computer · WSL {version}",
+  "@WSLSubtitleVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "WSLTitle": "Distributions",
+  "WSLSettingsAll": "WSL settings",
+  "ColLocation": "Location",
+  "WSLDefault": "Default",
+  "WSLExportBackup": "Export or back up…",
+  "WSLSettingsBtn": "Settings",
+  "WSLTerminalProfile": "Add a Windows Terminal profile",
+  "WSLMoreActions": "More actions",
+  "WSLSparse": "Sparse disk",
+  "WSLSparseSet": "Set sparse…",
+  "WSLReclaimShort": "About {size} can be reclaimed",
+  "@WSLReclaimShort": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "WSLMeasuring": "Measuring…",
+  "WSLCompactOpen": "Reclaim disk space…",
+  "WSLCompactStep1": "{name} is shut down",
+  "@WSLCompactStep1": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "WSLCompactStep2Official": "wsl.exe compacts the disk of {name}",
+  "@WSLCompactStep2Official": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "WSLCompactStep2Shutdown": "WSL shuts down; {count, plural, =0 {no other distribution is running} one {# other running distribution stops too} other {# other running distributions stop too}}",
+  "@WSLCompactStep2Shutdown": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "WSLCompactStep3Admin": "diskpart compacts the disk in a separate administrator window",
+  "WSLCompactStepCheck": "The new size of {name} is measured",
+  "@WSLCompactStepCheck": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "WSLCompactBackupFirst": "Back up first",
+  "WSLCompactShutdown": "Shut down and reclaim",
+  "WSLDistroSettingsTitle": "Settings of {name}",
+  "@WSLDistroSettingsTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "WSLThisDistro": "This distribution (/etc/wsl.conf)",
+  "CfgSaveRestart": "Save and restart {name}",
+  "@CfgSaveRestart": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "CfgGroupBoot": "Boot",
+  "CfgGroupUser": "User",
+  "CfgGroupNetwork": "Network",
+  "CfgGroupWindows": "Windows interop",
+  "CfgGroupSystem": "System",
+  "CfgGroupVM": "Virtual machine",
+  "CfgGroupGeneral": "General",
+  "CfgGroupExperimental": "Experimental",
+  "CfgGroupSession": "Session",
+  "CfgGroupOther": "Other",
+  "CfgChanged": "Changed",
+  "CfgCannotSave": "This draft cannot be saved",
+  "CfgChangesToSave": "{count, plural, one {# change to save} other {# changes to save}}",
+  "@CfgChangesToSave": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "CfgAdvancedTitle": "The file as text",
+  "CfgEditRaw": "Edit as text",
+  "CfgBackToForm": "Back to the form",
+  "CtrSubtitle": "WSL Containers · wslc {version}",
+  "@CtrSubtitle": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "CtrHealthy": "Healthy",
+  "CtrUnhealthy": "Unhealthy",
+  "CtrExited": "Exited ({code})",
+  "@CtrExited": {
+    "placeholders": {
+      "code": {
+        "type": "int"
+      }
+    }
+  },
+  "CtrRestartNo": "No restart",
+  "CtrRestartAlways": "Always",
+  "CtrRestartUnless": "Unless stopped",
+  "CtrRestartOnFailure": "On failure",
+  "CtrNoneHint": "Run one from an image, or start a Compose project.",
+  "CtrLogsOf": "Logs of {name}",
+  "@CtrLogsOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "CtrSearchLogs": "Search logs",
+  "CtrNoLogs": "No output yet",
+  "CtrRestartNote": "Restart policy is enforced by WSLPilot, as WSL Containers has none.",
+  "ImgNone": "No images",
+  "ImgNoneHint": "Pull one from a registry to run containers.",
+  "ImgPick": "Select an image to see what you can do with it.",
+  "NetBuiltin": "Built-in",
+  "CmpNone": "No Compose projects",
+  "CmpBackendIs": "Backend: {backend}",
+  "@CmpBackendIs": {
+    "placeholders": {
+      "backend": {
+        "type": "String"
+      }
+    }
+  },
+  "CmpProjects": "Projects",
+  "CmpRunningOf": "{running} of {count} running",
+  "@CmpRunningOf": {
+    "placeholders": {
+      "running": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "CmpApply": "Apply changes",
+  "CmpCombinedLogs": "Combined logs",
+  "CmpBackUp": "Back up…",
+  "CmpEdited": "Edited",
+  "CmpValidate": "Validate",
+  "CmpValidating": "Validating…",
+  "CmpError": "Error",
+  "CmpWarning": "Warning",
+  "CmpOK": "No problems found",
+  "CmpInfo": "Note",
+  "CmpNativeNo": "Not supported by the native backend",
+  "CmpNativeYes": "Supported by the native backend",
+  "BkOpenBackup": "Open a backup…",
+  "BkDropTitle": "Restore from a backup made anywhere",
+  "BkDropHelp": "A WSLPilot repository or folder, a wsl --export archive or VHDX, or any Linux tar.",
+  "BkChooseFile": "Choose file…",
+  "BkChooseFolder": "Choose folder…",
+  "BkAdd": "Add",
+  "BkLocked": "Locked",
+  "BkFromOtherPC": "From another PC",
+  "BkGroupLine": "{count, plural, one {# version} other {# versions}} · latest {time}",
+  "@BkGroupLine": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "BkVersionsOf": "Versions of {name}",
+  "@BkVersionsOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "BkWhere": "Where",
+  "BkRestoreFrom": "Restore {name} from {time}",
+  "@BkRestoreFrom": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "BkStepCheck": "Check the backup",
+  "BkStepCheckAbout": "Reads it through once; nothing is changed.",
+  "BkStepChecked": "The backup is intact",
+  "BkStepRestoreAs": "Restore as",
+  "BkStopFirst": "Running distributions and containers are stopped for the backup, then started again.",
+  "BkRunsClosed": "Runs while WSLPilot is closed, through the background agent.",
+  "BkNoHistory": "No runs yet",
+  "VolSubtitle": "Native WSLc volumes keep Linux permissions intact, unlike Windows folders",
+  "VolRemoveUnused": "Remove unused…",
+  "VolNew": "New volume",
+  "VolNone": "No volumes",
+  "VolNotInUse": "Not in use",
+  "VolBackUp": "Back up…",
+  "VolDelete": "Delete…",
+  "VolPickHint": "Select a volume to export, back up or delete it.",
+  "VolRemoveUnusedTitle": "Remove {count, plural, one {# unused volume} other {# unused volumes}}?",
+  "@VolRemoveUnusedTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "VolRemoveUnusedMessage": "These volumes and all their data are deleted: {names}",
+  "@VolRemoveUnusedMessage": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "VolImportTitle": "Import a TAR archive",
+  "VolArchive": "Archive",
+  "VolArchiveSize": "{size} archive",
+  "@VolArchiveSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "VolIntoNew": "A new volume",
+  "VolIntoExisting": "Replace the contents of an existing volume",
+  "VolKeptTitle": "Kept exactly as in the archive",
+  "VolKept": "Owners and groups (numeric IDs) · permissions · symlinks and hard links · timestamps · extended attributes",
+  "VolCheckAfter": "Check entry count after import",
+  "VolCheckFailed": "The archive has {count} entries but only {found} were found in the volume.",
+  "@VolCheckFailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "found": {
+        "type": "int"
+      }
+    }
+  },
+  "VolImportGo": "Import",
+  "@UpdInstalled": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "TrayCheckUpdates": "Check for updates",
+  "TrayHint": "WSLPilot keeps running in the tray so scheduled backups continue. Choose Quit in the tray menu to close it, or change this in Settings.",
+  "DashOnDisk": "On disk (usage inside not measured)"
 }

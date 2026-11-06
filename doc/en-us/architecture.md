@@ -4,7 +4,7 @@
 
 | Process | Status | Role |
 |---|---|---|
-| `wslpilot` (`cmd/wslpilot`) | implemented | The GUI. Runs as the signed-in user, never elevated. Single instance; closing the window keeps it in the tray. Runs due backup plans every minute while open. |
+| `wslpilot` (`cmd/wslpilot`) | implemented | The GUI. Runs as the signed-in user, never elevated. Single instance; closing the window keeps it in the tray unless Settings say Quit. Runs due backup plans every minute and checks for updates daily while it runs (`gui.md`). |
 | `wslpilot-agent` (`cmd/wslpilot-agent`) | implemented | `run-due` (Task Scheduler, every 15 minutes) and `watch` (at sign-in: restart policies, Compose autostart, due plans). Built without a console window. |
 | `wslpilot-cli` (`cmd/wslpilot-cli`) | implemented | Scripting and debugging: status, lists, backup, catalog, verify, restore as new objects, compact, plans. |
 | elevated child | implemented | Only `diskpart` for compaction WSL cannot do itself, started through the UAC prompt (`internal/elevate`). |

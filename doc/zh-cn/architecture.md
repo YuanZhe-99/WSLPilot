@@ -4,7 +4,7 @@
 
 | 进程 | 状态 | 职责 |
 |---|---|---|
-| `wslpilot`（`cmd/wslpilot`） | 已实现 | GUI。以当前登录用户运行，从不提权。单实例；关闭窗口后保留在托盘。打开期间每分钟运行到期的备份计划。 |
+| `wslpilot`（`cmd/wslpilot`） | 已实现 | GUI。以当前登录用户运行，从不提权。单实例；关闭窗口后保留在托盘，除非在设置中选择“退出”。运行期间每分钟运行到期的备份计划，并每天检查更新（`gui.md`）。 |
 | `wslpilot-agent`（`cmd/wslpilot-agent`） | 已实现 | `run-due`（计划任务，每 15 分钟）与 `watch`（登录时：重启策略、Compose 自启、到期计划）。编译为无控制台窗口程序。 |
 | `wslpilot-cli`（`cmd/wslpilot-cli`） | 已实现 | 脚本与调试：状态、列表、备份、目录、校验、恢复为新对象、压缩、计划。 |
 | 提权子进程 | 已实现 | 仅用于 WSL 自身无法完成的压缩，运行 `diskpart`，通过 UAC 提示启动（`internal/elevate`）。 |

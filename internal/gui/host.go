@@ -1,10 +1,42 @@
 package gui
 
 import (
+	"context"
+	_ "embed"
 	"strconv"
 
 	"github.com/egoist/mygo/ui"
+
+	"github.com/YuanZhe-99/WSLPilot/internal/version"
 )
+
+//go:embed appicon.png
+var appIconPNG []byte
+
+// appIcon is the app's icon for the sidebar (nil if undecodable).
+var appIcon, _ = ui.DecodeBitmap(appIconPNG)
+
+// appVersion is the running version.
+func appVersion() string { return version.Version }
+
+// WindowOp is an operation on the main window.
+type WindowOp int
+
+// Window operations.
+const (
+	WindowMinimize WindowOp = iota
+	WindowToggleMaximize
+	WindowClose
+)
+
+// AppUpdate is a newer signed version found on the release feed.
+type AppUpdate struct {
+	Version string
+	Notes   string
+	// Install downloads it, checks its signature and replaces the app; the
+	// new version runs after Relaunch.
+	Install func(ctx context.Context, progress func(done, total int64)) error
+}
 
 // Host is what the GUI needs from the window and the system. The app
 // passes the MyGo implementation (cmd/wslpilot); tests pass a fake.
@@ -28,12 +60,20 @@ type Host interface {
 	OpenAtLogin() bool
 	// SetTheme chooses "system", "light" or "dark".
 	SetTheme(mode string)
-	// CheckForUpdates checks now and shows the update window.
-	CheckForUpdates()
-	// AutoUpdate reports whether updates are checked in the background.
-	AutoUpdate() bool
-	// SetAutoUpdate turns background update checks on or off.
-	SetAutoUpdate(on bool)
+	// Window minimizes, maximizes or restores, or closes the main window.
+	Window(op WindowOp)
+	// Maximized reports whether the main window is maximized.
+	Maximized() bool
+	// UpdatesEnabled reports whether this copy can update itself (an
+	// installed release build).
+	UpdatesEnabled() bool
+	// CheckUpdate asks the release feed for a newer version (nil: none).
+	CheckUpdate(ctx context.Context) (*AppUpdate, error)
+	// Relaunch restarts the app (into an installed update).
+	Relaunch()
+	// IdleSeconds is how long the user has not used the computer (0 when
+	// the system does not tell).
+	IdleSeconds() float64
 }
 
 // Term is a running terminal session.

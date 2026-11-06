@@ -44,8 +44,13 @@ func (a *App) confirmDialog(c *ui.Context) {
 	}
 	ui.Modal(c, &cs.open, func() {
 		ui.Column(c).Width(dialogWidth).Gap(gap).Children(func() {
-			ui.Text(c, cs.title).FontSize(sectionSize).Bold()
-			ui.Text(c, cs.message)
+			ui.Row(c).FillWidth().Gap(12).AlignItems(ui.Start).Children(func() {
+				iconTile(c, iconAlert, toneBad)
+				ui.Column(c).Grow(1).MinWidth(0).Gap(6).Children(func() {
+					ui.Text(c, cs.title).FontSize(16).Bold()
+					ui.Text(c, cs.message)
+				})
+			})
 			if cs.offerBackup {
 				ui.Checkbox(c, &cs.backup, L.ConfirmBackupFirst())
 			}

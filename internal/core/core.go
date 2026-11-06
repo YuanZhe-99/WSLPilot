@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/backup"
 	"github.com/YuanZhe-99/WSLPilot/internal/capability"
@@ -105,6 +106,23 @@ type Prefs struct {
 	BackupDir string `json:"backupDir,omitempty"`
 	// HelperImage is the image for volume transfers ("" = alpine:3.20).
 	HelperImage string `json:"helperImage,omitempty"`
+
+	// CloseQuits ends WSLPilot when the window closes; otherwise it stays
+	// in the tray. CloseHinted records that the tray hint was shown.
+	CloseQuits  bool `json:"closeQuits,omitempty"`
+	CloseHinted bool `json:"closeHinted,omitempty"`
+
+	// Updates (doc/en-us/gui.md, "Updates"): NoUpdateCheck turns the
+	// daily check off; LastUpdateCheck and AnnouncedVersion record the
+	// last check and the version last notified; AutoInstall is "", "idle"
+	// or "daily" (at AutoInstallHour); RelaunchHidden keeps the window in
+	// the tray after an update installed while it was closed.
+	NoUpdateCheck    bool      `json:"noUpdateCheck,omitempty"`
+	LastUpdateCheck  time.Time `json:"lastUpdateCheck,omitzero"`
+	AnnouncedVersion string    `json:"announcedVersion,omitempty"`
+	AutoInstall      string    `json:"autoInstall,omitempty"`
+	AutoInstallHour  int       `json:"autoInstallHour,omitempty"`
+	RelaunchHidden   bool      `json:"relaunchHidden,omitempty"`
 }
 
 // LoadPrefs reads the preferences (zero values when missing).
@@ -140,3 +158,6 @@ func (k *Core) repoPassword(dir string) (string, bool) {
 	}
 	return "", false
 }
+
+// SavePrefs stores the preferences.
+func (k *Core) SavePrefs(p Prefs) error { return k.Store.Save(SettingsDoc, 1, p) }

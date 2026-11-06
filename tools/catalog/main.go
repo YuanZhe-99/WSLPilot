@@ -23,7 +23,9 @@ type entry struct {
 	value json.RawMessage
 }
 
-var placeholder = regexp.MustCompile(`\{([a-zA-Z]+)(:int)?\}`)
+// placeholder matches {name}, {name:int} and the start of an ICU plural,
+// {name, plural, …}, whose name is a number.
+var placeholder = regexp.MustCompile(`\{([a-zA-Z]+)(:int\}|\}|, *plural,)`)
 
 func main() {
 	rows, err := readTSV("locales/messages.tsv")
@@ -60,12 +62,16 @@ func expand(s string) (string, map[string]string) {
 	types := map[string]string{}
 	out := placeholder.ReplaceAllStringFunc(s, func(m string) string {
 		sub := placeholder.FindStringSubmatch(m)
-		t := "String"
-		if sub[2] != "" {
-			t = "int"
+		switch sub[2] {
+		case "}":
+			types[sub[1]] = "String"
+			return m
+		case ":int}":
+			types[sub[1]] = "int"
+			return "{" + sub[1] + "}"
 		}
-		types[sub[1]] = t
-		return "{" + sub[1] + "}"
+		types[sub[1]] = "int" // a plural: kept as written
+		return m
 	})
 	return out, types
 }
@@ -189,9 +195,9 @@ func placeholderMeta(s string) json.RawMessage {
 			b.WriteString(",")
 		}
 		seen[m[1]] = true
-		t := "String"
-		if m[2] != "" {
-			t = "int"
+		t := "int"
+		if m[2] == "}" {
+			t = "String"
 		}
 		fmt.Fprintf(&b, `%q:{"type":%q}`, m[1], t)
 	}

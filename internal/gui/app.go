@@ -8,11 +8,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/egoist/mygo/ui"
-
 	"github.com/YuanZhe-99/WSLPilot/internal/capability"
 	"github.com/YuanZhe-99/WSLPilot/internal/core"
-	L "github.com/YuanZhe-99/WSLPilot/locales"
 )
 
 // Page IDs, also the sidebar item IDs.
@@ -24,23 +21,7 @@ const (
 	PageVolumes   = "volumes"
 	PageBackups   = "backups"
 	PageTerminal  = "terminal"
-	PageSettings  = "settings"
-)
-
-// Layout tokens.
-const (
-	sidebarWidth = 220
-	pagePadding  = 24
-	cardPadding  = 16
-	cardRadius   = 8
-	gap          = 12
-	smallGap     = 6
-	titleSize    = 24
-	sectionSize  = 16
-	dialogWidth  = 520
-	detailWidth  = 360
-	jobsWidth    = 360
-	editorHeight = 360
+	PageTasks     = "tasks"
 )
 
 // probeTimeout bounds one capability probe; wslc may need to start its
@@ -63,9 +44,19 @@ type App struct {
 	probe  func(context.Context) capability.Report
 	update func(func())
 
-	toasts   []toast
-	confirm  confirmState
-	jobsOpen bool
+	toasts  []toast
+	confirm confirmState
+
+	// settingsOpen shows the Settings sheet at settingsAt.
+	settingsOpen bool
+	settingsAt   settingsSection
+	settingsQ    string
+	focus        settingsFocus
+
+	upd updateState
+
+	// hidden is true while the window is closed into the tray.
+	hidden bool
 
 	wsl      wslPage
 	ctr      containersPage
@@ -92,6 +83,15 @@ func New(k *core.Core, host Host, update func(func())) *App {
 	a.probe = k.Prober.Probe
 	k.Jobs.OnChange = func() { a.update(func() {}) }
 	k.Jobs.OnFinish = a.jobFinished
+	// Lists start with nothing selected, whichever page loads them first.
+	a.wsl.list.Selected = &a.wsl.sel
+	a.ctr.cl.Selected, a.ctr.il.Selected, a.ctr.nl.Selected = &a.ctr.csel, &a.ctr.isel, &a.ctr.nsel
+	a.ctr.csel, a.ctr.isel, a.ctr.nsel = -1, -1, -1
+	a.cmp.pl.Selected, a.cmp.sel = &a.cmp.sel, -1
+	a.vol.ls.Selected, a.vol.sel = &a.vol.sel, -1
+	a.vol.imp = volInput{newVolume: true, driver: "guest", check: true}
+	a.bk.gl.Selected, a.bk.vl.Selected, a.bk.pl.Selected = &a.bk.gsel, &a.bk.vsel, &a.bk.psel
+	a.bk.gsel, a.bk.vsel, a.bk.psel = -1, -1, -1
 	return a
 }
 
@@ -136,104 +136,45 @@ func (a *App) notify(text string, isError bool) {
 	a.toasts = append(a.toasts, toast{text, isError})
 }
 
-// View builds the window: the sidebar, the chosen page, the job panel and
-// any dialog.
-func (a *App) View(c *ui.Context) {
-	for _, t := range a.toasts {
-		if t.error {
-			c.AddToast(ui.Toast{Title: t.text, Type: "error"})
-		} else {
-			c.Toast(t.text)
-		}
+// SetHidden records whether the window is closed into the tray.
+func (a *App) SetHidden(h bool) { a.hidden = h }
+
+// Prefs returns the stored preferences (theme, close behavior, updates).
+func (a *App) Prefs() Prefs {
+	a.loadPrefs()
+	return a.settings.prefs
+}
+
+// TakeRelaunchHidden reports whether the window should stay hidden after
+// an update relaunch, and clears the flag.
+func (a *App) TakeRelaunchHidden() bool {
+	a.loadPrefs()
+	h := a.settings.prefs.RelaunchHidden
+	if h {
+		a.settings.prefs.RelaunchHidden = false
+		a.k.SavePrefs(a.settings.prefs)
 	}
-	a.toasts = a.toasts[:0]
-	ui.Row(c).Fill().Children(func() {
-		ui.Sidebar(c, &a.page, func() {
-			ui.SidebarSection(c, L.AppName(), nil, func() {
-				ui.SidebarItem(c, PageDashboard, nil, L.NavDashboard())
-				ui.SidebarItem(c, PageWSL, nil, L.NavWSL())
-				ui.SidebarItem(c, PageWSLc, nil, L.NavWSLc())
-				ui.SidebarItem(c, PageCompose, nil, L.NavCompose())
-				ui.SidebarItem(c, PageVolumes, nil, L.NavVolumes())
-				ui.SidebarItem(c, PageBackups, nil, L.NavBackups())
-				ui.SidebarItem(c, PageTerminal, nil, L.NavTerminal()).Children(func() {
-					if n := len(a.term.sessions); n > 0 {
-						ui.Badge(c, itoa(n))
-					}
-				})
-				ui.SidebarItem(c, PageSettings, nil, L.NavSettings())
-			})
-		}).Width(sidebarWidth).FillHeight()
-		ui.Column(c).Grow(1).FillHeight().Padding(pagePadding).Gap(gap).Children(func() {
-			switch a.page {
-			case PageDashboard:
-				a.dashboard(c)
-			case PageWSL:
-				a.wslView(c)
-			case PageWSLc:
-				a.containersView(c)
-			case PageCompose:
-				a.composeView(c)
-			case PageVolumes:
-				a.volumesView(c)
-			case PageBackups:
-				a.backupsView(c)
-			case PageTerminal:
-				a.terminalView(c)
-			case PageSettings:
-				a.settingsView(c)
-			}
-		})
-		if a.jobsOpen {
-			a.jobsPanel(c)
-		}
-	})
-	a.confirmDialog(c)
+	return h
 }
 
-// header draws a page title with actions on the right.
-func (a *App) header(c *ui.Context, title string, actions func()) {
-	ui.Row(c).FillWidth().Gap(smallGap).AlignItems(ui.Center).Children(func() {
-		ui.Text(c, title).FontSize(titleSize).Bold().Grow(1)
-		if actions != nil {
-			actions()
-		}
-		if n := a.k.Jobs.Active(); n > 0 || len(a.k.Jobs.List()) > 0 {
-			label := L.JobsButton(n)
-			ui.Button(c, label).OnClick(func() { a.jobsOpen = !a.jobsOpen })
-		}
-	})
+// CloseHint reports whether to tell the user once that closing the window
+// keeps WSLPilot in the tray, and records that it was told.
+func (a *App) CloseHint() bool {
+	a.loadPrefs()
+	p := &a.settings.prefs
+	if p.CloseHinted || p.CloseQuits {
+		return false
+	}
+	p.CloseHinted = true
+	a.k.SavePrefs(*p)
+	return true
 }
 
-// card draws a titled panel around the content body builds.
-func card(c *ui.Context, title string, body func()) {
-	t := c.Theme()
-	ui.Column(c).FillWidth().Gap(smallGap).AlignItems(ui.Start).Padding(cardPadding).Radius(cardRadius).
-		Background(t.Surface).Border(1, t.Border).Children(func() {
-		if title != "" {
-			ui.Text(c, title).Bold()
-		}
-		body()
-	})
-}
-
-// muted draws secondary text.
-func muted(c *ui.Context, s string) ui.Element {
-	return ui.Text(c, s).TextColor(c.Theme().TextMuted)
-}
-
-// errorText draws an error line.
-func errorText(c *ui.Context, s string) ui.Element {
-	return ui.Text(c, s).TextColor(c.Theme().Danger)
-}
-
-// dangerButton is a button in the danger color.
-func dangerButton(c *ui.Context, label string) ui.Element {
-	t := c.Theme()
-	return ui.Button(c, label).TextColor(t.Danger)
-}
-
-// actions lays buttons out in a row that wraps.
-func actions(c *ui.Context, body func()) {
-	ui.Row(c).FillWidth().Wrap().Gap(smallGap).Children(body)
+// OpenUpdates opens Settings at About & updates and checks now (the tray's
+// "Check for updates").
+func (a *App) OpenUpdates() {
+	a.openSettings(setAbout)
+	if a.host != nil && a.host.UpdatesEnabled() {
+		go a.checkUpdate(context.Background(), true)
+	}
 }

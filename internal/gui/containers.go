@@ -14,6 +14,7 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/backup"
+	"github.com/YuanZhe-99/WSLPilot/internal/configdoc"
 	"github.com/YuanZhe-99/WSLPilot/internal/jobs"
 	"github.com/YuanZhe-99/WSLPilot/internal/restart"
 	"github.com/YuanZhe-99/WSLPilot/internal/wslc"
@@ -43,6 +44,9 @@ type containersPage struct {
 	sessions []string
 	choice   string
 	client   atomic.Pointer[wslc.Client]
+
+	storageBytes int64 // the CLI session's storage.vhdx
+	logQuery     string
 
 	logsFor    string
 	logs       *logBuffer
@@ -142,11 +146,17 @@ func (a *App) loadContainers() {
 		imgs, _ := a.wc().Images(ctx)
 		nets, _ := a.wc().Networks(ctx)
 		wt := wtprofile.Installed()
+		var storage int64
+		for _, s := range sessions {
+			if wslc.IsCLISession(s) {
+				storage = sessionStorageSize(s)
+			}
+		}
 		sort.Slice(list, func(i, j int) bool { return list[i].Names < list[j].Names })
 		return func() {
 			p.loading, p.loaded, p.err = false, true, err
 			p.list, p.detail, p.stats, p.images, p.networks, p.wt = list, detail, stats, imgs, nets, wt
-			p.sessions = sessions
+			p.sessions, p.storageBytes = sessions, storage
 			if p.choice == "" {
 				for _, s := range sessions {
 					if wslc.IsCLISession(s) {
@@ -178,169 +188,6 @@ func (p *containersPage) visible() []wslc.ContainerSummary {
 		}
 	}
 	return res
-}
-
-// containersView draws the WSL Containers page.
-func (a *App) containersView(c *ui.Context) {
-	p := &a.ctr
-	if !p.loaded && !p.loading {
-		p.cl.Selected, p.il.Selected, p.nl.Selected = &p.csel, &p.isel, &p.nsel
-		p.csel, p.isel, p.nsel = -1, -1, -1
-		a.loadContainers()
-	}
-	a.header(c, L.NavWSLc(), func() {
-		if len(p.sessions) > 1 {
-			ui.Select(c, &p.choice, p.sessions).Label(L.CtrSession()).OnChange(func() { a.selectSession(p.choice) })
-		}
-		ui.Button(c, L.Refresh()).Disabled(p.loading).OnClick(a.loadContainers)
-	})
-	if a.report != nil && !a.report.HasWSLc() {
-		card(c, L.DashNotFound(), func() { muted(c, L.DashWSLcHint()) })
-		return
-	}
-	if a.ctr.client.Load() != nil {
-		ui.Text(c, L.CtrOtherSession(p.choice)).TextColor(c.Theme().Warning)
-	}
-	if p.err != nil {
-		errorText(c, friendlyError(p.err))
-	}
-	ui.Tabs(c, &p.tab, L.CtrContainers(), L.CtrImages(), L.CtrNetworks())
-	switch p.tab {
-	case 0:
-		a.containerList(c)
-	case 1:
-		a.imageList(c)
-	case 2:
-		a.networkList(c)
-	}
-	a.containerDialogs(c)
-}
-
-func (a *App) containerList(c *ui.Context) {
-	p := &a.ctr
-	vis := p.visible()
-	ui.Row(c).FillWidth().Gap(smallGap).AlignItems(ui.Center).Children(func() {
-		ui.PrimaryButton(c, L.CtrRun()).OnClick(func() { p.in = ctrInput{start: true, restart: restart.No}; p.dlg = "run" })
-		ui.Spacer(c)
-		ui.Checkbox(c, &p.showAll, L.CtrShowAll())
-		dangerButton(c, L.CtrPrune()).OnClick(func() {
-			a.ask(L.CtrPruneTitle(), L.CtrPruneMessage(), L.CtrPrune(), func(bool) {
-				a.wslcJob(L.CtrPrune(), "wslc.container.prune", func(ctx context.Context) error { _, err := a.wc().Prune(ctx, "container"); return err })
-			})
-		})
-	})
-	if p.loaded && len(vis) == 0 {
-		muted(c, L.CtrNone())
-	}
-	ui.Row(c).Grow(1).FillWidth().Gap(gap).Children(func() {
-		cols := []ui.TableColumn{{Title: L.ColName()}, {Title: L.CtrImage()}, {Title: L.ColState(), Width: 80}, {Title: L.CtrPorts()}, {Title: L.CtrCPU(), Width: 64, Align: ui.End}, {Title: L.CtrMemory(), Width: 90, Align: ui.End}}
-		ui.Table(c, &p.cl, cols, len(vis), func(row, col int) {
-			s := vis[row]
-			st := p.stats[shortID(s.ID)]
-			switch col {
-			case 0:
-				ui.Text(c, s.Names).SingleLine()
-			case 1:
-				ui.Text(c, s.Image).SingleLine()
-			case 2:
-				ui.Text(c, s.State)
-			case 3:
-				ui.Text(c, s.Ports).SingleLine()
-			case 4:
-				ui.Text(c, st.CPUPerc)
-			case 5:
-				ui.Text(c, strings.SplitN(st.MemUsage, " /", 2)[0])
-			}
-		}).Grow(1).FillHeight()
-		if p.csel >= 0 && p.csel < len(vis) {
-			s := vis[p.csel]
-			ui.Column(c).Width(detailWidth + 80).FillHeight().Gap(gap).Children(func() { a.containerDetail(c, s) })
-		}
-	})
-}
-
-// containerDetail is the side panel for one container.
-func (a *App) containerDetail(c *ui.Context, s wslc.ContainerSummary) {
-	p := &a.ctr
-	d := p.detail[shortID(s.ID)]
-	ui.Text(c, s.Names).FontSize(sectionSize).Bold()
-	ui.Row(c).FillWidth().Gap(smallGap).Children(func() {
-		if s.Running() {
-			ui.PrimaryButton(c, L.CtrShell()).OnClick(func() {
-				a.openTerminal(s.Names, []string{"wslc.exe", "container", "exec", "--interactive", "--tty", s.ID, "sh", "-c", "command -v bash >/dev/null && exec bash || exec sh"})
-			})
-			ui.Button(c, L.Stop()).OnClick(func() {
-				a.wslcJob(L.JobStop(s.Names), "", func(ctx context.Context) error { return a.wc().Stop(ctx, -1, s.ID) })
-			})
-			ui.Button(c, L.Restart()).OnClick(func() {
-				a.wslcJob(L.Restart()+" "+s.Names, "", func(ctx context.Context) error { return a.wc().Restart(ctx, s.ID) })
-			})
-		} else {
-			ui.PrimaryButton(c, L.Start()).OnClick(func() {
-				a.wslcJob(L.JobStart(s.Names), "", func(ctx context.Context) error { return a.wc().Start(ctx, s.ID) })
-			})
-		}
-		ui.Button(c, L.CtrLogs()).OnClick(func() { a.openLogs(s.ID) })
-		if d.ID != "" && d.Labels["com.docker.compose.project"] == "" {
-			ui.Button(c, L.CtrEdit()).OnClick(func() { p.in = editInput(d); p.dlg = "run" })
-		}
-	})
-	ui.Scroll(c).Grow(1).FillWidth().Gap(gap).Children(func() {
-		card(c, "", func() {
-			kv(c, L.CtrImage(), s.Image)
-			kv(c, L.ColState(), s.Status)
-			kv(c, "ID", shortID(s.ID))
-			if s.Ports != "" {
-				kv(c, L.CtrPorts(), s.Ports)
-			}
-			for name, n := range d.NetworkSettings.Networks {
-				kv(c, L.CtrNetwork(), name+"  "+n.IPAddress)
-			}
-			for _, m := range d.Mounts {
-				src := m.Source
-				if m.Name != "" {
-					src = m.Name
-				}
-				kv(c, L.CtrMount(), src+" → "+m.Destination)
-			}
-			if pol := d.Labels[restart.Label]; pol != "" {
-				kv(c, L.CtrRestartPolicy(), pol)
-			}
-			if proj := d.Labels["com.docker.compose.project"]; proj != "" {
-				kv(c, L.NavCompose(), proj+" / "+d.Labels["com.docker.compose.service"])
-			}
-		})
-		if p.logsFor == s.ID && p.logs != nil {
-			card(c, L.CtrLogs(), func() {
-				ui.Row(c).Gap(smallGap).Children(func() {
-					ui.Button(c, L.Close()).OnClick(a.closeLogs)
-				})
-				ui.Text(c, lastLines(p.logs.String(), 300)).Font("monospace").FontSize(11).Selectable()
-			})
-		}
-		if p.wt {
-			ui.Button(c, L.CtrAddProfile()).OnClick(func() {
-				fr, err := wtprofile.Default()
-				if err == nil {
-					err = fr.Put(wtprofile.ContainerShell(s.Names, "sh"))
-				}
-				if err != nil {
-					a.notify(friendlyError(err), true)
-				} else {
-					a.notify(L.CtrProfileAdded(), false)
-				}
-			})
-		}
-		card(c, L.DangerZone(), func() {
-			dangerButton(c, L.CtrRemove()).OnClick(func() {
-				a.ask(L.CtrRemoveTitle(s.Names), L.CtrRemoveMessage(), L.CtrRemove(), func(bool) {
-					a.wslcJob(L.CtrRemove()+" "+s.Names, "wslc.container.remove", func(ctx context.Context) error {
-						return a.wc().Remove(ctx, true, false, s.ID)
-					})
-				})
-			})
-		})
-	})
 }
 
 // lastLines keeps the last n lines of s.
@@ -382,80 +229,6 @@ func (a *App) wslcJob(title, audit string, fn func(ctx context.Context) error) {
 	}, func() { a.loadContainers(); a.vol.loaded = false })
 }
 
-func (a *App) imageList(c *ui.Context) {
-	p := &a.ctr
-	ui.Row(c).FillWidth().Gap(smallGap).Children(func() {
-		ui.PrimaryButton(c, L.ImgPull()).OnClick(func() { p.in = ctrInput{}; p.dlg = "pull" })
-		ui.Spacer(c)
-		dangerButton(c, L.ImgPrune()).OnClick(func() {
-			a.ask(L.ImgPruneTitle(), L.ImgPruneMessage(), L.ImgPrune(), func(bool) {
-				a.wslcJob(L.ImgPrune(), "wslc.image.prune", func(ctx context.Context) error { _, err := a.wc().Prune(ctx, "image"); return err })
-			})
-		})
-	})
-	cols := []ui.TableColumn{{Title: L.ImgRepository()}, {Title: L.ImgTag(), Width: 120}, {Title: "ID", Width: 130}, {Title: L.ColDisk(), Width: 90, Align: ui.End}, {Title: L.ImgCreated(), Width: 170}}
-	ui.Table(c, &p.il, cols, len(p.images), func(row, col int) {
-		im := p.images[row]
-		switch col {
-		case 0:
-			ui.Text(c, im.Repository).SingleLine()
-		case 1:
-			ui.Text(c, im.Tag)
-		case 2:
-			muted(c, shortID(strings.TrimPrefix(im.ID, "sha256:")))
-		case 3:
-			ui.Text(c, im.Size)
-		case 4:
-			muted(c, im.CreatedAt).SingleLine()
-		}
-	}).Grow(1).FillWidth()
-	if p.isel >= 0 && p.isel < len(p.images) {
-		im := p.images[p.isel]
-		ui.Row(c).FillWidth().Gap(smallGap).Children(func() {
-			ui.Text(c, im.Ref()).Bold().Grow(1)
-			ui.Button(c, L.CtrRun()).OnClick(func() { p.in = ctrInput{image: im.Ref(), start: true, restart: restart.No}; p.dlg = "run" })
-			dangerButton(c, L.ImgRemove()).OnClick(func() {
-				a.ask(L.ImgRemoveTitle(im.Ref()), L.ImgRemoveMessage(), L.ImgRemove(), func(bool) {
-					a.wslcJob(L.ImgRemove()+" "+im.Ref(), "wslc.image.remove", func(ctx context.Context) error { return a.wc().RemoveImages(ctx, false, im.Ref()) })
-				})
-			})
-		})
-	}
-}
-
-func (a *App) networkList(c *ui.Context) {
-	p := &a.ctr
-	ui.Row(c).FillWidth().Gap(smallGap).Children(func() {
-		ui.PrimaryButton(c, L.NetCreate()).OnClick(func() { p.in = ctrInput{}; p.dlg = "network" })
-	})
-	cols := []ui.TableColumn{{Title: L.ColName()}, {Title: L.NetDriver(), Width: 90}, {Title: L.NetSubnet(), Width: 150}, {Title: L.CtrContainers(), Width: 100, Align: ui.End}}
-	ui.Table(c, &p.nl, cols, len(p.networks), func(row, col int) {
-		n := p.networks[row]
-		switch col {
-		case 0:
-			ui.Text(c, n.Name)
-		case 1:
-			ui.Text(c, n.Driver)
-		case 2:
-			if len(n.IPAM.Config) > 0 {
-				ui.Text(c, n.IPAM.Config[0].Subnet)
-			}
-		case 3:
-			ui.Text(c, itoa(len(n.Containers)))
-		}
-	}).Grow(1).FillWidth()
-	if p.nsel >= 0 && p.nsel < len(p.networks) {
-		n := p.networks[p.nsel]
-		if !n.Builtin() {
-			dangerButton(c, L.NetRemove()+" "+n.Name).OnClick(func() {
-				a.ask(L.NetRemoveTitle(n.Name), L.NetRemoveMessage(), L.NetRemove(), func(bool) {
-					a.wslcJob(L.NetRemove()+" "+n.Name, "wslc.network.remove", func(ctx context.Context) error { return a.wc().RemoveNetworks(ctx, n.Name) })
-				})
-			})
-		}
-	}
-}
-
 // containerDialogs draws the open dialog of the page.
 func (a *App) containerDialogs(c *ui.Context) {
 	p := &a.ctr
@@ -468,10 +241,10 @@ func (a *App) containerDialogs(c *ui.Context) {
 			switch p.dlg {
 			case "run":
 				if p.in.replace != "" {
-					ui.Text(c, L.CtrEditTitle(p.in.replaceName)).FontSize(sectionSize).Bold()
+					ui.Text(c, L.CtrEditTitle(p.in.replaceName)).FontSize(16).Bold()
 					ui.Text(c, L.CtrEditWarning()).TextColor(c.Theme().Warning)
 				} else {
-					ui.Text(c, L.CtrRunTitle()).FontSize(sectionSize).Bold()
+					ui.Text(c, L.CtrRunTitle()).FontSize(16).Bold()
 				}
 				ui.Form(c, func() {
 					ui.Field(c, L.CtrImage(), func() { ui.TextInput(c, &p.in.image).Placeholder("nginx:latest").Label(L.CtrImage()) })
@@ -499,14 +272,14 @@ func (a *App) containerDialogs(c *ui.Context) {
 					})
 				})
 			case "pull":
-				ui.Text(c, L.ImgPull()).FontSize(sectionSize).Bold()
+				ui.Text(c, L.ImgPull()).FontSize(16).Bold()
 				ui.Field(c, L.CtrImage(), func() { ui.TextInput(c, &p.in.ref).Placeholder("alpine:3.20").Label(L.CtrImage()).AutoFocus() })
 				dialogButtons(c, a, L.ImgPull(), strings.TrimSpace(p.in.ref) != "", func() {
 					ref := strings.TrimSpace(p.in.ref)
 					a.startJob(L.ImgPull()+" "+ref, func(ctx context.Context, j *jobs.Job) error { return a.wc().Pull(ctx, ref, j) }, a.loadContainers)
 				})
 			case "network":
-				ui.Text(c, L.NetCreate()).FontSize(sectionSize).Bold()
+				ui.Text(c, L.NetCreate()).FontSize(16).Bold()
 				ui.Field(c, L.ColName(), func() { ui.TextInput(c, &p.in.network).Label(L.ColName()) })
 				ui.Field(c, L.NetSubnet(), func() { ui.TextInput(c, &p.in.subnet).Placeholder("172.30.0.0/16").Label(L.NetSubnet()) })
 				dialogButtons(c, a, L.NetCreate(), strings.TrimSpace(p.in.network) != "", func() {
@@ -661,4 +434,20 @@ func (a *App) recreate(oldID string, spec wslc.ContainerSpec) {
 		}
 		return a.wc().Start(ctx, id)
 	})
+}
+
+// sessionStorageSize is the size of a session's storage.vhdx under the
+// storage path of settings.yaml (default %LOCALAPPDATA%).
+func sessionStorageSize(session string) int64 {
+	base := os.Getenv("LOCALAPPDATA")
+	if snap, err := configdoc.ReadFile(filepath.Join(base, "wslc", "settings.yaml")); err == nil {
+		if v, ok := configdoc.ParseYAML(snap.Text).Get("session.storagePath"); ok && v != "default" && v != "" {
+			base = strings.Trim(v, `"'`)
+		}
+	}
+	st, err := os.Stat(filepath.Join(base, "wslc", "sessions", session, "storage.vhdx"))
+	if err != nil {
+		return 0
+	}
+	return st.Size()
 }

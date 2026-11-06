@@ -11,6 +11,15 @@ acknowledged if someone asks.
 
 WSLPilot is built with [MyGo](https://github.com/egoist/mygo) (MIT License).
 
+## Lucide icons
+
+The page, action and window icons in `internal/gui/icons.go` are from
+[Lucide](https://lucide.dev) (ISC License): Copyright (c) for portions of Lucide are held by Cole
+Bemis 2013-2022 as part of Feather (MIT). All other copyright (c) for Lucide are held by Lucide
+Contributors 2022. Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above copyright notice and this
+permission notice appear in all copies.
+
 ## Go modules
 
 Compiled into WSLPilot; each license is compatible with GPL-3.0.

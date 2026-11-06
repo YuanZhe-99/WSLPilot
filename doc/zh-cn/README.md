@@ -18,6 +18,7 @@ WSLPilot 是 Windows 11 原生桌面工具，用于管理 WSL 发行版与 WSL �
 | [backups.md](backups.md) | 备份类型、目录与归档格式、目录扫描、恢复、计划、重启策略 |
 | [compose.md](compose.md) | Compose Backend、项目元数据、支持的键、迁移 |
 | [app-data.md](app-data.md) | WSLPilot 保存什么、保存在哪里 |
+| [gui.md](gui.md) | 窗口外壳、设置面板、应用内更新与各页面 |
 | [translation-guide.md](translation-guide.md) | 镜像规则与术语表 |
 | [version-history.md](version-history.md) | 发布记录及其测试所用的上游版本 |
 | [functions/INDEX.md](functions/INDEX.md) | 各包职责与关键声明 |
@@ -28,6 +29,6 @@ WSLPilot 是 Windows 11 原生桌面工具，用于管理 WSL 发行版与 WSL �
 |---|---|---|
 | Go | 1.27.3 | `go.mod` |
 | MyGo | v0.7.4 | `go.mod` |
-| WSLPilot | 0.1.0 | `internal/version`、`mygo.json` |
+| WSLPilot | 0.1.1 | `internal/version`、`mygo.json` |
 | WSL（已测试，不随附） | 3.0.3.0 | `internal/upstream/tested.json`、`upstream.md` |
 | WSLc（已测试，不随附） | 3.0.3.0 | `upstream.md` |

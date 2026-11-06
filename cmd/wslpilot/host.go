@@ -1,9 +1,10 @@
 package main
 
 import (
+	"context"
+
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/plugins/terminal"
-	"github.com/egoist/mygo/plugins/updater"
 	"github.com/egoist/mygo/ui"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/gui"
@@ -91,11 +92,43 @@ func (t *term) Done() bool {
 // Close ends the program.
 func (t *term) Close() { t.t.Close() }
 
-// CheckForUpdates checks now and shows MyGo's update window.
-func (h *host) CheckForUpdates() { updater.CheckForUpdates() }
+// Window minimizes, toggles maximized or closes the main window.
+func (h *host) Window(op gui.WindowOp) {
+	if h.win == nil {
+		return
+	}
+	switch op {
+	case gui.WindowMinimize:
+		h.win.Minimize()
+	case gui.WindowToggleMaximize:
+		if h.win.IsMaximized() {
+			h.win.Unmaximize()
+		} else {
+			h.win.Maximize()
+		}
+	case gui.WindowClose:
+		h.win.Close()
+	}
+}
 
-// AutoUpdate reports whether background update checks are on.
-func (h *host) AutoUpdate() bool { return updater.AutomaticChecks() }
+// Maximized reports whether the main window is maximized.
+func (h *host) Maximized() bool { return h.win != nil && h.win.IsMaximized() }
 
-// SetAutoUpdate turns background update checks on or off.
-func (h *host) SetAutoUpdate(on bool) { updater.SetAutomaticChecks(on) }
+// UpdatesEnabled reports whether this copy can update itself.
+func (h *host) UpdatesEnabled() bool { return mygo.Updater.Enabled() }
+
+// CheckUpdate asks the release feed (mygo.json "updates") for a newer
+// signed version.
+func (h *host) CheckUpdate(ctx context.Context) (*gui.AppUpdate, error) {
+	up, err := mygo.Updater.Check(ctx)
+	if err != nil || up == nil {
+		return nil, err
+	}
+	return &gui.AppUpdate{Version: up.Version, Notes: up.Notes, Install: up.Install}, nil
+}
+
+// Relaunch restarts WSLPilot into the installed update.
+func (h *host) Relaunch() { mygo.App.Relaunch() }
+
+// IdleSeconds is how long the computer has not been used.
+func (h *host) IdleSeconds() float64 { return mygo.Power.IdleTime().Seconds() }

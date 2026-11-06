@@ -185,100 +185,6 @@ func (p *backupsPage) locationOf(it backup.Item) backup.Location {
 	return best
 }
 
-// backupsView draws the Backups page.
-func (a *App) backupsView(c *ui.Context) {
-	p := &a.bk
-	if !p.loaded && !p.loading {
-		p.gl.Selected, p.vl.Selected, p.pl.Selected = &p.gsel, &p.vsel, &p.psel
-		p.gsel, p.vsel, p.psel = -1, -1, -1
-		a.loadCatalog()
-	}
-	a.ensurePlans()
-	a.header(c, L.NavBackups(), func() {
-		ui.Segmented(c, &p.view, L.BkRestore(), L.BkPlans()).Label(L.NavBackups())
-	})
-	if p.view == 1 {
-		a.plansView(c)
-	} else {
-		a.restoreView(c)
-	}
-	a.backupDialogs(c)
-}
-
-func (a *App) restoreView(c *ui.Context) {
-	p := &a.bk
-	t := c.Theme()
-	ui.Row(c).FillWidth().Gap(smallGap).Children(func() {
-		ui.PrimaryButton(c, L.BkOpenFolder()).OnClick(func() {
-			go func() {
-				if ps := a.host.PickFiles(L.BkOpenFolder(), true); len(ps) > 0 {
-					a.update(func() { a.addLocation(ps[0]) })
-				}
-			}()
-		})
-		ui.Button(c, L.BkOpenFile()).OnClick(func() {
-			go func() {
-				if ps := a.host.PickFiles(L.BkOpenFile(), false, "tar", "gz", "tgz", "zst", "xz", "vhdx"); len(ps) > 0 {
-					a.update(func() { a.addLocation(ps[0]) })
-				}
-			}()
-		})
-		ui.Spacer(c)
-		ui.Button(c, L.Refresh()).Disabled(p.loading).OnClick(func() { p.loaded = false; a.loadCatalog() })
-	})
-	muted(c, L.BkRestoreHelp())
-	for i, e := range p.scanErrs {
-		ui.Text(c.Key("se"+itoa(i)), e).TextColor(t.Warning)
-	}
-	ui.Row(c).Grow(1).FillWidth().Gap(gap).Children(func() {
-		ui.Column(c).Width(300).FillHeight().Gap(smallGap).Children(func() {
-			ui.Text(c, L.BkWhat()).Bold()
-			cols := []ui.TableColumn{{Title: L.ColName()}, {Title: L.BkVersions(), Width: 70, Align: ui.End}}
-			ui.Table(c, &p.gl, cols, len(p.groups), func(row, col int) {
-				g := p.groups[row]
-				switch col {
-				case 0:
-					ui.Text(c, groupTitle(g)).SingleLine()
-				case 1:
-					ui.Text(c, itoa(len(g.Items)))
-				}
-			}).Grow(1).FillWidth()
-			ui.Text(c, L.BkLocations()).Bold()
-			for _, l := range p.locations {
-				ui.Row(c.Key(l.Path)).FillWidth().Gap(smallGap).AlignItems(ui.Center).Children(func() {
-					label := l.Path
-					if l.Label != "" {
-						label = l.Label
-					}
-					ui.Text(c, label).SingleLine().Grow(1).Tooltip(l.Path)
-					if l.ReadOnly {
-						muted(c, L.BkReadOnly())
-					}
-					if l.Label == "" {
-						path := l.Path
-						ui.Button(c, "…").Label(L.More()).Menu(func(m *ui.Menu) {
-							if l.ReadOnly && m.Item(L.BkTakeOver()).Chosen() {
-								a.setLocation(path, false, false)
-							}
-							if m.Item(L.BkForget()).Chosen() {
-								a.setLocation(path, false, true)
-							}
-						})
-					}
-				})
-			}
-		})
-		if p.gsel >= 0 && p.gsel < len(p.groups) {
-			g := p.groups[p.gsel]
-			ui.Column(c).Grow(1).FillHeight().Gap(smallGap).Children(func() { a.versions(c, g) })
-		} else if p.loaded && len(p.groups) == 0 {
-			muted(c, L.BkNone())
-		} else {
-			muted(c, L.BkPick())
-		}
-	})
-}
-
 // groupTitle names a source for the list.
 func groupTitle(g backup.Group) string {
 	switch g.Source.Kind {
@@ -312,103 +218,6 @@ func kindLabel(k backup.Kind) string {
 		return L.BkKindVHDX()
 	}
 	return L.BkKindTar()
-}
-
-func (a *App) versions(c *ui.Context, g backup.Group) {
-	p := &a.bk
-	t := c.Theme()
-	ui.Text(c, groupTitle(g)).FontSize(sectionSize).Bold()
-	cols := []ui.TableColumn{{Title: L.BkWhen(), Width: 150}, {Title: L.BkKind(), Width: 110}, {Title: L.ColDisk(), Width: 90, Align: ui.End}, {Title: L.BkFrom()}, {Title: L.BkCheck(), Width: 90}}
-	ui.Table(c, &p.vl, cols, len(g.Items), func(row, col int) {
-		it := g.Items[row]
-		switch col {
-		case 0:
-			ui.Text(c, it.Time.Local().Format("2006-01-02 15:04"))
-		case 1:
-			ui.Text(c, kindLabel(it.Kind))
-		case 2:
-			if it.Size > 0 {
-				ui.Text(c, jobs.FormatBytes(it.Size))
-			}
-		case 3:
-			from := it.Source.Host
-			if it.Plan != "" {
-				from += " · " + a.planName(it.Plan)
-			}
-			if !it.Consistent {
-				from += " · " + L.BkInconsistent()
-			}
-			ui.Text(c, from).SingleLine()
-		case 4:
-			switch v := p.verified[itemKey(it)]; v {
-			case "":
-			case "ok":
-				ui.Text(c, L.BkCheckOK()).TextColor(t.Success)
-			default:
-				ui.Text(c, L.BkCheckBad()).TextColor(t.Danger)
-			}
-		}
-	}).Grow(1).FillWidth()
-	if p.vsel < 0 || p.vsel >= len(g.Items) {
-		return
-	}
-	it := g.Items[p.vsel]
-	loc := p.locationOf(it)
-	card(c, "", func() {
-		kv(c, L.BkPath(), it.Path)
-		if it.ID != "" {
-			kv(c, L.BkSnapshot(), it.ID[:min(12, len(it.ID))])
-		}
-		if it.Note != "" {
-			ui.Text(c, noteText(it.Note)).TextColor(t.Warning)
-		}
-		if v := p.verified[itemKey(it)]; v != "" && v != "ok" {
-			errorText(c, v)
-		}
-	})
-	ui.Row(c).FillWidth().Gap(smallGap).Children(func() {
-		if it.Note == backup.NoteEncrypted {
-			ui.PrimaryButton(c, L.BkUnlock()).OnClick(func() { p.rin = restoreInput{mode: "unlock", dir: it.Path}; p.dlg = "restore" })
-			return
-		}
-		ui.Button(c, L.BkVerify()).OnClick(func() { a.verifyItem(it) })
-		switch it.Source.Kind {
-		case backup.SourceDistro, backup.SourceUnknown:
-			ui.PrimaryButton(c, L.BkRestoreNewDistro()).OnClick(func() { p.rin = restoreInput{mode: "distro"}; p.dlg = "restore" })
-			if it.Kind != backup.KindVHDX {
-				ui.Button(c, L.BkRestoreFiles()).OnClick(func() { p.rin = restoreInput{mode: "files", dir: "/"}; p.dlg = "restore" })
-			}
-			if it.Source.Name != "" {
-				dangerButton(c, L.BkRestoreOver(it.Source.Name)).OnClick(func() { p.rin = restoreInput{mode: "over-distro", name: it.Source.Name}; p.dlg = "restore" })
-			}
-		}
-		if it.Kind != backup.KindVHDX && it.Source.Kind != backup.SourceCompose && it.Source.Kind != backup.SourceDistro {
-			ui.Button(c, L.BkRestoreNewVolume()).OnClick(func() { p.rin = restoreInput{mode: "volume"}; p.dlg = "restore" })
-		}
-		if it.Source.Kind == backup.SourceVolume {
-			dangerButton(c, L.BkRestoreOver(it.Source.Name)).OnClick(func() { p.rin = restoreInput{mode: "over-volume", name: it.Source.Name}; p.dlg = "restore" })
-		}
-		if it.Source.Kind == backup.SourceCompose {
-			ui.Button(c, L.BkExtractFiles()).OnClick(func() { p.rin = restoreInput{mode: "extract"}; p.dlg = "restore" })
-		}
-		if !loc.ReadOnly && (it.Kind == backup.KindArchive || it.Kind == backup.KindFolder) {
-			dangerButton(c, L.Delete()).OnClick(func() {
-				a.ask(L.BkDeleteTitle(), L.BkDeleteMessage(), L.Delete(), func(bool) {
-					a.async(func(ctx context.Context) func() {
-						err := backup.Delete(loc, it)
-						a.k.Jobs.Audit("backup.delete", it.Path, "", err)
-						return func() {
-							if err != nil {
-								a.notify(friendlyError(err), true)
-							}
-							p.loaded = false
-							a.loadCatalog()
-						}
-					})
-				})
-			})
-		}
-	})
 }
 
 // noteText localizes the notes Scan attaches.
@@ -511,119 +320,6 @@ func extractFiles(ctx context.Context, it backup.Item, dir string) error {
 	}
 	defer rc.Close()
 	return backup.ExtractFlat(rc, dir)
-}
-
-func (a *App) plansView(c *ui.Context) {
-	p := &a.bk
-	t := c.Theme()
-	ui.Row(c).FillWidth().Gap(smallGap).Children(func() {
-		ui.PrimaryButton(c, L.BkNewPlan()).OnClick(func() { a.editPlan(nil) })
-	})
-	muted(c, L.BkPlansHelp())
-	if !a.settings.agentInstalled {
-		ui.Row(c).Gap(smallGap).AlignItems(ui.Center).Children(func() {
-			ui.Text(c, L.BkAgentMissing()).TextColor(t.Warning)
-			ui.Button(c, L.SetInstallAgent()).OnClick(a.installAgent)
-		})
-	}
-	ui.Row(c).Grow(1).FillWidth().Gap(gap).Children(func() {
-		cols := []ui.TableColumn{{Title: L.ColName()}, {Title: L.BkSchedule(), Width: 160}, {Title: L.BkNext(), Width: 140}, {Title: L.BkLast()}}
-		ui.Table(c, &p.pl, cols, len(p.plans), func(row, col int) {
-			pl := p.plans[row]
-			st := p.states[pl.ID]
-			switch col {
-			case 0:
-				name := pl.Name
-				if !pl.Enabled {
-					name += " (" + L.BkPaused() + ")"
-				}
-				ui.Text(c, name)
-			case 1:
-				ui.Text(c, scheduleText(pl.Schedule))
-			case 2:
-				if pl.Enabled && !st.NextRun.IsZero() {
-					ui.Text(c, st.NextRun.Local().Format("2006-01-02 15:04"))
-				}
-			case 3:
-				switch {
-				case st.LastResult == "ok":
-					ui.Text(c, L.BkLastOK(st.LastRun.Local().Format("01-02 15:04"))).TextColor(t.Success)
-				case st.LastResult != "":
-					ui.Text(c, friendlyError(errors.New(st.LastResult))).TextColor(t.Danger).SingleLine()
-				}
-			}
-		}).Grow(1).FillHeight()
-		if p.psel >= 0 && p.psel < len(p.plans) {
-			pl := p.plans[p.psel]
-			ui.Column(c).Width(detailWidth).FillHeight().Gap(gap).Children(func() { a.planDetail(c, pl) })
-		}
-	})
-}
-
-func (a *App) planDetail(c *ui.Context, pl scheduler.Plan) {
-	p := &a.bk
-	ui.Text(c, pl.Name).FontSize(sectionSize).Bold()
-	ui.Row(c).Gap(smallGap).Children(func() {
-		ui.PrimaryButton(c, L.BkRunNow()).OnClick(func() {
-			plan := pl
-			a.startJob(L.BkRunNow()+" "+plan.Name, func(ctx context.Context, j *jobs.Job) error {
-				r := a.k.Scheduler.Run(ctx, plan)
-				if r.Result != "ok" {
-					return errors.New(r.Result)
-				}
-				return nil
-			}, func() { p.plansLoaded, p.loaded = false, false; p.history = nil })
-		})
-		ui.Button(c, L.Edit()).OnClick(func() { a.editPlan(&pl) })
-		dangerButton(c, L.Delete()).OnClick(func() {
-			a.ask(L.BkDeletePlanTitle(pl.Name), L.BkDeletePlanMessage(), L.Delete(), func(bool) {
-				id := pl.ID
-				a.async(func(ctx context.Context) func() {
-					err := a.k.Scheduler.Delete(id)
-					return func() {
-						if err != nil {
-							a.notify(friendlyError(err), true)
-						}
-						p.plansLoaded, p.psel = false, -1
-					}
-				})
-			})
-		})
-	})
-	card(c, "", func() {
-		var ts []string
-		for _, t := range pl.Targets {
-			ts = append(ts, t.Name)
-		}
-		kv(c, L.BkTargets(), strings.Join(ts, ", "))
-		kv(c, L.BkDestination(), kindLabel(pl.Destination.Kind)+" · "+pl.Destination.Path)
-		kv(c, L.BkSchedule(), scheduleText(pl.Schedule))
-		r := pl.Retention
-		kv(c, L.BkRetention(), L.BkRetentionText(r.KeepLast, r.KeepDaily, r.KeepWeekly, r.KeepMonthly))
-		if pl.Live {
-			kv(c, L.BkConsistency(), L.BkLive())
-		}
-	})
-	ui.Text(c, L.BkHistory()).Bold()
-	if p.history == nil {
-		id := pl.ID
-		p.history = []scheduler.Record{}
-		a.async(func(ctx context.Context) func() {
-			h := a.k.Scheduler.History(id, 30)
-			return func() { p.history = h }
-		})
-	}
-	ui.Scroll(c).Grow(1).FillWidth().Children(func() {
-		for i, r := range p.history {
-			line := r.Start.Local().Format("2006-01-02 15:04") + "  "
-			if r.Result == "ok" {
-				line += L.BkHistoryOK(len(r.Items), len(r.Expired))
-				ui.Text(c.Key(i), line)
-			} else {
-				ui.Text(c.Key(i), line+friendlyError(errors.New(r.Result))).TextColor(c.Theme().Danger)
-			}
-		}
-	})
 }
 
 // scheduleText describes a schedule.
@@ -771,12 +467,12 @@ func (a *App) restoreDialog(c *ui.Context) {
 	in := &p.rin
 	switch in.mode {
 	case "distro":
-		ui.Text(c, L.BkRestoreNewDistro()).FontSize(sectionSize).Bold()
+		ui.Text(c, L.BkRestoreNewDistro()).FontSize(16).Bold()
 		ui.Field(c, L.ColName(), func() { ui.TextInput(c, &in.name).Label(L.ColName()) })
 		folderField(c, a, L.WSLLocation(), &in.location)
 		dialogButtons(c, a, L.BkRestore(), validDistroName(in.name) && in.location != "", func() { a.restoreItem(it, *in) })
 	case "files":
-		ui.Text(c, L.BkRestoreFiles()).FontSize(sectionSize).Bold()
+		ui.Text(c, L.BkRestoreFiles()).FontSize(16).Bold()
 		muted(c, L.BkRestoreFilesHelp())
 		var names []string
 		for _, d := range a.wsl.distros {
@@ -787,17 +483,17 @@ func (a *App) restoreDialog(c *ui.Context) {
 		ui.Field(c, L.BkIntoFolder(), func() { ui.TextInput(c, &in.dir).Label(L.BkIntoFolder()) })
 		dialogButtons(c, a, L.BkRestore(), in.name != "" && strings.HasPrefix(in.dir, "/"), func() { a.restoreItem(it, *in) })
 	case "volume":
-		ui.Text(c, L.BkRestoreNewVolume()).FontSize(sectionSize).Bold()
+		ui.Text(c, L.BkRestoreNewVolume()).FontSize(16).Bold()
 		ui.Field(c, L.ColName(), func() { ui.TextInput(c, &in.name).Label(L.ColName()) })
 		dialogButtons(c, a, L.BkRestore(), strings.TrimSpace(in.name) != "", func() { a.restoreItem(it, *in) })
 	case "over-distro", "over-volume":
-		ui.Text(c, L.BkRestoreOver(in.name)).FontSize(sectionSize).Bold()
+		ui.Text(c, L.BkRestoreOver(in.name)).FontSize(16).Bold()
 		ui.Text(c, L.BkRestoreOverMessage()).TextColor(c.Theme().Warning)
 		muted(c, L.ConfirmTypeName(in.name))
 		ui.TextInput(c, &in.location).Label(L.ConfirmTypeName(in.name))
 		dialogButtons(c, a, L.BkRestore(), in.location == in.name, func() { a.restoreItem(it, *in) })
 	case "unlock":
-		ui.Text(c, L.BkUnlock()).FontSize(sectionSize).Bold()
+		ui.Text(c, L.BkUnlock()).FontSize(16).Bold()
 		muted(c, in.dir)
 		ui.Field(c, L.BkPassword(), func() { ui.TextInput(c, &in.password).Password().AutoFocus().Label(L.BkPassword()) })
 		dialogButtons(c, a, L.BkUnlock(), in.password != "", func() {
@@ -818,7 +514,7 @@ func (a *App) restoreDialog(c *ui.Context) {
 			})
 		})
 	case "extract":
-		ui.Text(c, L.BkExtractFiles()).FontSize(sectionSize).Bold()
+		ui.Text(c, L.BkExtractFiles()).FontSize(16).Bold()
 		folderField(c, a, L.BkIntoFolder(), &in.dir)
 		dialogButtons(c, a, L.BkRestore(), in.dir != "", func() { a.restoreItem(it, *in) })
 	}
@@ -826,7 +522,7 @@ func (a *App) restoreDialog(c *ui.Context) {
 
 func (a *App) planDialog(c *ui.Context) {
 	in := &a.bk.plan
-	ui.Text(c, L.BkPlan()).FontSize(sectionSize).Bold()
+	ui.Text(c, L.BkPlan()).FontSize(16).Bold()
 	ui.Scroll(c).MaxHeight(560).FillWidth().Children(func() {
 		ui.Form(c, func() {
 			ui.Field(c, L.ColName(), func() { ui.TextInput(c, &in.p.Name).Label(L.ColName()) })

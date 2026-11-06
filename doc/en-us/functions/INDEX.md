@@ -2,7 +2,7 @@
 
 | Package | Role | Key declarations |
 |---|---|---|
-| `cmd/wslpilot` | GUI entry point: single instance, tray, theme, main window, plans while open; `host` implements `gui.Host` with MyGo | `main`, `host` |
+| `cmd/wslpilot` | GUI entry point: single instance, tray (open, check for updates, quit), theme, the main window with its own title bar, close to tray, plans and the update loop while running; `host` implements `gui.Host` with MyGo | `main`, `host` |
 | `cmd/wslpilot-agent` | Background agent: `run-due`, `watch`, `install`, `uninstall` | `main`, `watch` |
 | `cmd/wslpilot-cli` | Command-line entry point | `main` |
 | `internal/version` | Release version, kept equal to `mygo.json` | `Version` |
@@ -18,7 +18,7 @@
 | `internal/elevate` | One elevated child process through the UAC prompt | `Run`, `ErrDeclined` |
 | `internal/secret` | DPAPI protection of stored secrets (repository passwords) | `Protect`, `Unprotect` |
 | `internal/backup/wpbk` | Incremental backup repository (see `backup-format.md`) | `Init`, `Open`, `Repo.Backup`, `Restore`, `Entries`, `Check`, `Forget`, `ApplyPolicy`, `Prune`, `RebuildIndex`, `ChangePassword`, `ReadConfig` |
-| `internal/gui` | Native UI: Dashboard, WSL, Containers, Compose, Volumes, Backups, Terminal, Settings; job panel, confirmation dialog, config forms | `App`, `New`, `Host`, `Term`, `confForm` |
+| `internal/gui` | Native UI (`gui.md`): window shell and sidebar, Dashboard, WSL, Containers, Compose, Volumes, Backups, Terminal, Tasks; the Settings sheet with search; in-app updates; confirmation dialog, config forms, style tokens and icons | `App`, `New`, `Host`, `Term`, `TitleBarOptions`, `UpdateLoop`, `confForm` |
 | `locales` | Generated message accessors from `locales/*.json` | `catalog_gen.go` |
 | `tools/checkdocs` | Verifies the `doc/` language mirror | `main` |
 | `tools/icon` | Renders the app icon SVG to PNG with MyGo's renderer | `render`, `matte` |

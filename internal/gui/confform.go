@@ -2,6 +2,7 @@ package gui
 
 import (
 	"context"
+	"strconv"
 	"strings"
 
 	"github.com/egoist/mygo/i18n"
@@ -31,12 +32,10 @@ type confForm struct {
 	advanced bool
 	raw      *editor.State
 
-	reviewing bool
-	preview   []string
-	draft     string
-	saving    bool
-	saveErr   string
-	note      string
+	saving  bool
+	saveErr string
+	note    string
+	bools   map[string]*bool // the switches of Bool fields
 }
 
 // formChoice is the select label meaning "not set: WSL's default".
@@ -67,7 +66,14 @@ func (f *confForm) reset(snap configdoc.Snapshot) {
 	} else {
 		f.raw.Buffer.SetLanguage(editor.LanguageFor("wsl.ini"))
 	}
-	f.reviewing, f.saveErr = false, ""
+	f.saveErr = ""
+	f.bools = map[string]*bool{}
+	for _, fd := range f.fields {
+		if fd.Kind == configdoc.Bool {
+			on := f.effective(fd) == "true"
+			f.bools[fd.Path()] = &on
+		}
+	}
 }
 
 func (f *confForm) get(fd configdoc.Field) (string, bool) {
@@ -158,148 +164,271 @@ func fieldText(fd configdoc.Field) (label, help string) {
 	return
 }
 
-// view draws the form. save is called with the new text after review; it
-// runs on a goroutine and returns the error to show.
-func (f *confForm) view(c *ui.Context, a *App, title, path string, effect string, save func(ctx context.Context, text string) error, reload func()) {
-	t := c.Theme()
-	if !f.loaded {
-		if f.err != nil {
-			errorText(c, friendlyError(f.err))
-			ui.Button(c, L.Retry()).OnClick(reload)
-		} else {
-			ui.Spinner(c)
+// effective is the value a field has: the one in the file or the form,
+// else its documented default.
+func (f *confForm) effective(fd configdoc.Field) string {
+	if v := f.value(fd.Path()); v != "" {
+		return v
+	}
+	return fd.Default
+}
+
+// groupName names an INI section or YAML parent for people.
+func groupName(sec string) string {
+	switch sec {
+	case "boot":
+		return L.CfgGroupBoot()
+	case "user":
+		return L.CfgGroupUser()
+	case "network":
+		return L.CfgGroupNetwork()
+	case "interop", "automount":
+		return L.CfgGroupWindows()
+	case "time", "gpu":
+		return L.CfgGroupSystem()
+	case "wsl2":
+		return L.CfgGroupVM()
+	case "general":
+		return L.CfgGroupGeneral()
+	case "experimental":
+		return L.CfgGroupExperimental()
+	case "session":
+		return L.CfgGroupSession()
+	}
+	return L.CfgGroupOther()
+}
+
+// fieldSections draws the fields as row sections grouped as groupName
+// does; a changed field shows a "Changed" pill.
+func (f *confForm) fieldSections(c *ui.Context, r *rows) {
+	type group struct {
+		name   string
+		fields []configdoc.Field
+	}
+	var gs []group
+	for _, fd := range f.fields {
+		n := groupName(fd.Section)
+		if len(gs) == 0 || gs[len(gs)-1].name != n {
+			gs = append(gs, group{name: n})
 		}
-		return
+		gs[len(gs)-1].fields = append(gs[len(gs)-1].fields, fd)
 	}
-	ui.Row(c).FillWidth().Gap(smallGap).AlignItems(ui.Center).Children(func() {
-		ui.Column(c).Grow(1).Children(func() {
-			ui.Text(c, title).Bold()
-			muted(c, path).SingleLine()
-		})
-		ui.Switch(c, &f.advanced).Label(L.CfgAdvanced())
-		muted(c, L.CfgAdvanced())
-	})
-	if !f.snap.Exists {
-		muted(c, L.CfgMissing())
-	}
-	if f.advanced {
-		muted(c, L.CfgAdvancedHelp())
-		editor.View(c, f.raw).FillWidth().Height(editorHeight)
-	} else {
-		ui.Scroll(c).Grow(1).FillWidth().Children(func() {
-			ui.Form(c, func() {
-				section := ""
-				for _, fd := range f.fields {
-					if fd.Section != section {
-						section = fd.Section
-						if section != "" {
-							ui.Text(c.Key("s-"+section), "["+section+"]").TextColor(t.TextMuted).Bold()
-						}
-					}
-					f.fieldView(c, fd)
+	for gi, g := range gs {
+		r.section(c, "grp-"+itoa(gi), g.name, nil, func(r *rows) {
+			for _, fd := range g.fields {
+				label, help := fieldText(fd)
+				if fd.Default != "" && fd.Kind != configdoc.Bool {
+					help += " " + L.CfgDefaultIs(fd.Default)
 				}
-			})
-			if ks := f.unknownKeys(); len(ks) > 0 {
-				muted(c, L.CfgOtherKeys(strings.Join(ks, ", ")))
+				k := toneNeutral
+				if err := fd.Validate(f.value(fd.Path())); err != nil {
+					help, k = L.CfgInvalid(), toneBad
+				}
+				r.rowTone(c, "f-"+fd.Path(), nil, label, help, k, func() { f.control(c, fd, label) })
 			}
-		})
-	}
-	if f.saveErr != "" {
-		errorText(c, f.saveErr)
-	}
-	if f.note != "" {
-		ui.Text(c, f.note).TextColor(t.Success)
-	}
-	ui.Row(c).FillWidth().Gap(smallGap).Justify(ui.End).Children(func() {
-		ui.Button(c, L.CfgReload()).OnClick(reload)
-		ui.PrimaryButton(c, L.CfgReview()).Disabled(f.saving).OnClick(func() {
-			draft, err := f.buildDraft()
-			if err != nil {
-				f.saveErr = friendlyError(err)
-				return
-			}
-			f.saveErr, f.note = "", ""
-			f.draft = draft
-			f.preview = configdoc.DiffLines(f.snap.Text, draft)
-			f.reviewing = true
-		})
-	})
-	if f.reviewing {
-		ui.Modal(c, &f.reviewing, func() {
-			ui.Column(c).Width(dialogWidth + 120).Gap(gap).Children(func() {
-				ui.Text(c, L.CfgReviewTitle()).FontSize(sectionSize).Bold()
-				if len(f.preview) == 0 {
-					muted(c, L.CfgNoChanges())
-				}
-				ui.Scroll(c).MaxHeight(320).FillWidth().Children(func() {
-					for i, l := range f.preview {
-						col := t.Success
-						if strings.HasPrefix(l, "-") {
-							col = t.Danger
-						}
-						ui.Text(c.Key(i), l).Font("monospace").TextColor(col).Selectable()
-					}
-				})
-				muted(c, L.CfgBackupNote())
-				if effect != "" {
-					ui.Text(c, effect).TextColor(t.Warning)
-				}
-				ui.Row(c).FillWidth().Gap(smallGap).Justify(ui.End).Children(func() {
-					ui.Button(c, L.Cancel()).OnClick(func() { f.reviewing = false })
-					ui.PrimaryButton(c, L.CfgSave()).Disabled(len(f.preview) == 0).OnClick(func() {
-						f.reviewing, f.saving = false, true
-						text := f.draft
-						a.async(func(ctx context.Context) func() {
-							err := save(ctx, text)
-							return func() {
-								f.saving = false
-								if err != nil {
-									f.saveErr = friendlyError(err)
-									if err == configdoc.ErrConflict {
-										f.saveErr = L.CfgConflict()
-									}
-									return
-								}
-								f.note = L.CfgSaved()
-								reload()
-							}
-						})
-					})
-				})
-			})
 		})
 	}
 }
 
-// fieldView draws one field.
-func (f *confForm) fieldView(c *ui.Context, fd configdoc.Field) {
-	label, help := fieldText(fd)
+// control is a field's input, preceded by a "Changed" pill.
+func (f *confForm) control(c *ui.Context, fd configdoc.Field, label string) {
 	p := fd.Path()
-	val := f.value(p)
-	bound := f.values[p]
-	var errMsg string
-	if err := fd.Validate(val); err != nil && fd.Kind != configdoc.Bool && fd.Kind != configdoc.Enum {
-		errMsg = L.CfgInvalid()
+	if f.value(p) != f.orig[p] {
+		pill(c, L.CfgChanged(), toneWarn)
 	}
-	desc := help
-	if fd.Default != "" {
-		desc = help + " " + L.CfgDefaultIs(fd.Default)
-	}
-	ui.Field(c.Key(p), label, func() {
-		switch fd.Kind {
-		case configdoc.Bool, configdoc.Enum:
-			opts := []string{formChoice()}
-			if fd.Kind == configdoc.Bool {
-				opts = append(opts, "true", "false")
-			} else {
-				opts = append(opts, fd.Choices...)
+	switch fd.Kind {
+	case configdoc.Bool:
+		on := f.bools[p]
+		ui.Switch(c.Key("sw-"+p), on).Label(label).OnChange(func() {
+			v := strconv.FormatBool(*on)
+			if f.orig[p] == "" && v == fd.Default {
+				v = "" // back to "not set"
 			}
-			ui.Select(c, bound, opts).Label(label)
-		default:
-			in := ui.TextInput(c, bound).Label(label)
-			if fd.Default != "" {
-				in.Placeholder(fd.Default)
-			}
+			*f.values[p] = v
+		})
+	case configdoc.Enum:
+		opts := append([]string{formChoice()}, fd.Choices...)
+		ui.Select(c.Key("sel-"+p), f.values[p], opts).Label(label).Width(200)
+	default:
+		in := ui.TextInput(c.Key("in-"+p), f.values[p]).Label(label).Width(rowControlW)
+		if fd.Default != "" {
+			in.Placeholder(fd.Default)
 		}
-	}).Description(desc).Error(errMsg)
+	}
+}
+
+// changesCard is the "changes to save" card: the lines that change, what
+// it takes to apply them, and Save (and an extra action, as "Save and
+// restart"). It shows a sentence instead when nothing changed.
+func (f *confForm) changesCard(c *ui.Context, a *App, effect string, save func(ctx context.Context, text string) error, reload func(), extra string, after func()) {
+	t := c.Theme()
+	draft, err := f.buildDraft()
+	var diff []string
+	if err == nil {
+		diff = configdoc.DiffLines(f.snap.Text, draft)
+	}
+	card(c, "", func() {
+		switch {
+		case err != nil:
+			cardHead(c, L.CfgCannotSave(), nil)
+			errorText(c, friendlyError(err))
+		case len(diff) == 0:
+			cardHead(c, L.CfgNoChanges(), nil)
+			small(c, L.CfgBackupNote())
+		default:
+			cardHead(c, L.CfgChangesToSave(len(diff)), nil)
+			ui.Column(c).FillWidth().Padding(10, 12).Radius(8).Background(t.Surface).Gap(2).Children(func() {
+				for i, l := range diff {
+					col := t.Success
+					if strings.HasPrefix(l, "-") {
+						col = t.Danger
+					}
+					ui.Text(c.Key(i), l).Font("monospace").FontSize(12).TextColor(col).Selectable()
+				}
+			})
+			small(c, L.CfgBackupNote())
+		}
+		if !f.snap.Exists {
+			small(c, L.CfgMissing())
+		}
+		if effect != "" {
+			ui.Text(c, effect).FontSize(sizeSmall)
+		}
+		if f.saveErr != "" {
+			errorText(c, f.saveErr)
+		}
+		if f.note != "" {
+			ui.Text(c, f.note).TextColor(t.Success)
+		}
+		ui.Row(c).FillWidth().Gap(8).Justify(ui.End).Children(func() {
+			ui.Button(c.Key("reload"), L.CfgReload()).OnClick(reload)
+			ok := err == nil && len(diff) > 0 && !f.saving
+			doSave := func(then func()) {
+				f.saving, f.saveErr, f.note = true, "", ""
+				text := draft
+				a.async(func(ctx context.Context) func() {
+					serr := save(ctx, text)
+					return func() {
+						f.saving = false
+						switch {
+						case serr == configdoc.ErrConflict:
+							f.saveErr = L.CfgConflict()
+						case serr != nil:
+							f.saveErr = friendlyError(serr)
+						default:
+							f.note = L.CfgSaved()
+							reload()
+							if then != nil {
+								then()
+							}
+						}
+					}
+				})
+			}
+			if extra != "" {
+				if ui.Button(c.Key("save-plain"), L.CfgSave()).Disabled(!ok).Clicked() {
+					doSave(nil)
+				}
+				if ui.PrimaryButton(c.Key("save-extra"), extra).Disabled(!ok).Clicked() {
+					doSave(after)
+				}
+			} else if ui.PrimaryButton(c.Key("save"), L.CfgSave()).Disabled(!ok).Clicked() {
+				doSave(nil)
+			}
+		})
+	})
+}
+
+// advancedCard offers the raw file: other keys kept as they are, and the
+// editor (only changed lines are written; the file is backed up first).
+func (f *confForm) advancedCard(c *ui.Context, path string) {
+	card(c, L.CfgAdvancedTitle(), func() {
+		if ks := f.unknownKeys(); len(ks) > 0 {
+			small(c, L.CfgOtherKeys(strings.Join(ks, ", ")))
+		}
+		small(c, path).Selectable()
+		label := L.CfgEditRaw()
+		if f.advanced {
+			label = L.CfgBackToForm()
+		}
+		if ui.Button(c.Key("raw-toggle"), label).Clicked() {
+			if !f.advanced {
+				text := f.form2text()
+				f.raw.Buffer = editor.NewBuffer(text)
+				if f.yaml {
+					f.raw.Buffer.SetLanguage(editor.LanguageFor("settings.yaml"))
+				} else {
+					f.raw.Buffer.SetLanguage(editor.LanguageFor("wsl.ini"))
+				}
+			}
+			f.advanced = !f.advanced
+		}
+	})
+}
+
+// form2text is the file as the form would write it (the editor starts
+// there, so form edits are not lost).
+func (f *confForm) form2text() string {
+	adv := f.advanced
+	f.advanced = false
+	text, err := f.buildDraft()
+	f.advanced = adv
+	if err != nil {
+		return f.snap.Text
+	}
+	return text
+}
+
+// loadingOr draws the load error or a spinner until the form has loaded.
+// Returns: whether the form is loaded.
+func (f *confForm) loadingOr(c *ui.Context, reload func()) bool {
+	if f.loaded {
+		return true
+	}
+	if f.err != nil {
+		errorText(c, friendlyError(f.err))
+		ui.Button(c.Key("retry"), L.Retry()).OnClick(reload)
+	} else {
+		ui.Spinner(c)
+	}
+	return false
+}
+
+// formRows is the whole form in one column (the Settings sheet): fields
+// (or the raw editor), the changes card, the advanced card.
+func (f *confForm) formRows(c *ui.Context, a *App, path, effect string, save func(ctx context.Context, text string) error, reload func()) {
+	if !f.loadingOr(c, reload) {
+		return
+	}
+	if f.advanced {
+		editor.View(c, f.raw).FillWidth().Height(editorHeight)
+	} else {
+		f.fieldSections(c, &rows{})
+	}
+	ui.Box(c).Height(14)
+	f.changesCard(c, a, effect, save, reload, "", nil)
+	ui.Box(c).Height(14)
+	f.advancedCard(c, path)
+}
+
+// formSplit is the form with the changes and advanced cards beside it (the
+// distribution and WSL settings pages, as in the design).
+func (f *confForm) formSplit(c *ui.Context, a *App, path, effect string, save func(ctx context.Context, text string) error, reload func(), extra string, after func()) {
+	if !f.loaded {
+		body(c, func() { f.loadingOr(c, reload) })
+		return
+	}
+	ui.Row(c.Key("form-split")).Grow(1).FillWidth().MinHeight(0).Padding(0, panePadX, 0, panePadX).Gap(20).AlignItems(ui.Start).Children(func() {
+		ui.Scroll(c.Key("form-left")).Grow(1).MinWidth(0).FillHeight().Padding(0, 0, panePadX, 0).Children(func() {
+			if f.advanced {
+				editor.View(c, f.raw).FillWidth().Height(520)
+			} else {
+				f.fieldSections(c, &rows{})
+			}
+		})
+		ui.Column(c.Key("form-right")).Width(detailWidth-20).Shrink(0).Gap(14).Padding(20, 0, 0, 0).Children(func() {
+			f.changesCard(c, a, effect, save, reload, extra, after)
+			f.advancedCard(c, path)
+		})
+	})
 }

@@ -2,7 +2,7 @@
 
 | 包 | 职责 | 关键声明 |
 |---|---|---|
-| `cmd/wslpilot` | GUI 入口：单实例、托盘、主题、主窗口、窗口打开期间的计划运行；`host` 用 MyGo 实现 `gui.Host` | `main`、`host` |
+| `cmd/wslpilot` | GUI 入口：单实例、托盘（打开、检查更新、退出）、主题、自带标题栏的主窗口、关闭到托盘、运行期间的计划与更新循环；`host` 用 MyGo 实现 `gui.Host` | `main`、`host` |
 | `cmd/wslpilot-agent` | 后台 agent：`run-due`、`watch`、`install`、`uninstall` | `main`、`watch` |
 | `cmd/wslpilot-cli` | 命令行入口 | `main` |
 | `internal/version` | 发布版本号，与 `mygo.json` 保持一致 | `Version` |
@@ -18,7 +18,7 @@
 | `internal/elevate` | 通过 UAC 提示启动单个提权子进程 | `Run`、`ErrDeclined` |
 | `internal/secret` | 以 DPAPI 保护保存的机密（仓库密码） | `Protect`、`Unprotect` |
 | `internal/backup/wpbk` | 增量备份仓库（见 `backup-format.md`） | `Init`、`Open`、`Repo.Backup`、`Restore`、`Entries`、`Check`、`Forget`、`ApplyPolicy`、`Prune`、`RebuildIndex`、`ChangePassword`、`ReadConfig` |
-| `internal/gui` | 原生 UI：概览、WSL、容器、Compose、Volume、备份、终端、设置页面；任务面板、确认对话框、配置表单 | `App`、`New`、`Host`、`Term`、`confForm` |
+| `internal/gui` | 原生 UI（`gui.md`）：窗口外壳与侧边栏、概览、WSL、容器、Compose、Volume、备份、终端、任务；带搜索的设置面板；应用内更新；确认对话框、配置表单、样式常量与图标 | `App`、`New`、`Host`、`Term`、`TitleBarOptions`、`UpdateLoop`、`confForm` |
 | `locales` | 由 `locales/*.json` 生成的消息访问函数 | `catalog_gen.go` |
 | `tools/checkdocs` | 校验 `doc/` 语言镜像 | `main` |
 | `tools/icon` | 使用 MyGo 渲染器将应用图标 SVG 渲染为 PNG | `render`、`matte` |

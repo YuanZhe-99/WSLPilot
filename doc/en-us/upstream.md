@@ -86,3 +86,7 @@ date). `internal/configdoc/schema.go` copies the subset the forms show.
 |---|---|
 | Native UI needs no WebView2; it draws with Direct3D 11 on Windows 10/11 x64 and arm64. | WSLPilot uses native UI only. |
 | `mygo generate` writes `locales/catalog_gen.go` from the ARB catalogs. | Run after editing a catalog; the file is committed. |
+| `ui.Segmented` reports a new choice through `Changed` / `OnChange`; `OnClick` on it never fires (v0.7.4). | Settings segments use `OnChange`; a view test clicks them and checks the saved preference. |
+| `mygo.Updater.Check` returns the newer signed release or nil; `Update.Install(ctx, progress)` downloads, verifies and installs it; `Updater.Enabled` is false for a copy that cannot write where it runs; `App.Relaunch` restarts into it (v0.7.4). | The in-app update flow (`gui.md`) is built on these; the update window plugin is not used. |
+| `Power.IdleTime` reports how long the user has been idle (v0.7.4). | Used for "install when the computer is idle". |
+| `TitleBarHidden` with `HideWindowButtons` leaves the window frame to the app; `.DragWindow()` and `.MaximizeButton()` mark the drag area and the snap-layout button (v0.7.4). | The pane header is the title bar; WSLPilot draws its own window buttons on Windows. |

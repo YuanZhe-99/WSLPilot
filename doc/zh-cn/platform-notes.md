@@ -15,7 +15,7 @@
 | diskpart 压缩（提权） | 已验证 | 实机测试 `internal/core`（已通过 UAC）：WSLc vhd Volume 308 MB → 14 MB |
 | `wpbk` 仓库 | 已验证 | 单元、故障注入与规范测试 |
 | `wpbk` 加密、计划密码（DPAPI） | 已验证 | 单元、规范与泄露测试；加密计划端到端测试 |
-| 自动更新 | 已实现 | 由发布工作流签名；0.1.0 发布后才能进行首次更新检查 |
+| 自动更新（应用内流程） | 已实现 | 自动安装时机的单元测试；已在开发构建中确认“此构建不提供更新”；实际更新需要比最新版本旧的已安装版本 |
 | Volume tar 导入导出（属主、权限、链接） | 已验证 | 实机测试 `internal/volume` |
 | 发行版备份（目录、归档、仓库）、校验、恢复为新发行版、部分恢复 | 已验证 | 在 `wslpilot-test-d1` 上运行实机测试 `internal/backup` |
 | Compose builtin Backend 的 up / 更新 / down | 已验证 | 实机测试 `internal/compose`（`wslpilot-test-compose`） |
@@ -23,8 +23,8 @@
 | WSLc session：隔离、容器页切换 | 已验证 | 用 `session enter` 挂载第二个 session 手动验证；视图测试 |
 | 调度、保留策略、重试 | 已实现 | 单元测试；已手动验证用户级 `schtasks /Create /SC MINUTE` |
 | 重启监视 | 已实现 | 基于录制事件的单元测试 |
-| GUI 页面 | 已实现 | 视图测试，页面渲染已目检；打包后的应用可启动（10 秒冒烟运行） |
-| 终端插件、托盘、通知、UAC 提示 | 已实现 | 尚未手动操作验证 |
+| GUI 页面（0.1.1 重新设计） | 已验证 | 视图测试；全部页面以浅色与深色渲染并与 `design/` 对照；在 26300 版本上检查原生窗口（`go build` 构建，非安装包）：全部页面、设置面板、外观切换、最大化与还原、关闭到托盘、有数据的容器与 Volume 表格（`wslpilot-test-ui-*`） |
+| 终端插件、托盘菜单、通知 | 已实现 | 尚未手动操作验证（关闭到托盘已验证） |
 | 容器编辑配置（安全导出、校验后重建） | 已验证 | 实机测试 `internal/gui`（`wslpilot-test-edit`） |
 | WSLc 数据位置迁移 | 已验证 | 在空 session 上运行实机测试 `internal/core`：镜像与 Volume 已迁移、内容已校验、settings.yaml 已恢复 |
 

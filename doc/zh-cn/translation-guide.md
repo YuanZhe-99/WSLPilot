@@ -21,6 +21,9 @@
 | snapshot | 快照 |
 | restore | 恢复 |
 | retention policy | 保留策略 |
+| Tasks (page) | 任务 |
+| settings sheet | 设置面板 |
+| pane | 面板 |
 | repository (backup) | 仓库 |
 | chunk | 数据块 |
 | pack (backup) | 包 |

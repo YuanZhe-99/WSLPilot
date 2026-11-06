@@ -28,13 +28,14 @@ type composePage struct {
 	volMode         map[string]*string  // "id NUL key" → native | bind
 	volPath         map[string]*string
 	pl, svc         ui.ListState
-	sel             int
-	tab             int // 0 services, 1 file, 2 logs
+	sel             int // the open project (-1: the list)
+	showLogs        bool
 
 	fileFor  string
 	file     *editor.State
 	fileSnap configdoc.Snapshot
 	fileErr  string
+	diagFor  *compose.Report // the report the editor marks
 
 	logs       *logBuffer
 	logsFor    string
@@ -103,155 +104,6 @@ func (a *App) validate(pr *compose.Project) {
 	})
 }
 
-// composeView draws the Compose page.
-func (a *App) composeView(c *ui.Context) {
-	p := &a.cmp
-	if a.k.Compose == nil {
-		muted(c, L.DashChecking())
-		return
-	}
-	if !p.loaded && !p.loading {
-		p.pl.Selected = &p.sel
-		a.loadProjects()
-	}
-	a.header(c, L.NavCompose(), func() {
-		ui.Button(c, L.Refresh()).Disabled(p.loading).OnClick(a.loadProjects)
-	})
-	ui.Row(c).FillWidth().Gap(smallGap).Children(func() {
-		ui.PrimaryButton(c, L.CmpAdd()).OnClick(func() { p.in = composeInput{}; p.dlg = "add" })
-	})
-	muted(c, L.CmpHelp())
-	if p.err != nil {
-		errorText(c, friendlyError(p.err))
-	}
-	ui.Row(c).Grow(1).FillWidth().Gap(gap).Children(func() {
-		cols := []ui.TableColumn{{Title: L.ColName()}, {Title: L.CmpBackend(), Width: 90}, {Title: L.ColState(), Width: 120}}
-		ui.Table(c, &p.pl, cols, len(p.projects), func(row, col int) {
-			pr := p.projects[row]
-			switch col {
-			case 0:
-				ui.Text(c, pr.Name)
-			case 1:
-				ui.Text(c, string(pr.Backend))
-			case 2:
-				running, total := 0, len(p.ps[pr.ID])
-				for _, s := range p.ps[pr.ID] {
-					if s.State == "running" {
-						running++
-					}
-				}
-				ui.Text(c, L.CmpRunning(running, total))
-			}
-		}).Width(360).FillHeight()
-		if p.sel >= 0 && p.sel < len(p.projects) {
-			pr := p.projects[p.sel]
-			ui.Column(c).Grow(1).FillHeight().Gap(gap).Children(func() { a.projectDetail(c, pr) })
-		}
-	})
-	a.composeDialogs(c)
-}
-
-func (a *App) projectDetail(c *ui.Context, pr *compose.Project) {
-	p := &a.cmp
-	t := c.Theme()
-	ui.Row(c).FillWidth().Gap(smallGap).AlignItems(ui.Center).Children(func() {
-		ui.Text(c, pr.Name).FontSize(sectionSize).Bold().Grow(1)
-		ui.PrimaryButton(c, L.CmpUp()).OnClick(func() { a.composeJob(pr, "up", nil) })
-		ui.Button(c, L.Stop()).OnClick(func() { a.composeJob(pr, "stop", nil) })
-		ui.Button(c, L.Restart()).OnClick(func() { a.composeJob(pr, "restart", nil) })
-		ui.Button(c, L.CmpDown()).OnClick(func() {
-			p.in = composeInput{}
-			p.dlg = "down"
-		})
-	})
-	muted(c, strings.Join(pr.Files, "\n"))
-	ui.Row(c).Gap(smallGap).AlignItems(ui.Center).Children(func() {
-		kv(c, L.CmpBackend(), string(pr.Backend))
-		muted(c, L.CmpBackendFixed())
-	})
-	ui.Row(c).Gap(smallGap).AlignItems(ui.Center).Children(func() {
-		ui.Switch(c, &pr.Autostart).Label(L.CmpAutostart()).OnChange(func() {
-			proj := snapshotProject(pr)
-			a.async(func(ctx context.Context) func() {
-				err := a.k.Projects.Save(proj)
-				return func() {
-					if err != nil {
-						a.notify(friendlyError(err), true)
-					}
-				}
-			})
-		})
-		ui.Text(c, L.CmpAutostart())
-		muted(c, L.CmpAutostartHelp())
-	})
-	if rep, ok := p.reports[pr.ID]; !ok {
-		a.validate(pr)
-		p.reports = ensureReports(p.reports, pr.ID)
-	} else if rep != nil {
-		if rep.OK() && len(rep.Warnings) == 0 {
-			ui.Text(c, L.CmpValid()).TextColor(t.Success)
-		}
-		for i, is := range rep.Errors {
-			ui.Text(c.Key("e"+itoa(i)), "✕ "+is.String()).TextColor(t.Danger).Selectable()
-		}
-		for i, is := range rep.Warnings {
-			ui.Text(c.Key("w"+itoa(i)), "! "+is.String()).TextColor(t.Warning).Selectable()
-		}
-	}
-	a.projectVolumes(c, pr)
-	ui.Tabs(c, &p.tab, L.CmpServices(), L.CmpFile(), L.CtrLogs())
-	switch p.tab {
-	case 0:
-		ps := p.ps[pr.ID]
-		cols := []ui.TableColumn{{Title: L.CmpService()}, {Title: L.ColName()}, {Title: L.ColState(), Width: 90}, {Title: L.CmpHealth(), Width: 90}, {Title: L.CtrImage()}}
-		ui.Table(c, &p.svc, cols, len(ps), func(row, col int) {
-			s := ps[row]
-			switch col {
-			case 0:
-				ui.Text(c, s.Service)
-			case 1:
-				ui.Text(c, s.Name)
-			case 2:
-				ui.Text(c, s.State)
-			case 3:
-				ui.Text(c, s.Health)
-			case 4:
-				ui.Text(c, s.Image).SingleLine()
-			}
-		}).Grow(1).FillWidth()
-		if len(ps) == 0 {
-			muted(c, L.CmpNotUp())
-		}
-	case 1:
-		a.composeFile(c, pr)
-	case 2:
-		if p.logsFor != pr.ID {
-			a.openProjectLogs(pr)
-		}
-		ui.Scroll(c).Grow(1).FillWidth().Children(func() {
-			ui.Text(c, lastLines(p.logs.String(), 400)).Font("monospace").FontSize(11).Selectable()
-		})
-	}
-	card(c, L.DangerZone(), func() {
-		dangerButton(c, L.CmpRemove()).OnClick(func() {
-			a.ask(L.CmpRemoveTitle(pr.Name), L.CmpRemoveMessage(), L.CmpRemove(), func(bool) {
-				id := pr.ID
-				a.async(func(ctx context.Context) func() {
-					err := a.k.Projects.Delete(id)
-					a.k.Jobs.Audit("compose.project.remove", pr.Name, "", err)
-					return func() {
-						if err != nil {
-							a.notify(friendlyError(err), true)
-						}
-						a.cmp.sel = -1
-						a.loadProjects()
-					}
-				})
-			})
-		})
-	})
-}
-
 // ensureReports marks a project's report as being computed.
 func ensureReports(m map[string]*compose.Report, id string) map[string]*compose.Report {
 	if m == nil {
@@ -301,64 +153,6 @@ func (a *App) composeJob(pr *compose.Project, what string, opts *compose.DownOpt
 	}, func() { a.loadProjects(); a.loadContainers() })
 }
 
-// composeFile edits the project's first Compose file as text.
-func (a *App) composeFile(c *ui.Context, pr *compose.Project) {
-	p := &a.cmp
-	if len(pr.Files) == 0 {
-		return
-	}
-	path := pr.Files[0]
-	if p.fileFor != path {
-		p.fileFor, p.file, p.fileErr = path, nil, ""
-		a.async(func(ctx context.Context) func() {
-			snap, err := configdoc.ReadFile(path)
-			return func() {
-				if err != nil {
-					p.fileErr = friendlyError(err)
-					return
-				}
-				p.fileSnap = snap
-				buf := editor.NewBuffer(snap.Text)
-				buf.SetLanguage(editor.LanguageFor(path))
-				p.file = &editor.State{Buffer: buf}
-			}
-		})
-	}
-	if p.fileErr != "" {
-		errorText(c, p.fileErr)
-	}
-	if p.file == nil {
-		return
-	}
-	editor.View(c, p.file).Grow(1).FillWidth()
-	ui.Row(c).FillWidth().Gap(smallGap).Justify(ui.End).Children(func() {
-		ui.Button(c, L.ShowInExplorer()).OnClick(func() { a.host.OpenPath(filepath.Dir(path)) })
-		ui.PrimaryButton(c, L.CfgSave()).Disabled(!p.file.Buffer.Modified()).OnClick(func() {
-			text, snap := p.file.Buffer.String(), p.fileSnap
-			if err := configdoc.ParseYAML(text).Validate(); err != nil {
-				p.fileErr = friendlyError(err)
-				return
-			}
-			a.async(func(ctx context.Context) func() {
-				_, err := snap.Save(text)
-				return func() {
-					if err == configdoc.ErrConflict {
-						p.fileErr = L.CfgConflict()
-						return
-					}
-					if err != nil {
-						p.fileErr = friendlyError(err)
-						return
-					}
-					p.fileErr, p.fileFor = "", ""
-					delete(p.reports, pr.ID)
-					a.notify(L.CfgSaved(), false)
-				}
-			})
-		})
-	})
-}
-
 // openProjectLogs follows the merged logs of a project.
 func (a *App) openProjectLogs(pr *compose.Project) {
 	p := &a.cmp
@@ -386,7 +180,7 @@ func (a *App) composeDialogs(c *ui.Context) {
 		ui.Column(c).Width(dialogWidth).Gap(gap).Children(func() {
 			switch p.dlg {
 			case "add":
-				ui.Text(c, L.CmpAdd()).FontSize(sectionSize).Bold()
+				ui.Text(c, L.CmpAdd()).FontSize(16).Bold()
 				muted(c, L.CmpAddHelp())
 				pathField(c, a, L.CmpFile(), &p.in.file, false, "yaml", "yml")
 				if p.in.name == "" && p.in.file != "" {
@@ -411,7 +205,7 @@ func (a *App) composeDialogs(c *ui.Context) {
 				})
 			case "down":
 				pr := p.projects[p.sel]
-				ui.Text(c, L.CmpDownTitle(pr.Name)).FontSize(sectionSize).Bold()
+				ui.Text(c, L.CmpDownTitle(pr.Name)).FontSize(16).Bold()
 				muted(c, L.CmpDownMessage())
 				ui.Checkbox(c, &p.in.removeVolumes, L.CmpRemoveVolumes())
 				if p.in.removeVolumes {

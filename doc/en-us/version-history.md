@@ -1,5 +1,26 @@
 # Version history
 
+## 0.1.1
+
+Released 2026-11-05. A redesigned interface; the data layer and formats are unchanged. Tested with
+WSL 3.0.3.0, WSLc 3.0.3.0 and MyGo v0.7.4 on Windows 11 ARM64.
+
+- A new window: Mica background, a sidebar with icons, the page on a raised pane whose header is
+  the title bar, and WSLPilot's own window buttons with snap layouts (`gui.md`).
+- Every page rebuilt after the design mockups: stat cards and disk usage bars on the dashboard,
+  tables with status dots and pills, a distribution card with an inline compact panel, distribution
+  settings as their own page, container logs in a console, a restore-first Backups page, Volumes
+  with an inline TAR import, a Tasks page.
+- Settings is a searchable sheet in groups (General, Backups & agent, WSL Containers, About &
+  updates).
+- Updates are installed in the app: daily check, one notice per version, Install and restart
+  with progress, and optional automatic installs when idle or at a chosen hour; MyGo's update
+  window is no longer used. The tray gains Check for updates.
+- Closing the window can quit instead of keeping WSLPilot in the tray; the first close says where
+  the window went.
+- Fixes: lists loaded first by the dashboard no longer start with a row chosen (Compose opened
+  the first project); counts read "1 image", not "1 images".
+
 ## 0.1.0
 
 Released 2026-11-05. The first release. Tested with WSL 3.0.3.0, WSLc 3.0.3.0 and MyGo v0.7.4 on

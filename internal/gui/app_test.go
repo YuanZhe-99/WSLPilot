@@ -3,6 +3,7 @@ package gui
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -30,16 +31,23 @@ import (
 type fakeHost struct {
 	mu        sync.Mutex
 	terminals [][]string
+	ops       []WindowOp
 }
 
-func (h *fakeHost) PickFiles(string, bool, ...string) []string { return nil }
-func (h *fakeHost) PickSave(string, string) string             { return "" }
-func (h *fakeHost) OpenPath(string)                            {}
-func (h *fakeHost) OpenURL(string)                             {}
-func (h *fakeHost) Notify(string, string)                      {}
-func (h *fakeHost) SetOpenAtLogin(bool) error                  { return nil }
-func (h *fakeHost) OpenAtLogin() bool                          { return false }
-func (h *fakeHost) SetTheme(string)                            {}
+func (h *fakeHost) PickFiles(string, bool, ...string) []string      { return nil }
+func (h *fakeHost) PickSave(string, string) string                  { return "" }
+func (h *fakeHost) OpenPath(string)                                 {}
+func (h *fakeHost) OpenURL(string)                                  {}
+func (h *fakeHost) Notify(string, string)                           {}
+func (h *fakeHost) SetOpenAtLogin(bool) error                       { return nil }
+func (h *fakeHost) OpenAtLogin() bool                               { return false }
+func (h *fakeHost) SetTheme(string)                                 {}
+func (h *fakeHost) Window(op WindowOp)                              { h.mu.Lock(); h.ops = append(h.ops, op); h.mu.Unlock() }
+func (h *fakeHost) Maximized() bool                                 { return false }
+func (h *fakeHost) UpdatesEnabled() bool                            { return false }
+func (h *fakeHost) CheckUpdate(context.Context) (*AppUpdate, error) { return nil, nil }
+func (h *fakeHost) Relaunch()                                       {}
+func (h *fakeHost) IdleSeconds() float64                            { return 0 }
 func (h *fakeHost) Terminal(title string, argv []string) (Term, error) {
 	h.mu.Lock()
 	h.terminals = append(h.terminals, argv)
@@ -171,10 +179,35 @@ func TestDashboardShowsProbe(t *testing.T) {
 		t.Fatalf("before a probe: texts %q", tt.Texts())
 	}
 	a.Refresh()
-	settle(t, tt, func() bool { return tt.HasText(L.DashWSLVersion("3.0.3.0", "6.18.54.1-1")) })
-	for _, want := range []string{L.DashDistros(1), L.DashNotFound(), L.DashComposeBuiltin()} {
+	settle(t, tt, func() bool { return a.wsl.loaded && tt.HasText(L.DashDistros(len(a.wsl.distros))) })
+	for _, want := range []string{L.DashReady(), L.DashNotFound(), L.DashComposeBuiltin()} {
 		if !tt.HasText(want) {
 			t.Errorf("missing %q in %q", want, tt.Texts())
+		}
+	}
+}
+
+func TestAutoInstallDue(t *testing.T) {
+	at := func(h int) time.Time { return time.Date(2026, 11, 5, h, 30, 0, 0, time.Local) }
+	for _, c := range []struct {
+		mode    string
+		hour    int
+		now     time.Time
+		idle    time.Duration
+		lastTry time.Time
+		want    bool
+	}{
+		{"", 3, at(3), time.Hour, time.Time{}, false},
+		{autoInstallIdle, 0, at(9), 20 * time.Minute, time.Time{}, true},
+		{autoInstallIdle, 0, at(9), 5 * time.Minute, time.Time{}, false},
+		{autoInstallIdle, 0, at(9), 0, time.Time{}, false}, // idle not reported
+		{autoInstallDaily, 3, at(3), 0, time.Time{}, true},
+		{autoInstallDaily, 3, at(4), 0, time.Time{}, false},
+		{autoInstallDaily, 3, at(3), 0, at(3).Add(-time.Hour), false}, // retry waits
+		{autoInstallDaily, 3, at(3), 0, at(3).Add(-7 * time.Hour), true},
+	} {
+		if got := autoInstallDue(c.mode, c.hour, c.now, c.idle, c.lastTry); got != c.want {
+			t.Errorf("%+v: got %v", c, got)
 		}
 	}
 }
@@ -202,18 +235,21 @@ func TestWSLPageListsAndCompacts(t *testing.T) {
 	if err := tt.Click(L.NavWSL()); err != nil {
 		t.Fatal(err)
 	}
-	settle(t, tt, func() bool { return tt.HasText("Debian  ★") && tt.HasText("wslpilot-test-d1") })
-	a.wsl.sel = 0
-	settle(t, tt, func() bool { return tt.HasText(L.WSLCompact()) })
-	if err := tt.Click(L.WSLCompact()); err != nil {
+	settle(t, tt, func() bool {
+		return tt.HasText("Debian") && tt.HasText(L.WSLDefault()) && tt.HasText("wslpilot-test-d1")
+	})
+	a.selectDistro("Debian")
+	settle(t, tt, func() bool { return tt.HasText(L.WSLCompactOpen()) })
+	if err := tt.Click(L.WSLCompactOpen()); err != nil {
 		t.Fatal(err)
 	}
-	tt.Frame()
-	if !a.confirm.open || !tt.HasText(L.WSLCompactMessage()) {
-		t.Fatalf("no confirmation: %q", tt.Texts())
+	// The panel lists the steps; a backup first is on by default.
+	settle(t, tt, func() bool { return tt.HasText("2. " + L.WSLCompactStep2Official("Debian")) })
+	if !a.wsl.compactBackup {
+		t.Error("backup first is off by default")
 	}
-	a.confirm.onOK(false)
-	a.confirm.open = false
+	a.wsl.compactOpen = false
+	a.runCompact(a.wsl.distros[0], true, false)
 	settle(t, tt, func() bool { return cmd.ran("--manage Debian --compact") && a.k.Jobs.Active() == 0 })
 }
 
@@ -262,7 +298,7 @@ func TestVolumesAndBackupsPages(t *testing.T) {
 	settle(t, tt, func() bool { return tt.HasText("wslpilot-test-vhd") })
 	tt.Click(L.NavBackups())
 	settle(t, tt, func() bool { return a.bk.loaded })
-	if !tt.HasText(L.BkOpenFolder()) {
+	if !tt.HasText(L.BkChooseFolder()) {
 		t.Errorf("restore view: %q", tt.Texts())
 	}
 	tt.Click(L.BkPlans())
@@ -302,7 +338,7 @@ func TestComposePageAddsProject(t *testing.T) {
 func TestSidebarNavigatesEveryPage(t *testing.T) {
 	a, _, _ := testApp(t)
 	tt := ui.NewTester(a.View, 1300, 820)
-	for _, p := range []string{L.NavWSL(), L.NavWSLc(), L.NavCompose(), L.NavVolumes(), L.NavBackups(), L.NavTerminal(), L.NavSettings(), L.NavDashboard()} {
+	for _, p := range []string{L.NavWSL(), L.NavWSLc(), L.NavCompose(), L.NavVolumes(), L.NavBackups(), L.NavTerminal(), L.NavTasks(), L.NavDashboard()} {
 		if err := tt.Click(p); err != nil {
 			t.Fatalf("%s: %v", p, err)
 		}
@@ -334,10 +370,6 @@ func TestRunSpecParsesDialog(t *testing.T) {
 	}
 }
 
-func (h *fakeHost) CheckForUpdates()   {}
-func (h *fakeHost) AutoUpdate() bool   { return true }
-func (h *fakeHost) SetAutoUpdate(bool) {}
-
 func TestContainersSessionSwitch(t *testing.T) {
 	a, cmd, _ := testApp(t)
 	cmd.out["info --format json"] = fixture(t, "wslc/testdata/3.0.3.0/info-two-sessions.json")
@@ -353,5 +385,76 @@ func TestContainersSessionSwitch(t *testing.T) {
 	a.selectSession("wslc-cli-user")
 	if a.wc() != a.k.WSLc {
 		t.Error("default session not restored")
+	}
+}
+
+func TestSettingsSheet(t *testing.T) {
+	a, _, _ := testApp(t)
+	tt := ui.NewTester(a.View, 1300, 820)
+	a.openSettings(setAbout)
+	settle(t, tt, func() bool { return tt.HasText(L.SetAboutUpdates()) && tt.HasText(L.SetLicenses()) })
+	// A development build cannot update itself and says so.
+	if !tt.HasText(L.UpdUnavailable()) {
+		t.Errorf("texts %q", tt.Texts())
+	}
+	a.settingsQ = L.SetCloseWindow()
+	settle(t, tt, func() bool { return len(searchSettings(settingsHits(), a.settingsQ)) > 0 })
+}
+
+// Regression: the dashboard loads projects and volumes first, which used to
+// skip the pages' own setup, so Compose opened the first project and the
+// import panel started on "replace".
+func TestPagesLoadedByDashboardStartUnselected(t *testing.T) {
+	a, _, _ := testApp(t)
+	dir := t.TempDir()
+	os.WriteFile(dir+`\compose.yaml`, []byte("services:\n  web:\n    image: alpine:3.20\n"), 0o644)
+	p, err := compose.NewProject("wslpilot-test-ui", dir+`\compose.yaml`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a.k.Projects.Save(p)
+	a.report = &capability.Report{WSL: wsl.Version{WSL: "3.0.3.0"}}
+	a.report.WSLc.Client.Version = "3.0.3.0"
+	tt := ui.NewTester(a.View, 1300, 820)
+	settle(t, tt, func() bool { return a.cmp.loaded && a.vol.loaded })
+	a.page = PageCompose
+	tt.Frame()
+	if a.cmp.sel != -1 || a.vol.sel != -1 || !a.vol.imp.newVolume || !a.vol.imp.check {
+		t.Errorf("compose sel %d, volume sel %d, import %+v", a.cmp.sel, a.vol.sel, a.vol.imp)
+	}
+}
+
+// Regression: the appearance and close segments listened for OnClick, which
+// a segmented control never fires, so choosing one saved nothing.
+func TestSettingsSegmentsSave(t *testing.T) {
+	a, _, _ := testApp(t)
+	tt := ui.NewTester(a.View, 1300, 820)
+	a.openSettings(setGeneral)
+	settle(t, tt, func() bool { return tt.HasText(L.SetThemeLight()) })
+	if err := tt.Click(L.SetThemeDark()); err != nil {
+		t.Fatal(err)
+	}
+	if err := tt.Click(L.SetCloseQuit()); err != nil {
+		t.Fatal(err)
+	}
+	settle(t, tt, func() bool { return a.Prefs().Theme == "dark" && a.Prefs().CloseQuits })
+}
+
+// WSLPilot draws its own window buttons on Windows; each reaches the host.
+func TestWindowButtons(t *testing.T) {
+	if !ownWindowButtons {
+		t.Skip("the system draws the window buttons here")
+	}
+	a, _, h := testApp(t)
+	tt := ui.NewTester(a.View, 1300, 820)
+	tt.Frame()
+	for _, label := range []string{L.WindowMinimize(), L.WindowMaximize(), L.WindowClose()} {
+		if err := tt.Click(label); err != nil {
+			t.Fatalf("%s: %v", label, err)
+		}
+	}
+	want := []WindowOp{WindowMinimize, WindowToggleMaximize, WindowClose}
+	if fmt.Sprint(h.ops) != fmt.Sprint(want) {
+		t.Errorf("ops %v, want %v", h.ops, want)
 	}
 }
