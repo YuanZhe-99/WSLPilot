@@ -6,6 +6,7 @@
 | `cmd/wslpilot-agent` | Background agent: `run-due`, `watch`, `install`, `uninstall` | `main`, `watch` |
 | `cmd/wslpilot-cli` | Command-line entry point | `main` |
 | `internal/version` | Release version, kept equal to `mygo.json` | `Version` |
+| `internal/earlyenv` | Environment MyGo reads while it initializes (whole frames: `MYGO_PARTIAL=0`); imported first by `cmd/wslpilot` | `FullFrames` |
 | `internal/upstream` | Upstream versions WSLPilot was tested with (`tested.json`) | `Tested`, `Manifest`, `Compare`, `NewerThanTested` |
 | `internal/procexec` | Child processes from argument vectors; output decoding; raw streams | `Runner`, `Run`, `Streamer`, `Stream`, `Spec`, `RunnerFrom`, `Decode`, `ExitError` |
 | `internal/wsl` | `wsl.exe` adapter: list, lifecycle, import/export, move, compact, sparse, exec, file read/write | `Client`, `Distro`, `List`, `ParseListVerbose`, `ParseListOnline`, `InstallArgs`, `ExecArgs`, `Compact`, `ReadFile`, `WriteFile` |

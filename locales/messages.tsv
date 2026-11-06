@@ -728,3 +728,14 @@ SidebarFold	Fold the sidebar	收起侧边栏
 SidebarUnfold	Show the sidebar	展开侧边栏
 SetLoginTray	Start in the tray	启动到托盘
 SetLoginTrayHelp	At sign-in, keep the window closed and run in the tray. Off: the window opens.	登录时不打开窗口，只在托盘中运行。关闭此项则会打开窗口。
+CtrCleanup	Clean up…	清理…
+CtrCleanupTitle	Clean up WSL Containers	清理 WSL 容器
+CtrCleanupHelp	Removes what nothing uses, as docker system prune does. Running containers and what they use are kept.	删除没有被使用的对象，与 docker system prune 相同。运行中的容器及其使用的对象会保留。
+CtrCleanupContainers	Stopped containers: {count:int}	已停止的容器：{count:int} 个
+CtrCleanupContainersHelp	Stopped containers of Compose projects too; Apply changes creates them again.	包括 Compose 项目中已停止的容器；“应用更改”会重新创建它们。
+CtrCleanupNetworks	Networks no container uses	没有容器使用的网络
+CtrCleanupImages	Dangling images (untagged, used by no container)	悬空镜像（无标签且无容器使用）
+CtrCleanupImagesAll	Every image no container uses	所有没有容器使用的镜像
+CtrCleanupVolumes	Volumes no container will use: {count:int}	将没有容器使用的 Volume：{count:int} 个
+CtrCleanupVolumesHelp	Their data is deleted. Volumes of Compose projects you added are kept, even with the project down.	其中的数据会被删除。你添加的 Compose 项目的 Volume 会保留，即使项目已 down。
+CtrCleanupVolumesOther	Volumes are cleaned up only in the default session.	只有在默认 session 中才会清理 Volume。

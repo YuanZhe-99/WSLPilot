@@ -10,7 +10,7 @@
 |---|---|---|
 | WSL | 3.0.3.0（内核 6.18.54.1-1） | Windows 11 ARM64，build 26300 |
 | WSLc | 3.0.3.0（session manager 3.0.3） | Windows 11 ARM64，build 26300 |
-| MyGo | v0.8.0 | Windows 11 ARM64，build 26300 |
+| MyGo | v0.8.1 | Windows 11 ARM64，build 26300 |
 
 ## wsl.exe
 
@@ -57,6 +57,7 @@ Fixture：`internal/wsl/testdata/3.0.3.0/`（真实录制）、`internal/wsl/tes
 | `system events --format json` 持续输出 Docker 形式的事件（`Type`、`Action`、`Actor.Attributes`、`timeNano`），连接保持打开。 | `wslc.Client.Events`；重启策略监听 `die`。 |
 | `image save` 用 `--output` 写出，`image load` 用 `--input` 读取；`network connect` 使用 `--network-alias`。 | `Save`、`Load`、`Connect`。 |
 | `wslc build` 存在（`--file`、`--tag`、`--build-arg`、`--target`、`--progress plain`）。 | 通过它支持 Compose 的 `build`。 |
+| 没有 `wslc system prune`；有 `container`、`image`、`volume` 与 `network prune`，均支持 `--force` 与 `--filter`（`image` 与 `volume` 还支持 `--all`）。`--filter label=k=v` 可把 `container` 与 `network prune` 限定在带该标签的对象上；输出列出 “Deleted Containers:” 或 “Deleted Networks:” 以及 “Total reclaimed space”（3.0.3.0）。 | “系统清理”组合使用它们；Volume 使用 WSLPilot 自己的规则而不是 `volume prune`，因为后者会连已 down 的 Compose 项目的 Volume 一起删除。 |
 | 带 `--health-cmd` 时 `inspect` 报告 `State.Health.Status`（`healthy`…）；`--memory 64M` 得到 `HostConfig.Memory` 64 MiB；容器的 `Image` 等于镜像 inspect 的 `Id`；label 同时出现在 `Config.Labels` 与顶层 `Labels` 中。 | Compose 据此等待健康状态，并按 ID 检测镜像变化。 |
 | `system session terminate` 停止 CLI session 虚拟机；下一条命令会启动新的 session。 | `TerminateSession`（使设置生效、可压缩 vhd Volume）。 |
 | session 相互隔离：每个 session 有自己的存储（`<storagePath>\wslc\sessions\<name>\storage.vhdx`）、镜像、Volume 与容器。`--session <name>` 访问其它 session；`wslc info --format json` 列出全部（`system session list` 没有 JSON 输出）。CLI 自己的 session 名为 `wslc-cli-<user>`。 | 有多个 session 运行时，容器页提供 session 切换，并对其它应用创建的 session 给出提示。 |
@@ -87,6 +88,7 @@ Fixture：`internal/wslc/testdata/3.0.3.0/`（用户名已替换为 `user`）。
 | `mygo.Updater.Check` 返回更新的已签名版本或 nil；`Update.Install(ctx, progress)` 下载、校验并安装；对于无法写入自身所在位置的副本，`Updater.Enabled` 为 false；`App.Relaunch` 重启到新版本（v0.7.4）。 | 应用内更新流程（`gui.md`）基于这些接口；不使用更新窗口插件。 |
 | `Power.IdleTime` 报告用户已空闲多长时间（v0.7.4）。 | 用于“电脑空闲时安装”。 |
 | `TitleBarHidden` 加 `HideWindowButtons` 把窗口框架交给应用；`.DragWindow()` 与 `.MaximizeButton()` 标出拖动区域与贴靠布局按钮（v0.7.4）。 | 面板页眉即标题栏；WSLPilot 在 Windows 上自绘窗口按钮。 |
+| 自 v0.8.0 起，Windows（D3D11）上的每一帧只重绘变化的部分，并以脏矩形提交，假定交换链保留其余内容；`MYGO_PARTIAL=0` 可关闭此行为，它在 MyGo 渲染包初始化时读取。 | 在托盘中放置过一段时间的窗口，之后只显示变化的区域（悬停的行、滚动条），其余为空白。WSLPilot 改为整帧绘制：`internal/earlyenv` 先于 MyGo 初始化（按导入路径顺序；已用 `GODEBUG=inittrace=1` 确认），设置 `MYGO_PARTIAL=0`；`MYGO_FRAME_STATS=all` 显示没有局部帧（v0.8.1）。 |
 | `App.SetLocale(tag)` 立即切换界面语言，并在下次启动时保留；`""` 表示跟随系统（v0.8.0）。 | “语言”设置调用它。 |
 | `ui.Select` 显示并保存选项字符串本身；`ui.SelectBase` 允许每个选项显示自己的标签（v0.8.0）。 | `labeledSelect` 保存 `daily` 这样的取值，显示“每天”。 |
 | 自 v0.8.0 起，非活动窗口的强调色显示为灰色，并且所有按键都会到达 `HandleInput`。 | WSLPilot 没有使用 `HandleInput` 或 `ObserveInput`，无需改动。 |

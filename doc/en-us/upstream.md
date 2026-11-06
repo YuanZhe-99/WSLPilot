@@ -11,7 +11,7 @@ The machine-readable list is `internal/upstream/tested.json`; keep it and this t
 |---|---|---|
 | WSL | 3.0.3.0 (kernel 6.18.54.1-1) | Windows 11 ARM64, build 26300 |
 | WSLc | 3.0.3.0 (session manager 3.0.3) | Windows 11 ARM64, build 26300 |
-| MyGo | v0.8.0 | Windows 11 ARM64, build 26300 |
+| MyGo | v0.8.1 | Windows 11 ARM64, build 26300 |
 
 ## wsl.exe
 
@@ -59,6 +59,7 @@ Fixtures: `internal/wsl/testdata/3.0.3.0/` (captured), `internal/wsl/testdata/sy
 | `system events --format json` streams Docker-shaped events (`Type`, `Action`, `Actor.Attributes`, `timeNano`) and stays open. | `wslc.Client.Events`; restart policies watch `die`. |
 | `image save` writes with `--output`, `image load` reads with `--input`; `network connect` takes `--network-alias`. | `Save`, `Load`, `Connect`. |
 | `wslc build` exists (`--file`, `--tag`, `--build-arg`, `--target`, `--progress plain`). | Compose `build` is supported through it. |
+| There is no `wslc system prune`; `container`, `image`, `volume` and `network prune` exist, each with `--force` and `--filter` (`image` and `volume` also `--all`). `--filter label=k=v` scopes `container` and `network prune` to labeled objects; the report lists "Deleted Containers:" or "Deleted Networks:" and "Total reclaimed space" (3.0.3.0). | System cleanup combines them; volumes use WSLPilot's own rule instead of `volume prune`, which would also take a down Compose project's volumes. |
 | `inspect` reports `State.Health.Status` (`healthy`…) for a `--health-cmd`; `--memory 64M` gives `HostConfig.Memory` 64 MiB; a container's `Image` equals the image's inspect `Id`; labels appear in both `Config.Labels` and the top-level `Labels`. | Compose waits on health and detects image changes by ID. |
 | `system session terminate` stops the CLI session VM; the next command starts a new one. | `TerminateSession` (settings take effect, vhd volumes can be compacted). |
 | Sessions are isolated: each has its own storage (`<storagePath>\wslc\sessions\<name>\storage.vhdx`), images, volumes and containers. `--session <name>` addresses another; `wslc info --format json` lists all (`system session list` has no JSON). The CLI's own session is `wslc-cli-<user>`. | The Containers page offers a session switcher when more than one runs, with a warning for sessions other apps created. |
@@ -90,6 +91,7 @@ date). `internal/configdoc/schema.go` copies the subset the forms show.
 | `mygo.Updater.Check` returns the newer signed release or nil; `Update.Install(ctx, progress)` downloads, verifies and installs it; `Updater.Enabled` is false for a copy that cannot write where it runs; `App.Relaunch` restarts into it (v0.7.4). | The in-app update flow (`gui.md`) is built on these; the update window plugin is not used. |
 | `Power.IdleTime` reports how long the user has been idle (v0.7.4). | Used for "install when the computer is idle". |
 | `TitleBarHidden` with `HideWindowButtons` leaves the window frame to the app; `.DragWindow()` and `.MaximizeButton()` mark the drag area and the snap-layout button (v0.7.4). | The pane header is the title bar; WSLPilot draws its own window buttons on Windows. |
+| From v0.8.0 a frame on Windows (D3D11) redraws only what changed and presents it with dirty rectangles, trusting the swap chain to hold the rest; `MYGO_PARTIAL=0` turns this off and is read when MyGo's renderer package initializes. | A window that had sat in the tray showed only the regions that changed afterwards (a hovered row, a scrollbar) over an empty frame. WSLPilot draws whole frames: `internal/earlyenv`, which initializes before MyGo (import-path order; checked with `GODEBUG=inittrace=1`), sets `MYGO_PARTIAL=0`; `MYGO_FRAME_STATS=all` shows no partial frames (v0.8.1). |
 | `App.SetLocale(tag)` switches the interface language at once and keeps it for the next launches; `""` follows the system (v0.8.0). | The Language setting calls it. |
 | `ui.Select` shows and stores the option strings themselves; `ui.SelectBase` lets each option show a label of its own (v0.8.0). | `labeledSelect` stores values such as `daily` and shows "Every day". |
 | Since v0.8.0 an inactive window shows its accent in gray, and every key reaches `HandleInput`. | WSLPilot uses neither `HandleInput` nor `ObserveInput`; no change needed. |

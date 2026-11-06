@@ -21,6 +21,8 @@ machine.
 | Distribution backup (folder, archive, repository), verify, restore as new, partial restore | verified | live test `internal/backup` on `wslpilot-test-d1` |
 | Deleting a backup version (repository: merged into the next, last one removes it) | verified | unit test over a repository (other versions restore byte for byte and pass Check); view test through the confirmation |
 | Compose builtin backend up / update / down | verified | live test `internal/compose` (`wslpilot-test-compose`) |
+| WSLc cleanup (prune) | verified | live `container` and `network prune --filter label=…` on `wslpilot-test-prune-*` (WSLc 3.0.3.0); unit test of the volume rule; view test of the commands run |
+| Whole frames instead of partial redraw | verified | `GODEBUG=inittrace=1`: `internal/earlyenv` initializes before MyGo's renderer; `MYGO_FRAME_STATS=all`: no partial frames (10 of 14 with `MYGO_PARTIAL=1`) |
 | Compose project backup (files, bind folder, named volume) and restore | verified | live test `internal/core` (`wslpilot-test-pbk`): stopped and started again, bind file extracted, volume restored with its owner; unit tests over folder, archive and repository |
 | Distribution export as VHD and import of the copy | verified | by hand after `wsl --shutdown` on `wslpilot-test-vhd` |
 | WSLc sessions: isolation, switching the Containers page | verified | by hand with a second session attached by `session enter`; view test |

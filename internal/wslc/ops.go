@@ -445,10 +445,21 @@ func (c *Client) Disconnect(ctx context.Context, network, id string) error {
 	return c.do(ctx, "network", "disconnect", network, id)
 }
 
-// Prune removes unused objects of kind: "container", "image", "volume"
-// or "network". Destructive; callers confirm first.
-func (c *Client) Prune(ctx context.Context, kind string) (string, error) {
-	return c.run(ctx, kind, "prune", "--force")
+// Prune removes unused objects of kind: "container" (stopped ones),
+// "image" (dangling ones, every unused one with all), "volume" or
+// "network". Destructive; callers confirm first.
+// Inputs: filters are --filter values, e.g. "label=k=v" (verified on
+// WSLc 3.0.3.0 for containers and networks).
+// Returns: the command's report ("Deleted Containers:" …).
+func (c *Client) Prune(ctx context.Context, kind string, all bool, filters ...string) (string, error) {
+	args := []string{kind, "prune", "--force"}
+	if all {
+		args = append(args, "--all")
+	}
+	for _, f := range filters {
+		args = append(args, "--filter", f)
+	}
+	return c.run(ctx, args...)
 }
 
 // do runs a command whose output is not needed.

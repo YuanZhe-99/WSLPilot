@@ -7535,3 +7535,113 @@ func SetLoginTrayHelp() string { return In(i18n.Locale()).SetLoginTrayHelp() }
 func (msgs Messages) SetLoginTrayHelp() string {
 	return Catalog.Format(msgs.locale, "SetLoginTrayHelp", nil)
 }
+
+// CtrCleanup says "Clean up…"
+// in the language the app shows.
+func CtrCleanup() string { return In(i18n.Locale()).CtrCleanup() }
+
+// CtrCleanup says "Clean up…"
+// in the language of msgs.
+func (msgs Messages) CtrCleanup() string {
+	return Catalog.Format(msgs.locale, "CtrCleanup", nil)
+}
+
+// CtrCleanupTitle says "Clean up WSL Containers"
+// in the language the app shows.
+func CtrCleanupTitle() string { return In(i18n.Locale()).CtrCleanupTitle() }
+
+// CtrCleanupTitle says "Clean up WSL Containers"
+// in the language of msgs.
+func (msgs Messages) CtrCleanupTitle() string {
+	return Catalog.Format(msgs.locale, "CtrCleanupTitle", nil)
+}
+
+// CtrCleanupHelp says "Removes what nothing uses, as docker system prune does. Running containers and what they use are kept."
+// in the language the app shows.
+func CtrCleanupHelp() string { return In(i18n.Locale()).CtrCleanupHelp() }
+
+// CtrCleanupHelp says "Removes what nothing uses, as docker system prune does. Running containers and what they use are kept."
+// in the language of msgs.
+func (msgs Messages) CtrCleanupHelp() string {
+	return Catalog.Format(msgs.locale, "CtrCleanupHelp", nil)
+}
+
+// CtrCleanupContainers says "Stopped containers: {count}"
+// in the language the app shows.
+func CtrCleanupContainers(count int) string { return In(i18n.Locale()).CtrCleanupContainers(count) }
+
+// CtrCleanupContainers says "Stopped containers: {count}"
+// in the language of msgs.
+func (msgs Messages) CtrCleanupContainers(count int) string {
+	return Catalog.Format(msgs.locale, "CtrCleanupContainers", map[string]any{"count": count})
+}
+
+// CtrCleanupContainersHelp says "Stopped containers of Compose projects too; Apply changes creates them again."
+// in the language the app shows.
+func CtrCleanupContainersHelp() string { return In(i18n.Locale()).CtrCleanupContainersHelp() }
+
+// CtrCleanupContainersHelp says "Stopped containers of Compose projects too; Apply changes creates them again."
+// in the language of msgs.
+func (msgs Messages) CtrCleanupContainersHelp() string {
+	return Catalog.Format(msgs.locale, "CtrCleanupContainersHelp", nil)
+}
+
+// CtrCleanupNetworks says "Networks no container uses"
+// in the language the app shows.
+func CtrCleanupNetworks() string { return In(i18n.Locale()).CtrCleanupNetworks() }
+
+// CtrCleanupNetworks says "Networks no container uses"
+// in the language of msgs.
+func (msgs Messages) CtrCleanupNetworks() string {
+	return Catalog.Format(msgs.locale, "CtrCleanupNetworks", nil)
+}
+
+// CtrCleanupImages says "Dangling images (untagged, used by no container)"
+// in the language the app shows.
+func CtrCleanupImages() string { return In(i18n.Locale()).CtrCleanupImages() }
+
+// CtrCleanupImages says "Dangling images (untagged, used by no container)"
+// in the language of msgs.
+func (msgs Messages) CtrCleanupImages() string {
+	return Catalog.Format(msgs.locale, "CtrCleanupImages", nil)
+}
+
+// CtrCleanupImagesAll says "Every image no container uses"
+// in the language the app shows.
+func CtrCleanupImagesAll() string { return In(i18n.Locale()).CtrCleanupImagesAll() }
+
+// CtrCleanupImagesAll says "Every image no container uses"
+// in the language of msgs.
+func (msgs Messages) CtrCleanupImagesAll() string {
+	return Catalog.Format(msgs.locale, "CtrCleanupImagesAll", nil)
+}
+
+// CtrCleanupVolumes says "Volumes no container will use: {count}"
+// in the language the app shows.
+func CtrCleanupVolumes(count int) string { return In(i18n.Locale()).CtrCleanupVolumes(count) }
+
+// CtrCleanupVolumes says "Volumes no container will use: {count}"
+// in the language of msgs.
+func (msgs Messages) CtrCleanupVolumes(count int) string {
+	return Catalog.Format(msgs.locale, "CtrCleanupVolumes", map[string]any{"count": count})
+}
+
+// CtrCleanupVolumesHelp says "Their data is deleted. Volumes of Compose projects you added are kept, even with the project down."
+// in the language the app shows.
+func CtrCleanupVolumesHelp() string { return In(i18n.Locale()).CtrCleanupVolumesHelp() }
+
+// CtrCleanupVolumesHelp says "Their data is deleted. Volumes of Compose projects you added are kept, even with the project down."
+// in the language of msgs.
+func (msgs Messages) CtrCleanupVolumesHelp() string {
+	return Catalog.Format(msgs.locale, "CtrCleanupVolumesHelp", nil)
+}
+
+// CtrCleanupVolumesOther says "Volumes are cleaned up only in the default session."
+// in the language the app shows.
+func CtrCleanupVolumesOther() string { return In(i18n.Locale()).CtrCleanupVolumesOther() }
+
+// CtrCleanupVolumesOther says "Volumes are cleaned up only in the default session."
+// in the language of msgs.
+func (msgs Messages) CtrCleanupVolumesOther() string {
+	return Catalog.Format(msgs.locale, "CtrCleanupVolumesOther", nil)
+}

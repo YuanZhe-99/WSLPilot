@@ -6,6 +6,7 @@
 | `cmd/wslpilot-agent` | 后台 agent：`run-due`、`watch`、`install`、`uninstall` | `main`、`watch` |
 | `cmd/wslpilot-cli` | 命令行入口 | `main` |
 | `internal/version` | 发布版本号，与 `mygo.json` 保持一致 | `Version` |
+| `internal/earlyenv` | MyGo 初始化时读取的环境变量（整帧绘制：`MYGO_PARTIAL=0`）；由 `cmd/wslpilot` 最先导入 | `FullFrames` |
 | `internal/upstream` | WSLPilot 测试过的上游版本（`tested.json`） | `Tested`、`Manifest`、`Compare`、`NewerThanTested` |
 | `internal/procexec` | 以参数向量启动子进程；输出解码；原始数据流 | `Runner`、`Run`、`Streamer`、`Stream`、`Spec`、`RunnerFrom`、`Decode`、`ExitError` |
 | `internal/wsl` | `wsl.exe` 适配层：列表、生命周期、导入导出、迁移、压缩、稀疏、exec、文件读写 | `Client`、`Distro`、`List`、`ParseListVerbose`、`ParseListOnline`、`InstallArgs`、`ExecArgs`、`Compact`、`ReadFile`、`WriteFile` |

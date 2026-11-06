@@ -1,5 +1,16 @@
 # Version history
 
+## 0.1.4
+
+Released 2026-11-06. Tested with WSL 3.0.3.0, WSLc 3.0.3.0 and MyGo v0.8.1 on Windows 11 ARM64.
+
+- Fix: a window that had sat in the tray could show only the parts that changed (a hovered row, a
+  scrollbar) over an empty frame. WSLPilot now draws whole frames instead of MyGo 0.8's partial
+  redraw (`upstream.md`, MyGo).
+- Containers › Clean up…: stopped containers, unused networks, dangling or all unused images and,
+  on request, volumes no container will use (never a Compose project's), each backed up first.
+- MyGo v0.8.1.
+
 ## 0.1.3
 
 Released 2026-11-06. Tested with WSL 3.0.3.0, WSLc 3.0.3.0 and MyGo v0.8.0 on Windows 11 ARM64.

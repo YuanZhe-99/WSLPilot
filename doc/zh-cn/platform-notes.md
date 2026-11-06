@@ -20,6 +20,8 @@
 | 发行版备份（目录、归档、仓库）、校验、恢复为新发行版、部分恢复 | 已验证 | 在 `wslpilot-test-d1` 上运行实机测试 `internal/backup` |
 | 删除备份版本（仓库：合并到下一个版本，删除最后一个时删除仓库） | 已验证 | 针对仓库的单元测试（其余版本逐字节还原并通过检查）；通过确认对话框的视图测试 |
 | Compose builtin Backend 的 up / 更新 / down | 已验证 | 实机测试 `internal/compose`（`wslpilot-test-compose`） |
+| WSLc 清理（prune） | 已验证 | 在 `wslpilot-test-prune-*` 上实机运行 `container` 与 `network prune --filter label=…`（WSLc 3.0.3.0）；Volume 规则的单元测试；所执行命令的视图测试 |
+| 整帧绘制而非局部重绘 | 已验证 | `GODEBUG=inittrace=1`：`internal/earlyenv` 先于 MyGo 渲染包初始化；`MYGO_FRAME_STATS=all`：没有局部帧（`MYGO_PARTIAL=1` 时 14 帧中有 10 帧为局部） |
 | Compose 项目备份（文件、bind 目录、命名 Volume）与还原 | 已验证 | 实机测试 `internal/core`（`wslpilot-test-pbk`）：停止后再次启动，提取出 bind 文件，还原的 Volume 保留属主；单元测试覆盖目录、归档与仓库 |
 | 发行版导出为 VHD 并导入副本 | 已验证 | 在 `wslpilot-test-vhd` 上于 `wsl --shutdown` 后手动验证 |
 | WSLc session：隔离、容器页切换 | 已验证 | 用 `session enter` 挂载第二个 session 手动验证；视图测试 |

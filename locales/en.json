@@ -1634,5 +1634,30 @@
   "SidebarFold": "Fold the sidebar",
   "SidebarUnfold": "Show the sidebar",
   "SetLoginTray": "Start in the tray",
-  "SetLoginTrayHelp": "At sign-in, keep the window closed and run in the tray. Off: the window opens."
+  "SetLoginTrayHelp": "At sign-in, keep the window closed and run in the tray. Off: the window opens.",
+  "CtrCleanup": "Clean up…",
+  "CtrCleanupTitle": "Clean up WSL Containers",
+  "CtrCleanupHelp": "Removes what nothing uses, as docker system prune does. Running containers and what they use are kept.",
+  "CtrCleanupContainers": "Stopped containers: {count}",
+  "@CtrCleanupContainers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "CtrCleanupContainersHelp": "Stopped containers of Compose projects too; Apply changes creates them again.",
+  "CtrCleanupNetworks": "Networks no container uses",
+  "CtrCleanupImages": "Dangling images (untagged, used by no container)",
+  "CtrCleanupImagesAll": "Every image no container uses",
+  "CtrCleanupVolumes": "Volumes no container will use: {count}",
+  "@CtrCleanupVolumes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "CtrCleanupVolumesHelp": "Their data is deleted. Volumes of Compose projects you added are kept, even with the project down.",
+  "CtrCleanupVolumesOther": "Volumes are cleaned up only in the default session."
 }

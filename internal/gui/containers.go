@@ -53,8 +53,9 @@ type containersPage struct {
 	logsCancel context.CancelFunc
 	follow     bool
 
-	dlg string
-	in  ctrInput
+	dlg   string
+	in    ctrInput
+	clean cleanupInput
 }
 
 // ctrInput holds the fields of the container dialogs.
@@ -271,6 +272,8 @@ func (a *App) containerDialogs(c *ui.Context) {
 						return a.wc().Start(ctx, id)
 					})
 				})
+			case "cleanup":
+				a.cleanupDialog(c)
 			case "pull":
 				ui.Text(c, L.ImgPull()).FontSize(16).Bold()
 				ui.Field(c, L.CtrImage(), func() { ui.TextInput(c, &p.in.ref).Placeholder("alpine:3.20").Label(L.CtrImage()).AutoFocus() })

@@ -35,6 +35,9 @@ func (a *App) containersView(c *ui.Context) {
 		}
 		ui.Segmented(c.Key("tabs"), &p.tab, L.CtrContainers(), L.CtrImages(), L.CtrNetworks()).Label(L.NavWSLc())
 		iconButtonAction(c, "refresh", iconRefresh, L.Refresh(), a.loadContainers)
+		if ui.Button(c.Key("cleanup"), L.CtrCleanup()).Clicked() {
+			a.openCleanup()
+		}
 		switch p.tab {
 		case 0:
 			if ui.PrimaryButton(c.Key("run"), L.CtrRun()).Clicked() {
@@ -300,7 +303,7 @@ func (a *App) imageList(c *ui.Context) {
 		}
 		if ui.Button(c.Key("prune"), L.ImgPrune()).Clicked() {
 			a.ask(L.ImgPruneTitle(), L.ImgPruneMessage(), L.ImgPrune(), func(bool) {
-				a.wslcJob(L.ImgPrune(), "wslc.image.prune", func(ctx context.Context) error { _, err := a.wc().Prune(ctx, "image"); return err })
+				a.wslcJob(L.ImgPrune(), "wslc.image.prune", func(ctx context.Context) error { _, err := a.wc().Prune(ctx, "image", false); return err })
 			})
 		}
 	})

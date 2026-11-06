@@ -13,6 +13,8 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"github.com/YuanZhe-99/WSLPilot/internal/core"
+	// Before MyGo initializes: whole frames, not partial redraw.
+	_ "github.com/YuanZhe-99/WSLPilot/internal/earlyenv"
 	"github.com/YuanZhe-99/WSLPilot/internal/gui"
 	"github.com/YuanZhe-99/WSLPilot/internal/scheduler"
 	"github.com/YuanZhe-99/WSLPilot/internal/version"
