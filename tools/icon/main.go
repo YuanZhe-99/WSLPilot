@@ -1,5 +1,6 @@
 // Command icon renders resources/icon.svg into resources/icon.png, the
-// 1024×1024 app icon mygo build packages. Run from the repository root:
+// 1024×1024 app icon mygo build packages, and into the 64×64 icons of the
+// sidebar (internal/gui/appicon.png) and the tray (cmd/wslpilot/tray.png). Run from the repository root:
 //
 //	go run ./tools/icon
 //
@@ -18,11 +19,17 @@ import (
 	"github.com/egoist/mygo/ui"
 )
 
-const (
-	src  = "resources/icon.svg"
-	dst  = "resources/icon.png"
-	size = 1024
-)
+const src = "resources/icon.svg"
+
+// outputs are the files written and their sizes in pixels.
+var outputs = []struct {
+	path string
+	size int
+}{
+	{"resources/icon.png", 1024},
+	{"internal/gui/appicon.png", 64},
+	{"cmd/wslpilot/tray.png", 64},
+}
 
 func main() {
 	data, err := os.ReadFile(src)
@@ -33,8 +40,15 @@ func main() {
 	if err != nil {
 		fail(err)
 	}
-	black := render(icon, ui.Hex("#000000"))
-	white := render(icon, ui.Hex("#FFFFFF"))
+	for _, o := range outputs {
+		write(icon, o.path, o.size)
+	}
+}
+
+// write renders icon at size pixels into path.
+func write(icon *ui.SVG, dst string, size int) {
+	black := render(icon, ui.Hex("#000000"), size)
+	white := render(icon, ui.Hex("#FFFFFF"), size)
 	out := matte(black, white)
 	f, err := os.Create(dst)
 	if err != nil {
@@ -50,10 +64,10 @@ func main() {
 }
 
 // render draws icon at size×size device pixels over a solid background.
-func render(icon *ui.SVG, bg ui.Color) *image.RGBA {
+func render(icon *ui.SVG, bg ui.Color, size int) *image.RGBA {
 	tt := ui.NewTester(func(c *ui.Context) {
 		ui.Column(c).Fill().Background(bg).Children(func() {
-			ui.Image(c, icon).Width(size).Height(size)
+			ui.Image(c, icon).Width(float32(size)).Height(float32(size))
 		})
 	}, size, size)
 	tt.SetScale(1)

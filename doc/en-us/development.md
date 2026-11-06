@@ -22,8 +22,8 @@ WSLPILOT_LIVE=1 go test ./internal/...           # live tests on wslpilot-test-*
 WSLPILOT_SHOTS=<folder> go test -run Screenshots ./internal/gui   # render every page to PNG
 ```
 
-The icon's penguin is a redrawing after Tux; keep the credit in `THIRD_PARTY_NOTICES.md` when
-changing it.
+The app icon is a penguin drawn for WSLPilot. After editing `resources/icon.svg`, run `go run ./tools/icon`, which writes
+`resources/icon.png` and the 64-pixel sidebar and tray icons.
 
 ## Full local gate
 

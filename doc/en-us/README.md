@@ -30,6 +30,6 @@ written in Go with [MyGo](https://github.com/egoist/mygo)'s native UI. It drives
 |---|---|---|
 | Go | 1.27.3 | `go.mod` |
 | MyGo | v0.8.0 | `go.mod` |
-| WSLPilot | 0.1.2 | `internal/version`, `mygo.json` |
+| WSLPilot | 0.1.3 | `internal/version`, `mygo.json` |
 | WSL (tested, not bundled) | 3.0.3.0 | `internal/upstream/tested.json`, `upstream.md` |
 | WSLc (tested, not bundled) | 3.0.3.0 | `upstream.md` |

@@ -22,7 +22,8 @@ WSLPILOT_LIVE=1 go test ./internal/...           # live tests on wslpilot-test-*
 WSLPILOT_SHOTS=<folder> go test -run Screenshots ./internal/gui   # render every page to PNG
 ```
 
-图标中的企鹅依据 Tux 重绘；修改图标时须保留 `THIRD_PARTY_NOTICES.md` 中的署名。
+应用图标是为 WSLPilot 绘制的企鹅。修改 `resources/icon.svg` 后运行
+`go run ./tools/icon`，它会写出 `resources/icon.png` 以及 64 像素的侧边栏与托盘图标。
 
 ## 完整本地检查
 

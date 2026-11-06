@@ -133,6 +133,10 @@ func testApp(t *testing.T) (*App, *fakeCmd, *fakeHost) {
 	k.Backup = &backup.Runner{WSL: w, WSLc: c, Vol: k.Volumes}
 	k.Scheduler = &scheduler.Service{Store: st, Do: k.BackupTarget}
 	k.WireCompose(false)
+	// Each test app has its own backup folder, never the user's.
+	if err := k.SavePrefs(core.Prefs{BackupDir: t.TempDir()}); err != nil {
+		t.Fatal(err)
+	}
 	h := &fakeHost{}
 	var a *App
 	// Updates queue up and run on the test goroutine (drain), as

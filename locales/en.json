@@ -946,7 +946,7 @@
   "SetSearch": "Search settings",
   "SetSearchNone": "No settings match",
   "SetThemeHelp": "Follow Windows, or always light or dark.",
-  "SetOpenAtLoginHelp": "Start in the tray when you sign in to Windows.",
+  "SetOpenAtLoginHelp": "Start WSLPilot when you sign in to Windows.",
   "SetCloseWindow": "Closing the window",
   "SetCloseWindowHelp": "Keep running in the tray so scheduled backups and update checks continue, or quit.",
   "SetCloseToTray": "Keep in tray",
@@ -1613,5 +1613,26 @@
         "type": "String"
       }
     }
-  }
+  },
+  "BkDeleteRepoMessage": "This version is removed from the repository. Data that later versions also hold stays with them; only what this version alone held is freed.",
+  "BkDeleteRepoLast": "This is the last version in the repository, so the whole repository is deleted: {path}",
+  "@BkDeleteRepoLast": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "BkDeleteJob": "Delete backup {time}",
+  "@BkDeleteJob": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "SidebarFold": "Fold the sidebar",
+  "SidebarUnfold": "Show the sidebar",
+  "SetLoginTray": "Start in the tray",
+  "SetLoginTrayHelp": "At sign-in, keep the window closed and run in the tray. Off: the window opens."
 }

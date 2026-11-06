@@ -496,7 +496,7 @@
   "SetSearch": "搜索设置",
   "SetSearchNone": "没有匹配的设置",
   "SetThemeHelp": "跟随 Windows，或始终使用浅色或深色。",
-  "SetOpenAtLoginHelp": "登录 Windows 时在托盘中启动。",
+  "SetOpenAtLoginHelp": "登录 Windows 时启动 WSLPilot。",
   "SetCloseWindow": "关闭窗口时",
   "SetCloseWindowHelp": "保留在托盘中运行，使计划备份与更新检查继续进行；或直接退出。",
   "SetCloseToTray": "保留在托盘",
@@ -739,5 +739,12 @@
   "SetLanguageSystem": "跟随 Windows",
   "CmpProject": "项目",
   "BkRestoreProjectTitle": "还原项目 {name}",
-  "BkRestoreVolumeCheck": "还原 Volume {name}"
+  "BkRestoreVolumeCheck": "还原 Volume {name}",
+  "BkDeleteRepoMessage": "此版本会从仓库中删除。之后的版本也包含的数据会保留给它们；只释放此版本独有的数据。",
+  "BkDeleteRepoLast": "这是仓库中的最后一个版本，因此整个仓库都会被删除：{path}",
+  "BkDeleteJob": "删除备份 {time}",
+  "SidebarFold": "收起侧边栏",
+  "SidebarUnfold": "展开侧边栏",
+  "SetLoginTray": "启动到托盘",
+  "SetLoginTrayHelp": "登录时不打开窗口，只在托盘中运行。关闭此项则会打开窗口。"
 }

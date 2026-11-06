@@ -114,6 +114,11 @@ type Prefs struct {
 	// in the tray. CloseHinted records that the tray hint was shown.
 	CloseQuits  bool `json:"closeQuits,omitempty"`
 	CloseHinted bool `json:"closeHinted,omitempty"`
+	// LoginWindow opens the window when WSLPilot starts at sign-in; by
+	// default it starts in the tray.
+	LoginWindow bool `json:"loginWindow,omitempty"`
+	// SidebarRail folds the sidebar to its icons.
+	SidebarRail bool `json:"sidebarRail,omitempty"`
 
 	// Updates (doc/en-us/gui.md, "Updates"): NoUpdateCheck turns the
 	// daily check off; LastUpdateCheck and AnnouncedVersion record the

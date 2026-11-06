@@ -164,6 +164,13 @@ func (a *App) TakeRelaunchHidden() bool {
 	return h
 }
 
+// LoginToTray reports whether a start at sign-in keeps the window closed
+// (Settings › General, "Start in the tray"; on unless turned off).
+func (a *App) LoginToTray() bool {
+	a.loadPrefs()
+	return !a.settings.prefs.LoginWindow
+}
+
 // CloseHint reports whether to tell the user once that closing the window
 // keeps WSLPilot in the tray, and records that it was told.
 func (a *App) CloseHint() bool {

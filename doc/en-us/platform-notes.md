@@ -19,6 +19,7 @@ machine.
 | Automatic updates (in-app flow) | implemented | unit test of the auto-install timing; "not available in this build" checked in a dev build; a real update needs an installed release older than the newest |
 | Volume tar import/export (owners, modes, links) | verified | live test `internal/volume` |
 | Distribution backup (folder, archive, repository), verify, restore as new, partial restore | verified | live test `internal/backup` on `wslpilot-test-d1` |
+| Deleting a backup version (repository: merged into the next, last one removes it) | verified | unit test over a repository (other versions restore byte for byte and pass Check); view test through the confirmation |
 | Compose builtin backend up / update / down | verified | live test `internal/compose` (`wslpilot-test-compose`) |
 | Compose project backup (files, bind folder, named volume) and restore | verified | live test `internal/core` (`wslpilot-test-pbk`): stopped and started again, bind file extracted, volume restored with its owner; unit tests over folder, archive and repository |
 | Distribution export as VHD and import of the copy | verified | by hand after `wsl --shutdown` on `wslpilot-test-vhd` |

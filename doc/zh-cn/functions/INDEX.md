@@ -26,7 +26,7 @@
 | `internal/core` | 为各进程装配服务；Compose 接线（项目数据与备份、自启） | `Core`、`New`、`BackupTarget`、`WireCompose`、`FindProject`、`ProjectData`、`MoveWSLcData`、`AgentPath` |
 | `internal/compose` | Compose：Backend 接口、项目元数据、加载、校验、规划、builtin 与 native Backend、迁移（见 `compose.md`） | `Backend`、`Registry`、`Project`、`Projects`、`Load`、`Translate`、`Diff`、`Builtin`、`Native`、`Migrate` |
 | `internal/volume` | 经辅助容器以 tar 导入导出 Volume | `Pipeline`、`Import`、`Export`、`Decompress`、`HelperImage` |
-| `internal/backup` | 来源→tar→目录/归档/仓库；目录扫描、校验、恢复、保留（见 `backups.md`） | `Runner`、`Runner.BackupProject`、`ProjectManifest`、`ReadProjectManifest`、`ExtractProject`、`ProjectVolumeStream`、`FolderWriter`、`ArchiveWriter`、`RepoWriter`、`Scan`、`GroupBySource`、`Open`、`Verify`、`PlanRetention`、`Delete`、`RepoPassword` |
+| `internal/backup` | 来源→tar→目录/归档/仓库；目录扫描、校验、恢复、保留（见 `backups.md`） | `Runner`、`DeleteVersion`、`Runner.BackupProject`、`ProjectManifest`、`ReadProjectManifest`、`ExtractProject`、`ProjectVolumeStream`、`FolderWriter`、`ArchiveWriter`、`RepoWriter`、`Scan`、`GroupBySource`、`Open`、`Verify`、`PlanRetention`、`Delete`、`RepoPassword` |
 | `internal/scheduler` | 备份计划、到期计算、重试、保留、历史、锁、计划任务注册 | `Service`、`Plan`、`Schedule`、`Retry`、`RunDue`、`Run`、`Install` |
 | `internal/restart` | 基于 `wslc events` 的容器重启策略 | `Watcher`、`Decide`、`Label` |
 | `internal/wtprofile` | Windows Terminal fragment 配置 | `Fragment`、`ContainerShell`、`DistroShell`、`GUIDFor` |

@@ -15,7 +15,7 @@ WSLPilot 只保存自身的元数据（行为契约：状态归上游所有）�
 
 | 路径 | 内容 | Schema |
 |---|---|---|
-| `settings.json` | `theme`（`system`、`light`、`dark`）、`language`（`""` 为跟随 Windows，`en`、`zh-Hans`；MyGo 自己也会保存该选择）、`backupDir`、`helperImage`（Volume 辅助镜像，留空为 `alpine:3.20`）；窗口：`closeQuits`、`closeHinted`、`relaunchHidden`；更新：`noUpdateCheck`、`lastUpdateCheck`、`announcedVersion`、`autoInstall`（`""`、`idle`、`daily`）、`autoInstallHour`（见 `gui.md`） | 1 |
+| `settings.json` | `theme`（`system`、`light`、`dark`）、`language`（`""` 为跟随 Windows，`en`、`zh-Hans`；MyGo 自己也会保存该选择）、`backupDir`、`helperImage`（Volume 辅助镜像，留空为 `alpine:3.20`）；窗口：`closeQuits`、`closeHinted`、`relaunchHidden`、`sidebarRail`（侧边栏收起为图标）、`loginWindow`（登录时打开窗口，而不是只在托盘中启动）；更新：`noUpdateCheck`、`lastUpdateCheck`、`announcedVersion`、`autoInstall`（`""`、`idle`、`daily`）、`autoInstallHour`（见 `gui.md`） | 1 |
 | `locations.json` | 从外部打开的备份位置：`path`、`readOnly`、`label` | 1 |
 | `projects/<id>/project.json` | 一个 Compose 项目（见 [compose.md](compose.md)） | 1 |
 | `plans/<id>.json` | 一个备份计划（见 [backups.md](backups.md)） | 1 |

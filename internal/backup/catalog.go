@@ -1,6 +1,7 @@
 package backup
 
 import (
+	"context"
 	"errors"
 	"os"
 	"path/filepath"
@@ -219,4 +220,65 @@ func Delete(loc Location, it Item) error {
 		return os.RemoveAll(it.Path)
 	}
 	return errUnsupported(it.Kind)
+}
+
+// DeleteVersion removes one backup version the person chose to delete.
+// An archive or a folder backup is removed as Delete does. A repository
+// snapshot is forgotten and the repository pruned: data that later
+// versions share stays with them (in effect merged into the next one),
+// and only what this version alone held is freed. When it was the last
+// snapshot, the whole repository is removed.
+// Notes: refuses read-only locations and locked (encrypted, not unlocked)
+// repositories.
+func DeleteVersion(ctx context.Context, loc Location, it Item) error {
+	if it.Kind != KindRepo {
+		return Delete(loc, it)
+	}
+	if loc.ReadOnly {
+		return errors.New("backup: the location is read-only")
+	}
+	if it.ID == "" {
+		return errors.New("backup: unlock the repository first")
+	}
+	pw, _ := repoPassword(it.Path)
+	r, err := wpbk.Open(it.Path, wpbk.OpenOptions{Password: pw})
+	if err != nil {
+		return err
+	}
+	if _, err := r.Forget(it.ID); err != nil {
+		r.Close()
+		return err
+	}
+	left, err := r.Snapshots()
+	if err != nil {
+		r.Close()
+		return err
+	}
+	if len(left) == 0 {
+		r.Close()
+		return removeRepo(it.Path)
+	}
+	_, err = r.Prune(ctx)
+	if cerr := r.Close(); err == nil {
+		err = cerr
+	}
+	return err
+}
+
+// removeRepo deletes a repository's own entries (config.json and its
+// four folders), then the folder itself when nothing else is in it.
+func removeRepo(dir string) error {
+	if _, err := wpbk.ReadConfig(dir); err != nil {
+		return errors.New("backup: not a repository, not deleted")
+	}
+	for _, d := range []string{"packs", "index", "snapshots", "locks"} {
+		if err := os.RemoveAll(filepath.Join(dir, d)); err != nil {
+			return err
+		}
+	}
+	if err := os.Remove(filepath.Join(dir, "config.json")); err != nil {
+		return err
+	}
+	os.Remove(dir) // kept when other files are there
+	return nil
 }

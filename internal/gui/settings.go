@@ -89,6 +89,7 @@ type settingsPage struct {
 	backupDir      string
 	helperImage    string
 	openAtLogin    bool
+	loginTray      bool // the switch for !prefs.LoginWindow
 	agentInstalled bool
 	agentChecked   bool
 	wslc           confForm
@@ -128,6 +129,7 @@ func (a *App) loadPrefs() {
 	}
 	s.backupDir = s.prefs.BackupDir
 	s.helperImage = s.prefs.HelperImage
+	s.loginTray = !s.prefs.LoginWindow
 	if a.host != nil {
 		s.openAtLogin = a.host.OpenAtLogin()
 		a.host.SetTheme(s.prefs.Theme)
@@ -225,7 +227,7 @@ func (a *App) settingsSheet(c *ui.Context) {
 	if ownWindowButtons && a.host != nil {
 		ui.Overlay(c, func() {
 			// Exactly over the pane header's buttons (head: Padding(6, 8, …), Gap(10)).
-			ui.Row(c.Key("sheet-win")).Absolute().Top(paneMargin + 6 + (paneHeaderH+12-6-winButtonH)/2).Right(2 * paneMargin).Gap(10).AlignItems(ui.Center).Children(func() {
+			ui.Row(c.Key("sheet-win")).Absolute().Top(paneMargin + 6 + (paneHeaderH+12-6-winButtonH)/2).Right(paneMargin + 8).Gap(10).AlignItems(ui.Center).Children(func() {
 				a.windowButtons(c, "sheet-win", true)
 			})
 		})
@@ -307,6 +309,7 @@ func settingsHits() []settingsHit {
 		{setGeneral, L.SetTheme(), L.SetThemeHelp()},
 		{setGeneral, L.SetLanguage(), L.SetLanguageHelp() + " English 简体中文 Language 语言"},
 		{setGeneral, L.SetOpenAtLogin(), L.SetOpenAtLoginHelp()},
+		{setGeneral, L.SetLoginTray(), L.SetLoginTrayHelp()},
 		{setGeneral, L.SetCloseWindow(), L.SetCloseWindowHelp()},
 		{setBackups, L.SetAgent(), L.SetAgentHelp()},
 		{setBackups, L.SetBackupDir(), L.SetBackupDirHelp()},
@@ -396,6 +399,12 @@ func (a *App) generalSettings(c *ui.Context, r *rows) {
 					if err := a.host.SetOpenAtLogin(s.openAtLogin); err != nil {
 						a.notify(friendlyError(err), true)
 					}
+				})
+			})
+			r.row(c, "login-tray", iconTray, L.SetLoginTray(), L.SetLoginTrayHelp(), func() {
+				ui.Switch(c.Key("login-tray-sw"), &s.loginTray).Label(L.SetLoginTray()).Disabled(!s.openAtLogin).OnChange(func() {
+					s.prefs.LoginWindow = !s.loginTray
+					a.savePrefs()
 				})
 			})
 			r.row(c, "close", iconTray, L.SetCloseWindow(), L.SetCloseWindowHelp(), func() {

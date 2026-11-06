@@ -1,5 +1,21 @@
 # Version history
 
+## 0.1.3
+
+Released 2026-11-06. Tested with WSL 3.0.3.0, WSLc 3.0.3.0 and MyGo v0.8.0 on Windows 11 ARM64.
+
+- Backup versions can be deleted, also from a right-click menu on the version. In an incremental
+  repository the version merges into the next one: data later versions also hold stays, only
+  what it alone held is freed; the last version takes the repository with it.
+- Settings › General: Start in the tray, under Open WSLPilot at sign-in (on by default; off opens the
+  window at sign-in).
+- The sidebar folds to a rail of icons and back (the button beside the app's name), as in Kyokai.
+- The pane sits 8 px from the window's edges (4 px from the sidebar) with 4 px corners on Windows, as
+  in Kyokai, so its corners no longer look rounder than the window's.
+- A new app icon: a plain penguin drawn for WSLPilot, in place of the window with a penguin after Tux.
+- Fix: view tests raced on a shared update channel and could end before background saves did,
+  which failed the CI race detector.
+
 ## 0.1.2
 
 Released 2026-11-06. Tested with WSL 3.0.3.0, WSLc 3.0.3.0 and MyGo v0.8.0 on Windows 11 ARM64.

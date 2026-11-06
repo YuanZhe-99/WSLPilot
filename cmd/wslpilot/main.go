@@ -50,8 +50,8 @@ func main() {
 	mygo.App.OnBeforeQuit(func(*mygo.QuitEvent) { quitting = true })
 	mygo.App.WhenReady(func() {
 		// An update installed while the window was closed keeps it closed;
-		// so does starting at sign-in.
-		hidden := a.TakeRelaunchHidden() || mygo.App.WasOpenedAtLogin()
+		// so does starting at sign-in, unless Start in the tray is off.
+		hidden := a.TakeRelaunchHidden() || (mygo.App.WasOpenedAtLogin() && a.LoginToTray())
 		// The pane header is the title bar (gui.TitleBarOptions): WSLPilot
 		// draws its own window buttons over Mica.
 		win = mygo.NewWindow(gui.TitleBarOptions(mygo.WindowOptions{

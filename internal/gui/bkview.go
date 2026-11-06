@@ -180,42 +180,48 @@ func (a *App) versions(c *ui.Context, g backup.Group) {
 		cols := []ui.TableColumn{{Title: L.BkWhen(), Width: 150}, {Title: L.BkKind(), Width: 120}, {Title: L.BkWhere()}, {Title: L.ColDisk(), Width: 90, Align: ui.End}, {Title: L.BkFrom()}, {Title: L.BkCheck(), Width: 80}}
 		ui.Table(c, &p.vl, cols, len(g.Items), func(row, col int) {
 			it := g.Items[row]
-			switch col {
-			case 0:
-				ui.Text(c, it.Time.Local().Format("2006-01-02 15:04")).FontWeight(600)
-			case 1:
-				ui.Text(c, kindLabel(it.Kind))
-			case 2:
-				ui.Text(c, filepath.Base(filepath.Dir(it.Path))+`\`+filepath.Base(it.Path)).SingleLine()
-			case 3:
-				if it.Size > 0 {
-					ui.Text(c, jobs.FormatBytes(it.Size))
-				}
-			case 4:
-				from := a.planName(it.Plan)
-				if it.Plan == "" {
-					from = L.BkManual()
-				}
-				if !it.Consistent {
-					from += " · " + L.BkInconsistent()
-				}
-				ui.Text(c, from).SingleLine()
-			case 5:
-				switch v := p.verified[itemKey(it)]; v {
-				case "":
-				case "ok":
-					ui.Text(c, L.BkCheckOK()).TextColor(toneColor(t, selTone(toneGood, row == p.vsel)))
-				default:
-					ui.Text(c, L.BkCheckBad()).TextColor(toneColor(t, selTone(toneBad, row == p.vsel)))
-				}
+			// The whole cell takes the right-click menu.
+			cell := ui.Row(c.Key("cell")).FillWidth().FillHeight().AlignItems(ui.Center).ContextMenu(a.versionMenu(row, it))
+			if col == 3 {
+				cell.Justify(ui.End)
 			}
+			cell.Children(func() {
+				switch col {
+				case 0:
+					ui.Text(c, it.Time.Local().Format("2006-01-02 15:04")).FontWeight(600)
+				case 1:
+					ui.Text(c, kindLabel(it.Kind))
+				case 2:
+					ui.Text(c, filepath.Base(filepath.Dir(it.Path))+`\`+filepath.Base(it.Path)).SingleLine()
+				case 3:
+					if it.Size > 0 {
+						ui.Text(c, jobs.FormatBytes(it.Size))
+					}
+				case 4:
+					from := a.planName(it.Plan)
+					if it.Plan == "" {
+						from = L.BkManual()
+					}
+					if !it.Consistent {
+						from += " · " + L.BkInconsistent()
+					}
+					ui.Text(c, from).SingleLine()
+				case 5:
+					switch v := p.verified[itemKey(it)]; v {
+					case "":
+					case "ok":
+						ui.Text(c, L.BkCheckOK()).TextColor(toneColor(t, selTone(toneGood, row == p.vsel)))
+					default:
+						ui.Text(c, L.BkCheckBad()).TextColor(toneColor(t, selTone(toneBad, row == p.vsel)))
+					}
+				}
+			})
 		}).FillWidth().Height(min(float32(len(g.Items)+1)*tableRowH+8, 300))
 	})
 	if p.vsel < 0 || p.vsel >= len(g.Items) {
 		return
 	}
 	it := g.Items[p.vsel]
-	loc := p.locationOf(it)
 	card(c, L.BkRestoreFrom(groupTitle(g), it.Time.Local().Format("2006-01-02 15:04")), func() {
 		step := func(n int, title, about string, k tone) {
 			ui.Row(c.Key("step-" + itoa(n))).FillWidth().Gap(12).AlignItems(ui.Start).Children(func() {
@@ -288,20 +294,8 @@ func (a *App) versions(c *ui.Context, g backup.Group) {
 			if ui.Button(c.Key("verify"), L.BkVerify()).Clicked() {
 				a.verifyItem(it)
 			}
-			if !loc.ReadOnly && (it.Kind == backup.KindArchive || it.Kind == backup.KindFolder) && dangerButton(c, L.Delete()).Clicked() {
-				a.ask(L.BkDeleteTitle(), L.BkDeleteMessage(), L.Delete(), func(bool) {
-					a.async(func(ctx context.Context) func() {
-						err := backup.Delete(loc, it)
-						a.k.Jobs.Audit("backup.delete", it.Path, "", err)
-						return func() {
-							if err != nil {
-								a.notify(friendlyError(err), true)
-							}
-							p.loaded = false
-							a.loadCatalog()
-						}
-					})
-				})
+			if a.canDelete(it) && dangerButton(c, L.Delete()).Clicked() {
+				a.deleteVersion(it)
 			}
 		})
 	})
@@ -554,6 +548,74 @@ func (a *App) projectRestoreActions(c *ui.Context, it backup.Item) {
 		if ui.Button(c.Key("pv-"+v.Name), L.BkRestoreVolumeNamed(v.Name)).Clicked() {
 			p.rin, p.dlg = restoreInput{mode: "project", vols: choices(v.Name)}, "restore"
 			a.loadVolumes()
+		}
+	}
+}
+
+// canDelete reports whether a version can be deleted here: an archive, a
+// folder backup or a repository snapshot, in a location of this PC.
+func (a *App) canDelete(it backup.Item) bool {
+	if a.bk.locationOf(it).ReadOnly {
+		return false
+	}
+	switch it.Kind {
+	case backup.KindArchive, backup.KindFolder:
+		return true
+	case backup.KindRepo:
+		return it.ID != ""
+	}
+	return false
+}
+
+// repoVersions counts the snapshots the catalog shows for a repository.
+func (a *App) repoVersions(dir string) int {
+	n := 0
+	for _, g := range a.bk.groups {
+		for _, it := range g.Items {
+			if it.Kind == backup.KindRepo && it.ID != "" && strings.EqualFold(it.Path, dir) {
+				n++
+			}
+		}
+	}
+	return n
+}
+
+// deleteVersion confirms and deletes one version. In a repository the
+// version is forgotten and its data merged into the versions after it;
+// the last version takes the repository with it.
+func (a *App) deleteVersion(it backup.Item) {
+	p := &a.bk
+	loc := p.locationOf(it)
+	msg := L.BkDeleteMessage()
+	if it.Kind == backup.KindRepo {
+		msg = L.BkDeleteRepoMessage()
+		if a.repoVersions(it.Path) <= 1 {
+			msg = L.BkDeleteRepoLast(it.Path)
+		}
+	}
+	a.ask(L.BkDeleteTitle(), msg, L.Delete(), func(bool) {
+		a.startJob(L.BkDeleteJob(it.Time.Local().Format("2006-01-02 15:04")), func(ctx context.Context, j *jobs.Job) error {
+			err := backup.DeleteVersion(ctx, loc, it)
+			a.k.Jobs.Audit("backup.delete", it.Path, it.ID, err)
+			return err
+		}, func() {
+			p.vsel = -1
+			p.loaded = false
+			a.loadCatalog()
+		})
+	})
+}
+
+// versionMenu is the right-click menu of a version: check, restore, delete.
+func (a *App) versionMenu(row int, it backup.Item) func(m *ui.Menu) {
+	return func(m *ui.Menu) {
+		if m.Item(L.BkVerify()).Chosen() {
+			a.bk.vsel = row
+			a.verifyItem(it)
+		}
+		if m.Item(L.Delete() + "…").Disabled(!a.canDelete(it)).Chosen() {
+			a.bk.vsel = row
+			a.deleteVersion(it)
 		}
 	}
 }

@@ -21,12 +21,15 @@ const (
 	cardPadding float32 = 16
 
 	sidebarWidth float32 = 232
+	railWidth    float32 = 56 // the sidebar folded to its icons
+	railButton   float32 = 38 // a page's button in the rail
 	navRowH      float32 = 38
 	navIconSize  float32 = 16
 	appIconSize  float32 = 26
 
-	paneMargin  float32 = 8  // around the pane, from the window's edges
-	paneRadius  float32 = 12 // the pane's corners
+	paneMargin  float32 = 8  // around the pane, from the window's edges (half of it beside the sidebar, as Kyokai)
+	paneRadius  float32 = 12 // the pane's corners where the window is rounder (paneCorner)
+	paneTight   float32 = 4  // the pane's corners on Windows and Linux (paneCorner)
 	paneHeaderH float32 = 52 // the pane's header, which is the window's title bar
 	panePadX    float32 = 24 // the pane's body, from its sides
 	paneButton  float32 = 30 // an icon button in the header or sidebar
@@ -341,4 +344,15 @@ func labeledSelect(c *ui.Context, key string, selected *string, values []string,
 		}
 	})
 	return b
+}
+
+// paneCorner is the radius of the pane's corners: paneRadius on macOS; on
+// Windows and Linux, which round the window less (Windows 11 at 8 pixels),
+// paneTight, so that a corner paneMargin inside the window's never bulges
+// past its curve.
+func paneCorner(goos string) float32 {
+	if goos == "darwin" {
+		return paneRadius
+	}
+	return paneTight
 }

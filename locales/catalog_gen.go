@@ -5006,11 +5006,11 @@ func (msgs Messages) SetThemeHelp() string {
 	return Catalog.Format(msgs.locale, "SetThemeHelp", nil)
 }
 
-// SetOpenAtLoginHelp says "Start in the tray when you sign in to Windows."
+// SetOpenAtLoginHelp says "Start WSLPilot when you sign in to Windows."
 // in the language the app shows.
 func SetOpenAtLoginHelp() string { return In(i18n.Locale()).SetOpenAtLoginHelp() }
 
-// SetOpenAtLoginHelp says "Start in the tray when you sign in to Windows."
+// SetOpenAtLoginHelp says "Start WSLPilot when you sign in to Windows."
 // in the language of msgs.
 func (msgs Messages) SetOpenAtLoginHelp() string {
 	return Catalog.Format(msgs.locale, "SetOpenAtLoginHelp", nil)
@@ -7464,4 +7464,74 @@ func BkRestoreVolumeCheck(name string) string { return In(i18n.Locale()).BkResto
 // in the language of msgs.
 func (msgs Messages) BkRestoreVolumeCheck(name string) string {
 	return Catalog.Format(msgs.locale, "BkRestoreVolumeCheck", map[string]any{"name": name})
+}
+
+// BkDeleteRepoMessage says "This version is removed from the repository. Data that later versions also hold stays with them; only what this versi…"
+// in the language the app shows.
+func BkDeleteRepoMessage() string { return In(i18n.Locale()).BkDeleteRepoMessage() }
+
+// BkDeleteRepoMessage says "This version is removed from the repository. Data that later versions also hold stays with them; only what this versi…"
+// in the language of msgs.
+func (msgs Messages) BkDeleteRepoMessage() string {
+	return Catalog.Format(msgs.locale, "BkDeleteRepoMessage", nil)
+}
+
+// BkDeleteRepoLast says "This is the last version in the repository, so the whole repository is deleted: {path}"
+// in the language the app shows.
+func BkDeleteRepoLast(path string) string { return In(i18n.Locale()).BkDeleteRepoLast(path) }
+
+// BkDeleteRepoLast says "This is the last version in the repository, so the whole repository is deleted: {path}"
+// in the language of msgs.
+func (msgs Messages) BkDeleteRepoLast(path string) string {
+	return Catalog.Format(msgs.locale, "BkDeleteRepoLast", map[string]any{"path": path})
+}
+
+// BkDeleteJob says "Delete backup {time}"
+// in the language the app shows.
+func BkDeleteJob(time_ string) string { return In(i18n.Locale()).BkDeleteJob(time_) }
+
+// BkDeleteJob says "Delete backup {time}"
+// in the language of msgs.
+func (msgs Messages) BkDeleteJob(time_ string) string {
+	return Catalog.Format(msgs.locale, "BkDeleteJob", map[string]any{"time": time_})
+}
+
+// SidebarFold says "Fold the sidebar"
+// in the language the app shows.
+func SidebarFold() string { return In(i18n.Locale()).SidebarFold() }
+
+// SidebarFold says "Fold the sidebar"
+// in the language of msgs.
+func (msgs Messages) SidebarFold() string {
+	return Catalog.Format(msgs.locale, "SidebarFold", nil)
+}
+
+// SidebarUnfold says "Show the sidebar"
+// in the language the app shows.
+func SidebarUnfold() string { return In(i18n.Locale()).SidebarUnfold() }
+
+// SidebarUnfold says "Show the sidebar"
+// in the language of msgs.
+func (msgs Messages) SidebarUnfold() string {
+	return Catalog.Format(msgs.locale, "SidebarUnfold", nil)
+}
+
+// SetLoginTray says "Start in the tray"
+// in the language the app shows.
+func SetLoginTray() string { return In(i18n.Locale()).SetLoginTray() }
+
+// SetLoginTray says "Start in the tray"
+// in the language of msgs.
+func (msgs Messages) SetLoginTray() string {
+	return Catalog.Format(msgs.locale, "SetLoginTray", nil)
+}
+
+// SetLoginTrayHelp says "At sign-in, keep the window closed and run in the tray. Off: the window opens."
+// in the language the app shows.
+func SetLoginTrayHelp() string { return In(i18n.Locale()).SetLoginTrayHelp() }
+
+// SetLoginTrayHelp says "At sign-in, keep the window closed and run in the tray. Off: the window opens."
+// in the language of msgs.
+func (msgs Messages) SetLoginTrayHelp() string {
+	return Catalog.Format(msgs.locale, "SetLoginTrayHelp", nil)
 }

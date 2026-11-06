@@ -138,6 +138,13 @@ Every restore first runs `Verify` on the item and stops if it fails.
 Restoring over an existing object needs the user to type its name, and is written to the audit
 log.
 
+A version can also be deleted (the step card's Delete, or right-click on it), only in a location of
+this PC and after confirmation; it is written to the audit log. An archive is removed with its
+sidecar and a folder backup with its folder. In a repository the snapshot is forgotten and the
+repository pruned (`DeleteVersion`): data that later versions also hold stays with them, so the
+version is in effect merged into the next one, and only what it alone held is freed. Deleting the
+last snapshot removes the repository (`config.json` and its four folders).
+
 ## Plans and scheduling
 
 `internal/scheduler` stores plans; a plan only produces backups, which belong to the destination.

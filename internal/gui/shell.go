@@ -1,6 +1,8 @@
 package gui
 
 import (
+	"runtime"
+
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
 
@@ -58,10 +60,15 @@ func (a *App) View(c *ui.Context) {
 	}
 	a.toasts = a.toasts[:0]
 	ui.Row(c.Key("shell")).Fill().AlignItems(ui.Stretch).Children(func() {
-		a.sidebar(c)
-		ui.Column(c.Key("main")).Grow(1).MinWidth(0).MinHeight(0).Padding(paneMargin, paneMargin, paneMargin, 0).Children(func() {
-			ui.Column(c.Key("pane")).Grow(1).FillWidth().MinHeight(0).Radius(paneRadius).Clip().
-				Background(t.Background).Border(1, t.Border).Shadow(0, 6, 18, 0, paneShadow).Children(func() {
+		a.loadPrefs()
+		if a.settings.prefs.SidebarRail {
+			a.rail(c)
+		} else {
+			a.sidebar(c)
+		}
+		ui.Column(c.Key("main")).Grow(1).MinWidth(0).MinHeight(0).Padding(paneMargin, paneMargin, paneMargin, paneMargin/2).Children(func() {
+			ui.Column(c.Key("pane")).Grow(1).FillWidth().MinHeight(0).Radius(paneCorner(runtime.GOOS)).Clip().
+				Background(t.Background).Border(1, t.Border).Children(func() {
 				switch a.page {
 				case PageWSL:
 					a.wslView(c)
@@ -96,7 +103,8 @@ func (a *App) sidebar(c *ui.Context) {
 			if appIcon != nil {
 				ui.Image(c, appIcon).Size(appIconSize, appIconSize)
 			}
-			ui.Text(c, L.AppName()).FontSize(16).Bold()
+			ui.Text(c, L.AppName()).FontSize(16).Bold().Grow(1)
+			a.foldButton(c, "sb-fold", true)
 		})
 		ui.Box(c).Height(6).Shrink(0)
 		for _, it := range mainPages {
@@ -278,5 +286,64 @@ func (a *App) windowButtons(c *ui.Context, key string, onScrim bool) {
 	}
 	if button("close", winClose, L.WindowClose()).Tooltip(L.WindowClose()).Clicked() {
 		a.host.Window(WindowClose)
+	}
+}
+
+// foldButton folds the sidebar to its icons (fold) or unfolds it, and
+// keeps the choice (settings.json "sidebarRail").
+func (a *App) foldButton(c *ui.Context, key string, fold bool) {
+	label := L.SidebarFold()
+	if !fold {
+		label = L.SidebarUnfold()
+	}
+	if iconButton(c, key, iconSidebar, label, false) {
+		a.settings.prefs.SidebarRail = fold
+		a.savePrefs()
+	}
+}
+
+// rail is the sidebar folded to its icons: unfold, the pages, and at the
+// foot Tasks, the appearance and Settings; names are in the tooltips.
+func (a *App) rail(c *ui.Context) {
+	ui.Column(c.Key("rail")).Width(railWidth).Shrink(0).FillHeight().Padding(10, 0, 12, 0).Gap(4).AlignItems(ui.Center).Children(func() {
+		ui.Row(c.Key("rail-top")).Height(paneHeaderH).Shrink(0).FillWidth().Justify(ui.Center).AlignItems(ui.Center).DragWindow().Children(func() {
+			a.foldButton(c, "rail-unfold", false)
+		})
+		ui.Box(c).Height(6).Shrink(0)
+		for _, it := range mainPages {
+			a.railRow(c, it.page, it.icon, it.label(), 0)
+		}
+		ui.Box(c.Key("rail-space")).Grow(1).FillWidth().DragWindow()
+		a.railRow(c, PageTasks, iconTasks, L.NavTasks(), a.k.Jobs.Active())
+		a.themeButton(c)
+		if iconButton(c, "rail-settings", iconSettings, L.NavSettings(), a.settingsOpen) {
+			a.openSettings(setGeneral)
+		}
+
+	})
+}
+
+// railRow is one page in the rail: its icon, with a count of running jobs
+// for Tasks, its name in the tooltip.
+func (a *App) railRow(c *ui.Context, page string, icon *ui.SVG, label string, count int) {
+	t := c.Theme()
+	b := ui.ButtonBase(c.Key("nav-"+page)).Size(railButton, railButton).Radius(8).Center().Shrink(0).Label(label).Tooltip(label)
+	fg := t.TextMuted
+	switch {
+	case a.page == page:
+		b.Background(t.Accent.Alpha(0.13))
+		fg = t.Accent
+	case b.Hovered():
+		b.Background(t.SurfaceHover)
+	}
+	b.Children(func() {
+		ui.Icon(c, icon).Size(navIconSize+2, navIconSize+2).TextColor(fg)
+		if count > 0 {
+			ui.Text(c, itoa(count)).FontSize(10).Bold().TextColor(t.AccentText).
+				Absolute().Right(1).Top(1).Padding(0, 4).Radius(7).Background(t.Accent)
+		}
+	})
+	if b.Clicked() {
+		a.page = page
 	}
 }

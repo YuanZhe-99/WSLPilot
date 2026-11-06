@@ -95,7 +95,13 @@ const locationsDoc = "locations.json"
 
 // backupDir is the default backup folder.
 func (a *App) backupDir() string {
-	if d := a.settings.backupDir; d != "" {
+	d := a.settings.backupDir
+	if !a.settings.loaded {
+		// Not loaded yet: read the stored setting rather than fall back to
+		// the default (it may run on a job goroutine, so state is untouched).
+		d = a.k.LoadPrefs().BackupDir
+	}
+	if d != "" {
 		return d
 	}
 	return filepath.Join(os.Getenv("USERPROFILE"), "WSLPilot Backups")

@@ -477,7 +477,7 @@ SetAboutUpdates	About & updates	关于与更新
 SetSearch	Search settings	搜索设置
 SetSearchNone	No settings match	没有匹配的设置
 SetThemeHelp	Follow Windows, or always light or dark.	跟随 Windows，或始终使用浅色或深色。
-SetOpenAtLoginHelp	Start in the tray when you sign in to Windows.	登录 Windows 时在托盘中启动。
+SetOpenAtLoginHelp	Start WSLPilot when you sign in to Windows.	登录 Windows 时启动 WSLPilot。
 SetCloseWindow	Closing the window	关闭窗口时
 SetCloseWindowHelp	Keep running in the tray so scheduled backups and update checks continue, or quit.	保留在托盘中运行，使计划备份与更新检查继续进行；或直接退出。
 SetCloseToTray	Keep in tray	保留在托盘
@@ -721,3 +721,10 @@ SetLanguageSystem	Same as Windows	跟随 Windows
 CmpProject	Project	项目
 BkRestoreProjectTitle	Restore the project {name}	还原项目 {name}
 BkRestoreVolumeCheck	Restore the volume {name}	还原 Volume {name}
+BkDeleteRepoMessage	This version is removed from the repository. Data that later versions also hold stays with them; only what this version alone held is freed.	此版本会从仓库中删除。之后的版本也包含的数据会保留给它们；只释放此版本独有的数据。
+BkDeleteRepoLast	This is the last version in the repository, so the whole repository is deleted: {path}	这是仓库中的最后一个版本，因此整个仓库都会被删除：{path}
+BkDeleteJob	Delete backup {time}	删除备份 {time}
+SidebarFold	Fold the sidebar	收起侧边栏
+SidebarUnfold	Show the sidebar	展开侧边栏
+SetLoginTray	Start in the tray	启动到托盘
+SetLoginTrayHelp	At sign-in, keep the window closed and run in the tray. Off: the window opens.	登录时不打开窗口，只在托盘中运行。关闭此项则会打开窗口。

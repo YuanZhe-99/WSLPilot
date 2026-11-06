@@ -17,7 +17,7 @@ and never rewrites it.
 
 | Path | Content | Schema |
 |---|---|---|
-| `settings.json` | `theme` (`system`, `light`, `dark`), `language` (`""` = same as Windows, `en`, `zh-Hans`; MyGo also keeps the choice itself), `backupDir`, `helperImage` (volume helper image, empty = `alpine:3.20`); window: `closeQuits`, `closeHinted`, `relaunchHidden`; updates: `noUpdateCheck`, `lastUpdateCheck`, `announcedVersion`, `autoInstall` (`""`, `idle`, `daily`), `autoInstallHour` (see `gui.md`) | 1 |
+| `settings.json` | `theme` (`system`, `light`, `dark`), `language` (`""` = same as Windows, `en`, `zh-Hans`; MyGo also keeps the choice itself), `backupDir`, `helperImage` (volume helper image, empty = `alpine:3.20`); window: `closeQuits`, `closeHinted`, `relaunchHidden`, `sidebarRail` (the sidebar folded to icons), `loginWindow` (open the window at sign-in instead of starting in the tray); updates: `noUpdateCheck`, `lastUpdateCheck`, `announcedVersion`, `autoInstall` (`""`, `idle`, `daily`), `autoInstallHour` (see `gui.md`) | 1 |
 | `locations.json` | backup locations opened from outside: `path`, `readOnly`, `label` | 1 |
 | `projects/<id>/project.json` | a Compose project (see [compose.md](compose.md)) | 1 |
 | `plans/<id>.json` | a backup plan (see [backups.md](backups.md)) | 1 |
