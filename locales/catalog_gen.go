@@ -7645,3 +7645,23 @@ func CtrCleanupVolumesOther() string { return In(i18n.Locale()).CtrCleanupVolume
 func (msgs Messages) CtrCleanupVolumesOther() string {
 	return Catalog.Format(msgs.locale, "CtrCleanupVolumesOther", nil)
 }
+
+// BkKindFull says "Full"
+// in the language the app shows.
+func BkKindFull() string { return In(i18n.Locale()).BkKindFull() }
+
+// BkKindFull says "Full"
+// in the language of msgs.
+func (msgs Messages) BkKindFull() string {
+	return Catalog.Format(msgs.locale, "BkKindFull", nil)
+}
+
+// BkKindFullHelp says "Full: this version builds on no earlier version. Deleting an older version moves the data it shares into the next one."
+// in the language the app shows.
+func BkKindFullHelp() string { return In(i18n.Locale()).BkKindFullHelp() }
+
+// BkKindFullHelp says "Full: this version builds on no earlier version. Deleting an older version moves the data it shares into the next one."
+// in the language of msgs.
+func (msgs Messages) BkKindFullHelp() string {
+	return Catalog.Format(msgs.locale, "BkKindFullHelp", nil)
+}

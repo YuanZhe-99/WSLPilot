@@ -350,3 +350,67 @@ func writeHeader(tw *tar.Writer, e Entry) error {
 	h.Format = tar.FormatPAX
 	return tw.WriteHeader(h)
 }
+
+// Delta reports how much stored data snapshot id holds beyond base: the
+// compressed size of every chunk (entry content and entry list) that id
+// references and base does not. With base "" it is id's whole stored size.
+// Use it to show what a version adds once its recorded Parent is gone.
+// Inputs: full ids or unique prefixes.
+// Side effects: holds a shared lock unless the repository is read-only;
+// reads both entry lists.
+// Notes: a chunk shared with snapshots other than base still counts, so
+// the result is what id would cost on its own next to base.
+func (r *Repo) Delta(ctx context.Context, id, base string) (int64, error) {
+	l, err := r.lock(false)
+	if err != nil {
+		return 0, err
+	}
+	defer l.release()
+	snap, err := r.resolveSnapshot(id)
+	if err != nil {
+		return 0, err
+	}
+	idx, err := r.loadIndex(false)
+	if err != nil {
+		return 0, err
+	}
+	br := r.newBlobReader(idx)
+	defer br.close()
+	chunks := func(s Snapshot) (map[string]bool, error) {
+		set := map[string]bool{}
+		for _, c := range s.Tree {
+			set[c] = true
+		}
+		err := walkTree(ctx, br, s, func(e Entry) error {
+			for _, c := range e.Chunks {
+				set[c] = true
+			}
+			return nil
+		})
+		return set, err
+	}
+	own, err := chunks(snap)
+	if err != nil {
+		return 0, err
+	}
+	if base != "" {
+		b, err := r.resolveSnapshot(base)
+		if err != nil {
+			return 0, err
+		}
+		shared, err := chunks(b)
+		if err != nil {
+			return 0, err
+		}
+		for c := range shared {
+			delete(own, c)
+		}
+	}
+	var n int64
+	for c := range own {
+		if locs := idx.blobs[c]; len(locs) > 0 {
+			n += locs[0].ref.Length
+		}
+	}
+	return n, nil
+}

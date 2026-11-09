@@ -1659,5 +1659,7 @@
     }
   },
   "CtrCleanupVolumesHelp": "Their data is deleted. Volumes of Compose projects you added are kept, even with the project down.",
-  "CtrCleanupVolumesOther": "Volumes are cleaned up only in the default session."
+  "CtrCleanupVolumesOther": "Volumes are cleaned up only in the default session.",
+  "BkKindFull": "Full",
+  "BkKindFullHelp": "Full: this version builds on no earlier version. Deleting an older version moves the data it shares into the next one."
 }

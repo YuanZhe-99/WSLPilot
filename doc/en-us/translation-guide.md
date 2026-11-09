@@ -20,6 +20,8 @@
 | backend | Backend |
 | backup | 备份 |
 | snapshot | 快照 |
+| full (backup version) | 全量 |
+| incremental | 增量 |
 | restore | 恢复 |
 | retention policy | 保留策略 |
 | Tasks (page) | 任务 |

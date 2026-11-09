@@ -103,11 +103,7 @@ func classifyDir(dir string) ([]Item, bool, error) {
 		}
 		defer repo.Close()
 		snaps, err := repo.Snapshots()
-		items := make([]Item, 0, len(snaps))
-		for _, s := range snaps {
-			items = append(items, snapshotItem(dir, s))
-		}
-		return items, true, err
+		return repoItems(context.Background(), repo, dir, snaps), true, err
 	}
 	return nil, false, nil
 }

@@ -18,7 +18,7 @@
 | `internal/vhdx` | 用 diskpart 压缩 WSL 自身无法压缩的 VHDX | `Script`、`Compact`、`Elevator`、`ErrInUse` |
 | `internal/elevate` | 通过 UAC 提示启动单个提权子进程 | `Run`、`ErrDeclined` |
 | `internal/secret` | 以 DPAPI 保护保存的机密（仓库密码） | `Protect`、`Unprotect` |
-| `internal/backup/wpbk` | 增量备份仓库（见 `backup-format.md`） | `Init`、`Open`、`Repo.Backup`、`Restore`、`Entries`、`Check`、`Forget`、`ApplyPolicy`、`Prune`、`RebuildIndex`、`ChangePassword`、`ReadConfig` |
+| `internal/backup/wpbk` | 增量备份仓库（见 `backup-format.md`） | `Init`、`Open`、`Repo.Backup`、`Restore`、`Entries`、`Delta`、`Check`、`Forget`、`ApplyPolicy`、`Prune`、`RebuildIndex`、`ChangePassword`、`ReadConfig` |
 | `internal/gui` | 原生 UI（`gui.md`）：窗口外壳与侧边栏、概览、WSL、容器、Compose、Volume、备份、终端、任务；带搜索的设置面板；应用内更新；确认对话框、配置表单、样式常量与图标 | `App`、`New`、`Host`、`Term`、`TitleBarOptions`、`UpdateLoop`、`confForm` |
 | `locales` | 由 `locales/*.json` 生成的消息访问函数 | `catalog_gen.go` |
 | `tools/checkdocs` | 校验 `doc/` 语言镜像 | `main` |

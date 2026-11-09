@@ -19,7 +19,7 @@ machine.
 | Automatic updates (in-app flow) | implemented | unit test of the auto-install timing; "not available in this build" checked in a dev build; a real update needs an installed release older than the newest |
 | Volume tar import/export (owners, modes, links) | verified | live test `internal/volume` |
 | Distribution backup (folder, archive, repository), verify, restore as new, partial restore | verified | live test `internal/backup` on `wslpilot-test-d1` |
-| Deleting a backup version (repository: merged into the next, last one removes it) | verified | unit test over a repository (other versions restore byte for byte and pass Check); view test through the confirmation |
+| Deleting a backup version (repository: merged into the next, last one removes it) | verified | unit test over a repository (other versions restore byte for byte and pass Check; the next version becomes Full and its size grows); view test through the confirmation; read-only Scan of a real repository after deletes (2026-11-09) |
 | Compose builtin backend up / update / down | verified | live test `internal/compose` (`wslpilot-test-compose`) |
 | WSLc cleanup (prune) | verified | live `container` and `network prune --filter label=…` on `wslpilot-test-prune-*` (WSLc 3.0.3.0); unit test of the volume rule; view test of the commands run |
 | Whole frames instead of partial redraw | verified | `GODEBUG=inittrace=1`: `internal/earlyenv` initializes before MyGo's renderer; `MYGO_FRAME_STATS=all`: no partial frames (10 of 14 with `MYGO_PARTIAL=1`) |

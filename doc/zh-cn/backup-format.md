@@ -166,7 +166,7 @@ BLAKE3-256。包中只有 blob；每个数据块用标准 zstd 解码器独立�
 | `source` | 备份对象。`kind` 为 `wsl-distro`、`wslc-volume` 或 `compose-project`；其它情况自由填写。 |
 | `tags` | 可选标签。 |
 | `tool` | 写入程序及其版本。 |
-| `parent` | 可选，同一来源的上一个快照。仅供参考。 |
+| `parent` | 可选，同一来源的上一个快照（WSLPilot 按 `time` 选最新的）。仅供参考：它可能指向之后已被 forget 的快照，读取方恢复时从不需要它。 |
 | `tree` | 明文拼接后构成条目列表的数据块。 |
 | `totals` | 条目数、内容字节数，以及本次备份新增的数据块数与压缩后字节数。 |
 

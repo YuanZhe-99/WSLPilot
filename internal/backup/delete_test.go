@@ -101,3 +101,60 @@ func TestDeleteVersionReadOnly(t *testing.T) {
 		t.Fatalf("versions %d", len(found))
 	}
 }
+
+// Deleting the oldest repository version merges it into the next one: that
+// version becomes Full and its size covers the data it took over. Deleting
+// the newest version simply removes it.
+func TestDeleteMergesIntoNewer(t *testing.T) {
+	ctx := context.Background()
+	dir := t.TempDir() + `\repo`
+	w := &backup.RepoWriter{Dir: dir}
+	loc := backup.Location{Path: dir}
+	var items []backup.Item
+	for i, files := range [][]string{{"a"}, {"a", "b"}, {"a", "b", "c"}} {
+		it, err := w.Write(ctx, bytes.NewReader(filesTar(files...)), backup.Meta{Source: backup.Source{Kind: backup.SourceCompose, Name: "p"}, Time: time.Unix(int64(1700000000+i*100), 0), Consistent: true})
+		if err != nil {
+			t.Fatal(err)
+		}
+		items = append(items, it)
+	}
+	scan := func() map[string]backup.Item {
+		found, errs := backup.Scan(loc)
+		if len(errs) > 0 {
+			t.Fatal(errs)
+		}
+		m := map[string]backup.Item{}
+		for _, it := range found {
+			m[it.ID] = it
+		}
+		return m
+	}
+	m := scan()
+	if !m[items[0].ID].Full || m[items[1].ID].Full || m[items[2].ID].Full {
+		t.Fatal("only the first version is full")
+	}
+	if err := backup.DeleteVersion(ctx, loc, items[0]); err != nil {
+		t.Fatal(err)
+	}
+	m = scan()
+	mid := m[items[1].ID]
+	if !mid.Full {
+		t.Error("the next version did not become full")
+	}
+	if mid.Size <= items[1].Size {
+		t.Errorf("merged version size %d, recorded %d", mid.Size, items[1].Size)
+	}
+	if m[items[2].ID].Full || m[items[2].ID].Size != items[2].Size {
+		t.Errorf("newest version changed: %+v", m[items[2].ID])
+	}
+	if err := backup.DeleteVersion(ctx, loc, items[2]); err != nil {
+		t.Fatal(err)
+	}
+	m = scan()
+	if len(m) != 1 || !m[items[1].ID].Full || m[items[1].ID].Size != mid.Size {
+		t.Errorf("after deleting the newest: %+v", m)
+	}
+	if err := backup.Verify(ctx, items[1]); err != nil {
+		t.Error(err)
+	}
+}

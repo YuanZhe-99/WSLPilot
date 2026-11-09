@@ -18,7 +18,7 @@
 | `internal/vhdx` | diskpart compaction of VHDX files WSL cannot compact itself | `Script`, `Compact`, `Elevator`, `ErrInUse` |
 | `internal/elevate` | One elevated child process through the UAC prompt | `Run`, `ErrDeclined` |
 | `internal/secret` | DPAPI protection of stored secrets (repository passwords) | `Protect`, `Unprotect` |
-| `internal/backup/wpbk` | Incremental backup repository (see `backup-format.md`) | `Init`, `Open`, `Repo.Backup`, `Restore`, `Entries`, `Check`, `Forget`, `ApplyPolicy`, `Prune`, `RebuildIndex`, `ChangePassword`, `ReadConfig` |
+| `internal/backup/wpbk` | Incremental backup repository (see `backup-format.md`) | `Init`, `Open`, `Repo.Backup`, `Restore`, `Entries`, `Delta`, `Check`, `Forget`, `ApplyPolicy`, `Prune`, `RebuildIndex`, `ChangePassword`, `ReadConfig` |
 | `internal/gui` | Native UI (`gui.md`): window shell and sidebar, Dashboard, WSL, Containers, Compose, Volumes, Backups, Terminal, Tasks; the Settings sheet with search; in-app updates; confirmation dialog, config forms, style tokens and icons | `App`, `New`, `Host`, `Term`, `TitleBarOptions`, `UpdateLoop`, `confForm` |
 | `locales` | Generated message accessors from `locales/*.json` | `catalog_gen.go` |
 | `tools/checkdocs` | Verifies the `doc/` language mirror | `main` |

@@ -64,9 +64,10 @@ func (r *Repo) Backup(ctx context.Context, src io.Reader, meta SnapshotMeta, pro
 
 	snaps, _ := r.loadSnapshots()
 	if meta.Parent == "" {
+		var newest time.Time
 		for _, s := range snaps {
-			if s.Source == meta.Source {
-				meta.Parent = s.ID
+			if s.Source == meta.Source && (meta.Parent == "" || s.Time.After(newest)) {
+				meta.Parent, newest = s.ID, s.Time
 			}
 		}
 	}

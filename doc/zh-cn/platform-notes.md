@@ -18,7 +18,7 @@
 | 自动更新（应用内流程） | 已实现 | 自动安装时机的单元测试；已在开发构建中确认“此构建不提供更新”；实际更新需要比最新版本旧的已安装版本 |
 | Volume tar 导入导出（属主、权限、链接） | 已验证 | 实机测试 `internal/volume` |
 | 发行版备份（目录、归档、仓库）、校验、恢复为新发行版、部分恢复 | 已验证 | 在 `wslpilot-test-d1` 上运行实机测试 `internal/backup` |
-| 删除备份版本（仓库：合并到下一个版本，删除最后一个时删除仓库） | 已验证 | 针对仓库的单元测试（其余版本逐字节还原并通过检查）；通过确认对话框的视图测试 |
+| 删除备份版本（仓库：合并到下一个版本，删除最后一个时删除仓库） | 已验证 | 针对仓库的单元测试（其余版本逐字节还原并通过检查；下一个版本变为全量且大小增加）；通过确认对话框的视图测试；删除后以只读方式扫描真实仓库（2026-11-09） |
 | Compose builtin Backend 的 up / 更新 / down | 已验证 | 实机测试 `internal/compose`（`wslpilot-test-compose`） |
 | WSLc 清理（prune） | 已验证 | 在 `wslpilot-test-prune-*` 上实机运行 `container` 与 `network prune --filter label=…`（WSLc 3.0.3.0）；Volume 规则的单元测试；所执行命令的视图测试 |
 | 整帧绘制而非局部重绘 | 已验证 | `GODEBUG=inittrace=1`：`internal/earlyenv` 先于 MyGo 渲染包初始化；`MYGO_FRAME_STATS=all`：没有局部帧（`MYGO_PARTIAL=1` 时 14 帧中有 10 帧为局部） |

@@ -1,5 +1,16 @@
 # Version history
 
+## 0.1.5
+
+Released 2026-11-09. Tested with WSL 3.0.3.0, WSLc 3.0.3.0 and MyGo v0.8.3 on Windows 11 ARM64.
+
+- Fix: after deleting an older version in an incremental repository, the next version kept the
+  size it had added on top of the deleted one and still looked incremental. Its size is now
+  recomputed against the version actually before it, so the deleted data visibly merges into it.
+- Backup versions that build on no earlier version are labeled Full; the others Incremental.
+- Fix: a new repository backup could record an older snapshot than the newest as its parent.
+- MyGo v0.8.3.
+
 ## 0.1.4
 
 Released 2026-11-06. Tested with WSL 3.0.3.0, WSLc 3.0.3.0 and MyGo v0.8.1 on Windows 11 ARM64.

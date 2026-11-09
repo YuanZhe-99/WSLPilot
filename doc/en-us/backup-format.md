@@ -181,7 +181,7 @@ encrypted repository the file holds the sealed document instead:
 | `source` | What was backed up. `kind` is `wsl-distro`, `wslc-volume` or `compose-project`; free-form for others. |
 | `tags` | Optional labels. |
 | `tool` | The writing program and version. |
-| `parent` | Optional previous snapshot of the same source. Informational only. |
+| `parent` | Optional previous snapshot of the same source (WSLPilot picks the newest by `time`). Informational only: it may name a snapshot that was forgotten since, and readers never need it to restore. |
 | `tree` | Chunks whose concatenated plaintext is the entry list. |
 | `totals` | Entry count, content bytes, and the chunks and compressed bytes this backup added. |
 

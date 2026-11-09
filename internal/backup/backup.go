@@ -47,7 +47,13 @@ type Item struct {
 	ID     string // snapshot ID within a repository; "" otherwise
 	Source Source
 	Time   time.Time
-	Size   int64 // bytes on disk (0 when unknown)
+	// Size is bytes on disk (0 when unknown). For a repository version it
+	// is what the version stores beyond the previous version of its source.
+	Size int64
+	// Full is set on a repository version that builds on no earlier
+	// version of its source (the oldest one left). Archives and folder
+	// backups are always whole and leave it false.
+	Full bool
 	// Consistent is false when the backup was taken from a running source
 	// by the user's explicit choice; such items are labeled in the UI.
 	Consistent bool

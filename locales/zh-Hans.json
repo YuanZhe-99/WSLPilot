@@ -757,5 +757,7 @@
   "CtrCleanupImagesAll": "所有没有容器使用的镜像",
   "CtrCleanupVolumes": "将没有容器使用的 Volume：{count} 个",
   "CtrCleanupVolumesHelp": "其中的数据会被删除。你添加的 Compose 项目的 Volume 会保留，即使项目已 down。",
-  "CtrCleanupVolumesOther": "只有在默认 session 中才会清理 Volume。"
+  "CtrCleanupVolumesOther": "只有在默认 session 中才会清理 Volume。",
+  "BkKindFull": "全量",
+  "BkKindFullHelp": "全量：此版本不依赖任何更早的版本。删除较旧的版本时，它与后续版本共享的数据会并入下一个版本。"
 }

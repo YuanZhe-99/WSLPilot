@@ -508,3 +508,51 @@ func TestBString(t *testing.T) {
 		}
 	}
 }
+
+// Delta of a snapshot against nothing is its whole stored size; against
+// its parent it is what the backup stored. A new backup's parent is the
+// newest snapshot of the source by time, whatever the file names are.
+func TestDeltaAndParent(t *testing.T) {
+	r := newTestRepo(t)
+	entries := sampleEntries(1)
+	src := Source{Kind: "k", Name: "n"}
+	at := func(sec int64, data []byte) Snapshot {
+		s, err := r.Backup(bg, bytes.NewReader(data), SnapshotMeta{Source: src, Time: time.Unix(1700000000+sec, 0)}, nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return s
+	}
+	first := at(0, buildTar(t, entries))
+	entries[2].data = []byte("hello, again\n")
+	second := at(100, buildTar(t, entries))
+	whole, err := r.Delta(bg, second.ID, "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if whole != first.Totals.NewBytes+second.Totals.NewBytes-mustDelta(t, r, first.ID, second.ID) {
+		t.Errorf("whole %d, first %d new %d", whole, first.Totals.NewBytes, second.Totals.NewBytes)
+	}
+	if d := mustDelta(t, r, second.ID, first.ID); d != second.Totals.NewBytes {
+		t.Errorf("delta to parent %d, recorded %d", d, second.Totals.NewBytes)
+	}
+	// Many more backups: the parent must always be the newest one.
+	prev := second
+	for i := int64(2); i < 12; i++ {
+		entries[2].data = []byte(fmt.Sprintf("hello %d\n", i))
+		s := at(i*100, buildTar(t, entries))
+		if s.Parent != prev.ID {
+			t.Fatalf("backup %d: parent %.8s, want %.8s", i, s.Parent, prev.ID)
+		}
+		prev = s
+	}
+}
+
+func mustDelta(t *testing.T, r *Repo, id, base string) int64 {
+	t.Helper()
+	n, err := r.Delta(bg, id, base)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return n
+}

@@ -64,7 +64,7 @@ func (w *RepoWriter) Write(ctx context.Context, r io.Reader, m Meta) (Item, erro
 // snapshotItem converts a repository snapshot into a catalog Item.
 func snapshotItem(dir string, s wpbk.Snapshot) Item {
 	it := Item{Kind: KindRepo, Path: dir, ID: s.ID, Source: s.Source, Time: s.Time, Size: s.Totals.NewBytes,
-		Consistent: true, Tool: s.Tool}
+		Full: s.Parent == "", Consistent: true, Tool: s.Tool}
 	for _, t := range s.Tags {
 		switch {
 		case t == "inconsistent":

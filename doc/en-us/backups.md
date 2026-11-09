@@ -145,6 +145,13 @@ repository pruned (`DeleteVersion`): data that later versions also hold stays wi
 version is in effect merged into the next one, and only what it alone held is freed. Deleting the
 last snapshot removes the repository (`config.json` and its four folders).
 
+In the versions table a repository version is labeled **Full** when no earlier version of its
+source is left in the repository (it builds on nothing before it), and **Incremental** otherwise.
+Its size is what it stores beyond the version before it. When that is still the recorded `parent`,
+the size written at backup time is shown; after versions in between were deleted, Scan recomputes it
+with `wpbk.Repo.Delta` (cached by snapshot id), so deleting the oldest version shows the next one
+becoming Full with the data it took over. Deleting the newest version just removes it.
+
 ## Plans and scheduling
 
 `internal/scheduler` stores plans; a plan only produces backups, which belong to the destination.

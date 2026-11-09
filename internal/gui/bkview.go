@@ -190,7 +190,11 @@ func (a *App) versions(c *ui.Context, g backup.Group) {
 				case 0:
 					ui.Text(c, it.Time.Local().Format("2006-01-02 15:04")).FontWeight(600)
 				case 1:
-					ui.Text(c, kindLabel(it.Kind))
+					if it.Kind == backup.KindRepo && it.Full {
+						ui.Text(c, L.BkKindFull()).Tooltip(L.BkKindFullHelp())
+					} else {
+						ui.Text(c, kindLabel(it.Kind))
+					}
 				case 2:
 					ui.Text(c, filepath.Base(filepath.Dir(it.Path))+`\`+filepath.Base(it.Path)).SingleLine()
 				case 3:

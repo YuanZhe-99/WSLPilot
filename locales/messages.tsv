@@ -339,6 +339,8 @@ BkCheckBad	Damaged	已损坏
 BkKindFolder	Folder	目录
 BkKindArchive	Archive	归档
 BkKindRepo	Incremental	增量
+BkKindFull	Full	全量
+BkKindFullHelp	Full: this version builds on no earlier version. Deleting an older version moves the data it shares into the next one.	全量：此版本不依赖任何更早的版本。删除较旧的版本时，它与后续版本共享的数据会并入下一个版本。
 BkKindVHDX	Disk image	磁盘镜像
 BkKindTar	Plain tar	普通 tar
 BkInconsistent	taken while running	运行中备份
